@@ -1,0 +1,111 @@
+/* Global Reset for Body and HTML */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevent unnecessary scrollbars */
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  font-family: 'Arial', sans-serif;
+  color: white;
+}
+
+/* Root Container */
+.App {
+  display: flex;
+  height: 100vh;
+  position: relative; /* Ensure children use this as a reference */
+  overflow: hidden;
+}
+
+/* Shooting Stars Background */
+.night {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotateZ(45deg);
+  z-index: 3; /* Above background, below main content */
+  pointer-events: none; /* Prevent interference */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 240px;
+  background-color: rgba(51, 51, 51, 0.9);
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 3; /* Sidebar always on top */
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.sidebar a {
+  display: block;
+  padding: 15px 20px;
+  text-decoration: none;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.sidebar a:hover {
+  background-color: #555;
+}
+
+/* Main Content Area */
+.main-content {
+  margin-left: 240px; /* Sidebar width */
+  flex-grow: 1;
+  height: 100vh;
+  overflow-y: auto;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  background-color: rgba(50, 50, 50, 0.7);
+  backdrop-filter: blur(3px);
+  position: relative; /* Ensure stacking context */
+  z-index: 2; /* Keep this below the ask-container */
+}
+
+/* Sections */
+#ask, #experience, #education,#publications, #projects, #skillset {
+  min-height: 100vh;
+  box-sizing: border-box;
+  border-right: none !important;
+}
+
+/* Mobile Responsive Adjustments */
+/* Sidebar Collapse for Small Screens */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 0;
+    height: 100vh;
+    overflow: hidden;
+    transition: width 0.3s ease-in-out;
+    position: absolute;
+    z-index: 4;
+  }
+
+  .sidebar.active {
+    width: 240px;
+  }
+
+  .main-content {
+    margin-left: 0;
+    transition: margin-left 0.3s ease-in-out;
+  }
+
+  .main-content.shifted {
+    margin-left: 240px;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .sidebar-toggle {
+    display: flex;
+  }
+}

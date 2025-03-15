@@ -1,0 +1,63 @@
+/* Shooting Stars Background Container */
+.night {
+  position: absolute;
+  top: 0%;
+  left: 0;
+  width: 150%;
+  height: 100%;
+  transform: rotateZ(45deg);
+  z-index: 2; /* Shooting stars layer */
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Individual Shooting Star */
+.shooting_star {
+  position: absolute;
+  height: 2px;
+  width: 100px; /* Tail length */
+  background: linear-gradient(-45deg, rgba(95, 145, 255, 1), rgba(0, 0, 255, 0));
+  border-radius: 999px;
+  animation: tail 6000ms ease-in-out infinite, shooting 6000ms ease-in-out infinite;
+  opacity: 0.8; /* Initial opacity for brightness */
+  filter: drop-shadow(0 0 4px rgba(105, 155, 255, 1)); /* Subtle glow effect */
+}
+
+/* Shooting Star Position Randomization */
+.shooting_star:nth-child(n) {
+  top: calc(100% * var(--top)); /* Random vertical positioning */
+  left: calc(100% * var(--left)); /* Random horizontal positioning */
+  animation-delay: calc(1000ms + 500ms * var(--delay)); /* Staggered animation delay */
+}
+
+/* Tail Animation */
+@keyframes tail {
+  0% {
+    width: 0;
+    opacity: 1;
+  }
+  30% {
+    width: 100px; /* Full tail length */
+    opacity: 0.8;
+  }
+  70% {
+    width: 50px; /* Tail starts shrinking */
+    opacity: 0.4;
+  }
+  100% {
+    width: 0;
+    opacity: 0; /* Fully faded out */
+  }
+}
+
+/* Shooting Animation */
+@keyframes shooting {
+  0% {
+    transform: translateX(0) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(400px) translateY(400px); /* Extended path */
+    opacity: 0; /* Fade out completely */
+  }
+}

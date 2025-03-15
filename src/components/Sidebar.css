@@ -1,0 +1,206 @@
+/* ✅ SIDEBAR FOR DESKTOP */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 240px;
+  height: 100vh;
+  background-color: #333;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 10px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  transition: left 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+/* ✅ Name (Always Visible in Web View) */
+.sidebar-name-container {
+  text-align: center;
+  margin-bottom: 0px;
+  margin-top: 20px;
+  width: 100%;
+  display: block;
+  font-size: 18px;
+}
+
+/* ✅ Social Icons Styling */
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 8px;
+  padding: 10px;  /* Adds space inside the border */
+}
+
+/* ✅ Individual Icon Styling */
+.social-icons a {
+  color: white;
+  font-size: 35px;
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px; /* Fixed width */
+  height: 40px; /* Fixed height */
+  border: 1px solid #444; /* White border around each icon */
+  border-radius: 30%; /* Makes each icon circular */
+  text-decoration: none; /* Removes underline */
+}
+
+/* ✅ Hover Effects */
+.social-icons a:hover {
+  color: black; /* Change color on hover */
+  background-color: white; /* Background changes on hover */
+  transform: scale(1.1); /* Slight zoom-in effect */
+}
+
+
+/* ✅ Navigation Buttons */
+.nav-buttons {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar button {
+  width: 100%;
+  padding: 20px 8px;
+  background: transparent;
+  border: none;
+  color: white;
+  text-align: center;
+  font-size: 16px;
+  cursor: pointer;
+  border-bottom: 2px solid #444;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.sidebar button:hover {
+  background-color: #444;
+}
+
+
+
+/* ✅ MOBILE VIEW FIXES */
+@media (max-width: 768px) {
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background-color: #222;
+    transition: height 0.3s ease-in-out;
+    position: fixed;
+    padding: 0;
+  }
+
+  /* ✅ TRUE HORIZONTAL NAVBAR WITH FIXED BUTTON WIDTH */
+  .nav-buttons {
+    display: flex; /* Ensures buttons are in a row */
+    flex-direction: row; /* Horizontal layout */
+    justify-content: flex-start; /* Align items to the left */
+    align-items: center;
+    gap: 6px; /* 🔥 Minimal gap between buttons */
+    width: 100%;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevents text from wrapping */
+    background-color: #222;
+    padding: 5px 2px; /* 🔥 Reduced padding */
+    /* border-bottom: 1px solid #444; */
+    z-index: 1001;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+
+  .nav-buttons button {
+    flex: 0 0 auto; /* Prevents buttons from stretching */
+    padding: 3px 8px; /* 🔥 Smaller padding */
+    font-size: 16px; /* 🔥 Smaller text */
+    border: none;
+    background: none;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap; /* Keep text in one line */
+    width: auto; /* 🔥 Explicitly set a fixed width for buttons */
+    height: 24px; /* 🔥 Reduce button height */
+    margin: 8px; /* 🔥 Remove any default margin */
+  }
+
+  .nav-buttons button:hover {
+    background-color: #444;
+  }
+
+  /* ✅ Enable scrolling for overflowing buttons */
+  .nav-buttons::-webkit-scrollbar {
+    height: 2px;
+  }
+
+  .nav-buttons::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 5px;
+  }
+
+  /* ✅ Name Bar Below Navbar (For Mobile) */
+  .name-bar {
+    width: 100vw;  /* 🔥 Full width */
+    height: 40px;  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #222;
+    position: fixed;
+    z-index: 1000;
+    top: 50px;  /* Adjust based on navbar height */
+    left: 0;  /* 🔥 Start from the left edge */
+    /* border-bottom: 1px solid #444; */
+  }
+
+  /* ✅ Name Styling */
+  .sidebar-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: white !important;
+    text-align: center;
+    width: 100%;
+    margin: 0;
+  }
+  .mobile-icons {
+    display: flex;
+    gap: 0px;  /* Reduce spacing */
+    align-items: center;
+    margin-right: 20px;
+  }
+  
+  /* ✅ Ensure only the icon is clickable */
+  .mobile-icons a {
+    display: inline-flex;  /* Ensures the link wraps the icon size */
+    align-items: center;
+    justify-content: center;
+    width: 20px;  /* Icon size */
+    height: 20px; /* Icon size */
+    font-size: 26px; /* Adjust icon size */
+    color: white;
+    transition: color 0.3s ease-in-out;
+  }
+  
+  /* ✅ Remove extra padding */
+  .mobile-icons a:hover {
+    color: #000000; /* 🔥 LinkedIn color */
+  }
+
+}

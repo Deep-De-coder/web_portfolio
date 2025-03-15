@@ -1,0 +1,188 @@
+/* Experience Section */
+#experience {
+    margin-top: 50px; /* Adjust this value as needed */
+    padding-top: 0px; /* Adds spacing without affecting layout */
+}
+.experience-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px;
+    justify-content: center;
+    padding-top: 0px;
+}
+
+.experience-card {
+    background: rgba(50, 50, 50, 0.8);
+    padding: 12px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%; /* Prevents overflow */
+}
+
+.experience-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Web View */
+.web-view {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+}
+
+/* Mobile View: Reduce spacing */
+.mobile-view {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    width: 94%;
+    max-width: 100%; /* Prevents right overflow */
+    overflow: hidden;
+}
+
+/* Fix background shift on hover */
+.mobile-view:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Logo Styling */
+.company-logo {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    object-fit: contain;
+    flex-shrink: 0;
+    margin-right: 6px;
+}
+
+/* Text Content Formatting */
+.company-info {
+    flex-grow: 1;
+    min-width: 0; /* Prevents pushing */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Company Name */
+.company-name {
+    font-size: 14px;
+    color: #bbb;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px; /* Prevents pushing */
+}
+
+/* Position (Title) - Ensures it fits */
+.position {
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+    margin: 3px 0 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; /* Prevents pushing */
+}
+
+/* Dropdown Icon Fix */
+.toggle-icon {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    min-width: fit-content; /* Prevents it from expanding */
+    margin-left: auto; /* Aligns it to the right properly */
+}
+
+/* View More Button */
+.view-more-btn {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 8px;
+    text-align: left;
+}
+
+.view-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* Tech Stack Badges */
+/* Tech Stack Badges */
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.tech-badge {
+    background: rgba(255, 255, 255, 0.2); /* Light background */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    /* font-weight: bold; */
+    text-transform: uppercase;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Content Visibility */
+.content {
+    display: block;
+}
+
+.content.hide {
+    display: none;
+}
+
+.content.show {
+    display: block;
+}
+
+/* Mobile View Behavior */
+@media (max-width: 768px) {
+    .experience-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px; /* Reduce gap between cards */
+        padding-bottom: 0px; /* Ensure no extra space */
+    }
+
+    .experience-card {
+        width: 100%;
+        margin-bottom: 20px; /* Remove any extra bottom margin */
+    }
+
+    .web-view {
+        display: none;
+    }
+
+    .mobile-view {
+        display: flex;
+    }
+
+    .content {
+        display: none;
+    }
+
+    .content.show {
+        display: block;
+    }
+}

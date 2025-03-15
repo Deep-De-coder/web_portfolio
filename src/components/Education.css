@@ -1,0 +1,182 @@
+/* General Styling */
+.education-container {
+  padding: 10px 5%;
+  background-color: transparent;
+  color: white;
+}
+
+/* Title */
+.education-title {
+  font-size: 2.2rem;
+  margin-bottom: 20px;
+  color: #ffffff;
+  text-align: left;
+}
+
+/* Timeline Layout */
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  flex-direction: column-reverse; /* Reverse order */
+  align-items: center;
+}
+
+/* Vertical Dashed Line */
+.timeline-line {
+  position: absolute;
+  width: 5px;
+  background: repeating-linear-gradient(
+    to bottom,
+    white,
+    white 10px,
+    transparent 10px,
+    transparent 15px
+  );
+  left: 50%;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+/* Year Labels */
+.timeline-year {
+  position: absolute;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffffff;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+/* Timeline Items */
+.timeline-item {
+  position: relative;
+  width: 60%;
+  padding: 0px 0px;
+  box-sizing: border-box;
+}
+
+/* Left Side (Master's - UB) */
+.timeline-item.left {
+  left: -37%;
+  text-align: left;
+}
+
+/* Right Side (Bachelor's - VIT) */
+.timeline-item.right .timeline-card {
+  min-height: 300px;
+  left: 60%;
+  text-align: center;
+  transform: translateY(-20px); 
+}
+
+/* Timeline Card Styling */
+.timeline-card {
+  background: rgba(50, 50, 50, 0.8);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  position: relative;
+  max-width: 90%;
+  text-align: center;
+  margin-bottom: 50px;
+  word-wrap: break-word;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* ✅ Smooth hover transition */
+}
+
+/* 🔥 Hover Effect */
+.timeline-card:hover {
+  transform: translateY(-5px); /* ✅ Lifts the card slightly */
+  box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3); /* ✅ Adds glow effect */
+}
+
+/* Text Inside Cards */
+.timeline-card h2 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+}
+
+.timeline-card p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.degree {
+  font-size: 1.6rem;
+  color: #f3f3f3;
+}
+
+.education-period {
+  font-style: italic;
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .timeline {
+    display: flex;
+    flex-direction: column-reverse; /* Reverse the order again for mobile */
+    align-items: center;
+    position: relative;
+    padding-left: 20px;
+  }
+
+  .timeline-line {
+    left: 15px;
+    width: 3px;
+  }
+
+  .timeline-item {
+    width: 100%;
+    text-align: left;
+    padding-left: 30px;
+    left: 0 !important;
+  }
+
+  .timeline-item.right {
+    left: 0;
+  }
+
+  .timeline-card {
+    width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+  }
+
+  .timeline-item.right .timeline-card,
+  .timeline-item.left .timeline-card {
+    left: auto; /* ✅ Ensures both cards are centered properly */
+    width: 90%;
+    text-align: center;
+  }
+
+  /* ✅ Ensure VIT (Bachelors) appears below UB (Masters) in mobile */
+  .timeline-item:first-child {
+    order: 2; /* Move VIT (2019-2023) below */
+  }
+  .timeline-item:last-child {
+    order: 1; /* Move UB (2023-2025) above */
+  }
+
+  /* Responsive Text Scaling */
+  .timeline-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .timeline-card p {
+    font-size: 0.9rem;
+  }
+
+  .degree {
+    font-size: 1.2rem;
+  }
+
+  /* Adjust Year Positioning */
+  .timeline-year {
+    left: 6%;
+    font-size: 1rem;
+  }
+}

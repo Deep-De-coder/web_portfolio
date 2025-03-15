@@ -1,0 +1,338 @@
+/* ✅ Container for the Ask section */
+.ask-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    color: white;
+    /* background-color: #41414141; */
+    border-radius: 15px;
+    padding: 10px;
+    box-sizing: border-box;
+    /* box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5); */
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* ✅ Hide header after first message */
+.ask-container.active-chat .ask-header {
+    display: none;
+}
+
+.ask-header {
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem; /* Default size */
+    color: white;
+    overflow: hidden;
+    white-space: normal; /* Allows text wrapping */
+    text-align: center;
+    max-width: 90%; /* Prevents it from stretching too wide */
+    word-wrap: break-word;
+}
+
+/* ✅ Chat Message Area */
+.message-area {
+    width: 100%;
+    flex-grow: 1;
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    overflow-y: auto;
+    background-color: #333;
+    border-radius: 10px;
+    box-sizing: border-box;
+    transition: all 0.3s ease-in-out;
+    max-height: 70vh;
+}
+
+/* ✅ Individual Messages */
+.message {
+    max-width: 70%;
+    width: fit-content;
+    padding: 10px 15px;
+    border-radius: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word; 
+    transition: all 0.3s ease;
+    display: inline-block;
+    white-space: normal;
+}
+
+/* ✅ User (Query) Messages - Right Aligned */
+.query {
+    align-self: flex-end;
+    background-color: #444;
+    color: white;
+    text-align: right;
+    border-radius: 15px 15px 15px 15px;
+}
+
+/* ✅ Bot (Response) Messages - Left Aligned */
+.response {
+    max-width: 70%;
+    width: fit-content;
+    align-self: flex-start;
+    /* background-color: #555; */
+    color: white;
+    text-align: left;
+    border-radius: 15px 15px 15px 0;
+    padding-right: 0px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ✅ Change link color to teal blue */
+a {
+    color: #00bcd4 !important; /* Teal blue color */
+    text-decoration: none; /* Removes underline */
+    font-weight: bold;
+}
+
+/* ✅ Change color on hover */
+a:hover {
+    color: #008ba3 !important; /* Darker teal on hover */
+    text-decoration: underline;
+}
+
+/* ✅ Error message */
+.error-message {
+    align-self: center;
+    background-color: #a00;
+    color: white;
+    border-radius: 10px;
+    padding: 8px;
+}
+
+/* ✅ Input Group */
+.input-group {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background-color: #333;
+    border: 1px solid #444;
+    border-radius: 30px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 10px;
+}
+
+/* ✅ Chat Bar */
+.chat-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+}
+
+/* ✅ Input field */
+.ask-input {
+    flex-grow: 1;
+    padding: 10px 15px;
+    border: 1px solid #555;
+    border-radius: 25px;
+    background-color: #333;
+    color: white;
+    outline: none;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+/* ✅ Button Group */
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0px;
+    margin-top: -4px;
+    gap: 10px;
+}
+
+/* ✅ Buttons (CV & Mail) */
+.button-left {
+    display: flex;
+    gap: 8px;
+}
+
+.cv-button, .mail-button {
+    padding: 8px 14px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.3s;
+}
+
+/* ✅ Submit (Arrow) Button */
+.submit-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+}
+
+/* ✅ Typing animation for header */
+h1 {
+    font-family: 'Arial', sans-serif;
+    font-size: 2rem;
+    color: white;
+    overflow: hidden;
+    white-space: nowrap;
+    border-right: 2px solid white;
+    animation: blink-header 0.9s step-end infinite;
+}
+
+/* ✅ Keyframes for header blinking */
+@keyframes blink-header {
+    0% {
+        border-right-color: white;
+    }
+    100% {
+        border-right-color: transparent;
+    }
+}
+
+/* ✅ Mobile Responsiveness */
+@media (max-width: 768px) {
+    .ask-container {
+        margin-top: 40px;
+        padding: 10px;
+        height: auto;
+        font-size: 1.5rem;
+    }
+
+    .message-area {
+        margin-top: 20px;
+        font-size: 14px;
+        padding: 8px;
+        max-height: 70vh;
+    }
+
+    .input-group {
+        width: 90%;
+        padding: 6px;
+        gap: 10px;
+    }
+
+    .chat-bar {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+    }
+
+    .ask-input {
+        padding: 8px 12px;
+        font-size: 1rem;
+    }
+
+    .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+        padding: 4px;
+        gap: 8px;
+    }
+
+    .cv-button, .mail-button {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+
+    .submit-button {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+    }
+}
+
+/* ✅ Further adjustments for smaller screens */
+@media (max-width: 600px) {
+    .ask-container {
+        padding: 5px;
+        font-size: 1.2rem;
+    }
+
+    .message-area {
+        margin-top: 20px;
+        font-size: 13px;
+        padding: 6px;
+        max-height: 65vh;
+    }
+
+    .ask-input {
+        padding: 5px 10px;
+    }
+
+    .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 3px;
+    }
+
+    .cv-button, .mail-button {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+
+    .submit-button {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+/* ✅ Extra small screen adjustments */
+@media (max-width: 400px) {
+    .ask-container {
+        padding: 5px;
+    }
+
+    .message-area {
+        margin-top: 20px;
+        font-size: 12px;
+        padding: 5px;
+        max-height: 65vh;
+    }
+
+    .ask-input {
+        padding: 4px 8px;
+    }
+
+    .button-group {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .cv-button, .mail-button {
+        font-size: 0.75rem;
+        padding: 5px 9px;
+    }
+
+    .submit-button {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}

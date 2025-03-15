@@ -1,0 +1,176 @@
+/* Projects Section */
+#projects {
+    margin-top: 50px;
+    padding-top: 0px;
+}
+
+.projects-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    padding: 15px;
+    justify-content: center;
+    padding-top: 0px;
+}
+
+/* Project Card */
+.project-card {
+    background: rgba(50, 50, 50, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+}
+
+/* Hover Effect */
+.project-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3);
+}
+
+/* Web Layout: Thumbnail + Info in Row */
+.project-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    justify-content: space-between;
+}
+
+/* Thumbnail Styling */
+.project-thumbnail {
+    width: 200px; /* Adjust size */
+    height: 120px; /* Keep it square */
+    border-radius: 10px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+/* Project Info */
+.project-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Project Name */
+.project-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+/* DEMO and CODE Links */
+.project-links {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.project-link {
+    text-decoration: none;
+    color: #4CAF50;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.project-link:hover {
+    color: #81C784;
+}
+
+/* Project Duration */
+.project-duration {
+    font-size: 13px;
+    font-weight: bold;
+    color: #bbb;
+}
+
+/* Tech Stack Badges */
+.tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.tech-badge {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Summary Section - Initially Hidden in Mobile */
+.project-summary {
+    font-size: 16px;
+    color: #ddd;
+    
+    margin-top: 10px;
+    display: block; /* Always visible in web */
+}
+
+/* Hide summary in mobile view */
+@media (max-width: 768px) {
+    .project-summary {
+        display: none;
+    }
+
+    /* Show summary only when expanded in mobile */
+    .project-card.expanded .project-summary {
+        display: block;
+    }
+}
+
+/* View More Button */
+.view-more-btn {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 0px;
+    text-align: left;
+    display: block;
+}
+
+.view-more-btn:hover {
+    text-decoration: underline;
+}
+
+/* Dropdown Toggle for Mobile */
+.toggle-icon {
+    /* font-size: 16px;
+    font-weight: bold;
+    color: white; */
+    display: none;
+}
+
+/* Mobile View: Cards in Column with Dropdown */
+@media (max-width: 768px) {
+    .projects-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .project-card {
+        width: 100%;
+    }
+
+    .project-thumbnail {
+        width: 120px;
+        height: 100px;
+    }
+
+    .toggle-icon {
+        display: none;
+    }
+}
