@@ -28,7 +28,7 @@ const Experience = () => {
       title: "Research Assistant",
       company: "University at Buffalo",
       period: "Jan 2025 - Present",
-      description: `Developing web scraping and data collection pipelines for large-scale research datasets. Utilizing Python-based frameworks like Scrapy and BeautifulSoup to extract, clean, and structure data for machine learning analysis.`,
+      description: `Automated the extraction and processing of 100+ journals from Clarivate’s Journal Citation Report using Playwright, efficiently handling dynamic web elements and multi-step interactions, reducing manual effort by 99.97% and improving data accuracy. Built a pipeline to merge extracted XLS files, structuring Journal Impact Factor, JIF Without Self Cites, and Citable Items (2000–2023) for seamless trend analysis and data-driven insights.`,
       techStack: ["Python", "Scrapy", "BeautifulSoup", "Data Collection"],
       logo: ub_logo,
     },
