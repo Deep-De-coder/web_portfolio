@@ -65,7 +65,7 @@ const Ask = () => {
             { type: 'loading', text: 'Looking for Answer...' } // Loading message
         ]);
     
-        const backendUrl = 'http://127.0.0.1:5000/chat';
+        const backendUrl = 'https://fastapi-app-latest-bsb8.onrender.com/chat';
     
         try {
             const response = await fetch(backendUrl, {
