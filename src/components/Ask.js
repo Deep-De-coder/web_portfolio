@@ -139,8 +139,22 @@ const Ask = () => {
                 </div>
                 <div className="button-group">
                     <div className="button-left">
-                        <button className="cv-button">CV</button>
-                        <button className="mail-button">Mail</button>
+                    <a
+                        href="https://drive.google.com/file/d/1lQ9L5IVFcwmXWWHKi9Je-lQC6pdSwijW/view?usp=sharing"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="cv-button"
+                    >
+                        CV
+                    </a>
+
+                    <a
+                        href="mailto:deepniti@buffalo.edu"
+                        className="mail-button"
+                    >
+                        Mail
+                    </a>
+
                     </div>
                     <button className="submit-button" onClick={handleChatSubmit}>↑</button>
                 </div>
