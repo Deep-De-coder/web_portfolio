@@ -65,7 +65,7 @@ const Ask = () => {
             { type: 'loading', text: 'Looking for Answer...' } // Loading message
         ]);
     
-        const backendUrl = 'https://fastapi-app-v1-fjfg.onrender.com/chat';
+        const backendUrl = 'https://portfolio-backend-wt45.onrender.com/chat';
     
         try {
             const response = await fetch(backendUrl, {
