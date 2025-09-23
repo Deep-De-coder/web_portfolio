@@ -12,6 +12,24 @@ const Projects = () => {
 
   const projects = [
     {
+      title: "Dresser Smart Wardrobe App",
+      period: "Jun 2025 - Aug 2025",
+      demoLink: "https://dresser-pi.vercel.app/",
+      codeLink: "",
+      summary: "Built a production-ready wardrobe app on Next.js 14 (App Router, TypeScript, Tailwind) with Node serverless API routes on Vercel, delivering AI outfit suggestions and real-time photo analysis. Integrated Azure Vision and a private Ollama LLM (qwen2:1.5b) via a Fly.io HTTPS proxy with API-key auth; added timeouts/retries and server-only secrets for a secure, reliable pipeline. Built a mobile-first UI with drag-and-drop uploads, guardrail category detection, and fallback for low-bandwidth devices.",
+      techStack: ["Next.js", "TypeScript", "Node.js", "Azure Vision", "Ollama", "Tailwind", "Vercel"],
+      thumbnail: "/images/dresser.png",
+    },
+    {
+      title: "Efficient Multimodal LLM Agent",
+      period: "Feb 2025 - May 2025",
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/efficient-multimodal-healthcare-llm-agent",
+      summary: "Built a multimodal assistant using RAG + vLLM to answer medical queries from radiology reports and X-rays, leveraging LLaMA-2, CLIP, and FAISS (50K embeddings) for semantic retrieval. Reduced LLM latency by 40% (920ms → 540ms) with FlashAttention + PagedAttention, sustaining 88% accuracy on a 100-sample clinical QA set. Fine-tuned LoRA adapters on 5K QA pairs using PyTorch Lightning + DeepSpeed, completing training in 6 hours on A100 GPUs.",
+      techStack: ["Python", "vLLM", "FlashAttention", "RAG", "PyTorch", "FAISS", "LLaMA-2", "CLIP"],
+      thumbnail: "/images/multimodal_llm.png",
+    },
+    {
       title: "Language Translation",
       period: "Feb 2024 - Apr 2024",
       demoLink: "",
@@ -28,6 +46,15 @@ const Projects = () => {
       summary: "Applied advanced preprocessing techniques to refine the Kaggle Satellite Road images dataset. Engineered a fusion model combining ResNet50 and VGG with three preprocessing techniques, achieving 95.2% training and 95.3% validation accuracy. Merged post-processing techniques such as Edge Detection to enhance output accuracy.",
       techStack: ["OpenCV", "Google Colab", "VGG", "ResNet", "UNet"],
       thumbnail: roadextract,
+    },
+    {
+      title: "Transformers Deep Learning",
+      period: "2024",
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/Transformers_deeplearning",
+      summary: "Deep learning project focused on Convolutional Neural Networks (CNNs) for binary image classification (dogs vs. cats) using PyTorch. Includes comprehensive data loading from Google Drive, model building, training, evaluation, and visualization of results. Features training and validation loss/accuracy curves and transformer architecture visualizations.",
+      techStack: ["PyTorch", "CNN", "Jupyter Notebook", "Google Colab", "Image Classification"],
+      thumbnail: "/images/transformers_dl.png",
     },
     {
       title: "Novel Chatbot",
@@ -50,8 +77,8 @@ const Projects = () => {
     {
       title: "Auto Envision",
       period: "Sep 2022 - Apr 2023",
-      demoLink: "", // Replace with actual link
-      codeLink: "https://github.com/Deep-De-coder/Auto-Envision", // Replace with actual link
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/Auto-Envision",
       summary: "Completed sales forecasting using ARIMA, LSTM, and FB Prophet. Led data cleaning for a dataset of 100,000+ rows. Conducting research under Dr. Chen Wang focusing on Gaussian Splatting for advanced rendering techniques. Developing methodologies to improve the efficiency and quality of rendering processes.",
       techStack: ["Python", "Google Colab", "Time Series Algorithm"],
       thumbnail: "/images/auto_envision.png",

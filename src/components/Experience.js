@@ -7,52 +7,35 @@ import bragr_logo from '../assets/bragr logo.jpg';
 const Experience = () => {
   const experiences = [
     {
-      title: "Graduate Teaching Assistant",
-      company: "University at Buffalo",
-      period: "Jan 2025 - Present",
-      description: `Serving as a Student Teaching Assistant for the "Introduction to Pattern Recognition" course. Assisting students with course material, grading assignments.
-      Responsible for designing and evaluating coding assignments related to probabilistic models, feature extraction, and classification techniques in pattern recognition.`,
-      techStack: ["Python", "Transformers", "Machine Learning", "Pattern Recognition", "Assistance"],
+      title: "Research Assistant",
+      company: "SAIR LAB at UB",
+      period: "Aug 2024 - Present",
+      description: `Exploring simulation, automation, and intelligent robotics for real-world impact. Achieved 16× speedup in drone 3D reconstruction by integrating 2D Gaussian Splatting into GPU-accelerated SLAM over video frame sequences, customizing a C++/CUDA surfel rasterizer for real-time aerial mapping. Researching NVIDIA Isaac Lab and developing humanoid robots with vision-language models (VLMs) like InstructBLIP2, Florence, etc., using PyTorch and RL for multimodal perception and decision-making.`,
+      techStack: ["Python", "C++", "CUDA", "PyTorch", "Gaussian Splatting", "SLAM", "Computer Vision", "Robotics"],
       logo: ub_logo,
     },
     {
-      title: "Research Assistant",
-      company: "University at Buffalo",
-      period: "Jan 2025 - Present",
-      description: `Conducting research under Dr. Chen Wang, focusing on implementing Gaussian Splatting in drones to enhance real-time 3D reconstruction and rendering.
-      Developing methodologies to improve the efficiency and accuracy of Gaussian Splatting for aerial applications, optimizing computational performance for real-time processing.`,
-      techStack: ["Python", "Gaussian Splatting", "Computer Vision", "Drones", "3D Reconstruction"],
-      logo: ub_logo,
-    },    
-    {
-      title: "Research Assistant",
-      company: "University at Buffalo",
-      period: "Jan 2025 - Present",
-      description: `Automated the extraction and processing of 100+ journals from Clarivate’s Journal Citation Report using Playwright, efficiently handling dynamic web elements and multi-step interactions, reducing manual effort by 99.97% and improving data accuracy. Built a pipeline to merge extracted XLS files, structuring Journal Impact Factor, JIF Without Self Cites, and Citable Items (2000–2023) for seamless trend analysis and data-driven insights.`,
-      techStack: ["Python", "Scrapy", "BeautifulSoup", "Data Collection"],
-      logo: ub_logo,
-    },
-    {
-      title: "Artificial Engineer Intern",
+      title: "AI Engineer Intern",
       company: "Bragr",
       period: "Aug 2024 - Jan 2025",
-      description: `During my ongoing internship at Bragr as an Artificial Engineer Intern, I have architected and implemented a robust FastAPI-driven backend for a chat application.
-      This system integrates Azure OpenAI to facilitate dynamic query processing and response generation, efficiently managing both real-time and historical user queries.
-      Additionally, I have developed an advanced asynchronous web scraping and search system using Python, aiohttp, and FastAPI, which is designed to handle multiple concurrent requests with high efficiency.
-      I've also designed MongoDB database interactions to optimize the storage and retrieval of chat histories and user queries.
-      Furthermore, I have been involved in refining the user flow and scaling the frontend of the web-based chat application, enhancing its overall scalability and user experience.`,
-      techStack: ["Python", "FastAPI", "Azure OpenAI", "MongoDB"],
+      description: `Startup developing AI chat solutions for live sports conversations. Architected and deployed a FastAPI + Azure OpenAI (RAG) backend, iterating prompt templates and system messages and retrieval thresholds, cutting response time 66% and improving answer quality. Built an async web scraping and semantic search pipeline using Python, aiohttp, and MongoDB, supporting 10+ concurrent users. Collaborated with frontend engineers on a microservices chat system, optimizing backend performance and deployment on Azure.`,
+      techStack: ["Python", "FastAPI", "Azure OpenAI", "MongoDB", "aiohttp", "RAG", "Microservices"],
       logo: bragr_logo,
     },
     {
-      title: "Software Intern",
+      title: "ML Intern",
+      company: "Captain Cool",
+      period: "Dec 2021 - Feb 2023",
+      description: `Consumer brand producing packaged ice creams for diverse markets. Built a full-stack Python + Flask + PostgreSQL web platform for order and inventory management, handling 1K+ daily transactions. Developed time-series demand forecasting models using PyTorch and scikit-learn, improving stock prediction accuracy by 18%. Implemented automated data pipelines for real-time syncing between POS systems and the central database.`,
+      techStack: ["Python", "Flask", "PostgreSQL", "PyTorch", "scikit-learn", "Time Series", "Data Pipelines"],
+      logo: vit_logo,
+    },
+    {
+      title: "ML Intern",
       company: "VIT",
-      period: "June 2021 - Aug 2021",
-      description: `During my summer internship at VIT, I played a crucial role in developing the VIT Internship Portal, which significantly improved the internship application process for both students and professors. 
-      I engineered an efficient backend system utilizing the Flask framework and SQLite, optimizing the management, storage, organization, and swift retrieval of data to ensure seamless access and updates. 
-      Collaborating closely with my team members, I helped design and implement a user-friendly web application using Python, enhancing overall usability. 
-      I successfully deployed the project on Azure Cloud, leveraging five free services—Q&A Maker, Azure Blob, Azure Map, Azure Cognitive Speech to Text, and Azure App Service—to enhance accessibility and user experience`,
-      techStack: ["Python", "Flask", "Azure", "SQL"],
+      period: "Jun 2021 - Aug 2021",
+      description: `Autonomous institution offering cutting-edge engineering and technology programs. Launched an internship portal with a recommendation system using TF-IDF and cosine similarity, improving match relevance by 25% and reducing manual effort. Built a Flask + PostgreSQL backend with SQLAlchemy, integrating scraped Internshala data into a normalized 400+ entry database. Deployed on Azure with Q&A Maker, Blob, Maps, and Speech-to-Text to enhance accessibility and interaction.`,
+      techStack: ["Python", "Flask", "PostgreSQL", "SQLAlchemy", "TF-IDF", "Azure", "Recommendation Systems"],
       logo: vit_logo,
     },
   ];
