@@ -3,6 +3,7 @@ import './Experience.css';
 import ub_logo from '../assets/Ub logo.jpg';
 import vit_logo from '../assets/vit logo.png';
 import bragr_logo from '../assets/bragr logo.jpg';
+import captain_cool_logo from '../assets/captain cool logo.png';
 
 const Experience = () => {
   const experiences = [
@@ -28,7 +29,7 @@ const Experience = () => {
       period: "Dec 2021 - Feb 2023",
       description: `Consumer brand producing packaged ice creams for diverse markets. Built a full-stack Python + Flask + PostgreSQL web platform for order and inventory management, handling 1K+ daily transactions. Developed time-series demand forecasting models using PyTorch and scikit-learn, improving stock prediction accuracy by 18%. Implemented automated data pipelines for real-time syncing between POS systems and the central database.`,
       techStack: ["Python", "Flask", "PostgreSQL", "PyTorch", "scikit-learn", "Time Series", "Data Pipelines"],
-      logo: vit_logo,
+      logo: captain_cool_logo,
     },
     {
       title: "ML Intern",
