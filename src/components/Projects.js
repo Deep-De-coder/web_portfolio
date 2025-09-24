@@ -5,6 +5,11 @@ import langTranslationImg from '../assets/projects/langtranslation.png';
 import roadextract from '../assets/projects/roadextract.png';
 import gdp from '../assets/projects/gdp.png';
 import novelchatbot from '../assets/projects/novelchatbot.png';
+import dresserImg from '../assets/projects/dresser.png';
+import healthcareImg from '../assets/projects/healthcare.png';
+import transformersImg from '../assets/projects/transformersdeeplearning.png';
+import autoenvisionImg from '../assets/projects/autoenvision.png';
+import carpriceedaImg from '../assets/projects/carpriceeda.png';
 
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -18,7 +23,7 @@ const Projects = () => {
       codeLink: "",
       summary: "Built a production-ready wardrobe app on Next.js 14 (App Router, TypeScript, Tailwind) with Node serverless API routes on Vercel, delivering AI outfit suggestions and real-time photo analysis. Integrated Azure Vision and a private Ollama LLM (qwen2:1.5b) via a Fly.io HTTPS proxy with API-key auth; added timeouts/retries and server-only secrets for a secure, reliable pipeline. Built a mobile-first UI with drag-and-drop uploads, guardrail category detection, and fallback for low-bandwidth devices.",
       techStack: ["Next.js", "TypeScript", "Node.js", "Azure Vision", "Ollama", "Tailwind", "Vercel"],
-      thumbnail: "/images/dresser.png",
+      thumbnail: dresserImg,
     },
     {
       title: "Efficient Multimodal LLM Agent",
@@ -27,7 +32,7 @@ const Projects = () => {
       codeLink: "https://github.com/Deep-De-coder/efficient-multimodal-healthcare-llm-agent",
       summary: "Built a multimodal assistant using RAG + vLLM to answer medical queries from radiology reports and X-rays, leveraging LLaMA-2, CLIP, and FAISS (50K embeddings) for semantic retrieval. Reduced LLM latency by 40% (920ms → 540ms) with FlashAttention + PagedAttention, sustaining 88% accuracy on a 100-sample clinical QA set. Fine-tuned LoRA adapters on 5K QA pairs using PyTorch Lightning + DeepSpeed, completing training in 6 hours on A100 GPUs.",
       techStack: ["Python", "vLLM", "FlashAttention", "RAG", "PyTorch", "FAISS", "LLaMA-2", "CLIP"],
-      thumbnail: "/images/multimodal_llm.png",
+      thumbnail: healthcareImg,
     },
     {
       title: "Language Translation",
@@ -54,7 +59,7 @@ const Projects = () => {
       codeLink: "https://github.com/Deep-De-coder/Transformers_deeplearning",
       summary: "Deep learning project focused on Convolutional Neural Networks (CNNs) for binary image classification (dogs vs. cats) using PyTorch. Includes comprehensive data loading from Google Drive, model building, training, evaluation, and visualization of results. Features training and validation loss/accuracy curves and transformer architecture visualizations.",
       techStack: ["PyTorch", "CNN", "Jupyter Notebook", "Google Colab", "Image Classification"],
-      thumbnail: "/images/transformers_dl.png",
+      thumbnail: transformersImg,
     },
     {
       title: "Novel Chatbot",
@@ -77,11 +82,11 @@ const Projects = () => {
     {
       title: "Auto Envision",
       period: "Sep 2022 - Apr 2023",
-      demoLink: "",
+      demoLink: "https://doi.org/10.1007/978-981-99-3982-4_41",
       codeLink: "https://github.com/Deep-De-coder/Auto-Envision",
       summary: "Completed sales forecasting using ARIMA, LSTM, and FB Prophet. Led data cleaning for a dataset of 100,000+ rows. Conducting research under Dr. Chen Wang focusing on Gaussian Splatting for advanced rendering techniques. Developing methodologies to improve the efficiency and quality of rendering processes.",
       techStack: ["Python", "Google Colab", "Time Series Algorithm"],
-      thumbnail: "/images/auto_envision.png",
+      thumbnail: autoenvisionImg,
     },
     {
       title: "Car Price EDA",
@@ -90,7 +95,7 @@ const Projects = () => {
       codeLink: "https://github.com/Deep-De-coder/EDA-on-car-price-prediction", 
       summary: "Performed in-depth EDA on a car price dataset with 11,900 rows and 16 columns. Used Matplotlib and Seaborn for data visualization.",
       techStack: ["Pandas", "NumPy", "Google Colab"],
-      thumbnail: "/images/car_price_eda.png",
+      thumbnail: carpriceedaImg,
     },
     {
       title: "Flying Cubes",

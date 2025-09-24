@@ -14,8 +14,8 @@ const publicationsData = [
     tags: ["Collaborative Filtering", "Deep Learning", "NLP"]
   },
   {
-    title: "Gaussian Splatting for Advanced Rendering ",
-    link: "#",
+    title: "Gaussian Splatting for Advanced Rendering",
+    link: "https://cse.buffalo.edu/tech-reports/2025-09.pdf",
     tags: ["3D Rendering", "Gaussian Splatting", "Computer Vision"]
   }
 ];
@@ -38,13 +38,9 @@ const Publications = () => {
               ))}
             </div>
 
-            {pub.link !== "#" ? (
-              <a href={pub.link} target="_blank" rel="noopener noreferrer" className="publication-link">
-                View Publication <FaExternalLinkAlt />
-              </a>
-            ) : (
-              <span className="ongoing-text">Ongoing Research</span>
-            )}
+            <a href={pub.link} target="_blank" rel="noopener noreferrer" className="publication-link">
+              View Publication <FaExternalLinkAlt />
+            </a>
           </div>
         ))}
       </div>
