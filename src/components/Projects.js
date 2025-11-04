@@ -35,15 +35,6 @@ const Projects = () => {
       thumbnail: healthcareImg,
     },
     {
-      title: "Language Translation",
-      period: "Feb 2024 - Apr 2024",
-      demoLink: "",
-      codeLink: "https://github.com/Deep-De-coder/deep_learning_project",
-      summary: "Developed a language translation system for English to French using the Europarl Parallel Corpus with over 1 million rows. Fine-tuned Google T5 and Facebook M2M-100 models, creating 20 custom Transformers with unique positional encodings. Achieved a METEOR score of 0.109 and explored BLEU and COMET metrics. Deployed on Gradio for real-time interaction.",
-      techStack: ["PyTorch", "Google T5", "Facebook M2M-100", "Gradio"],
-      thumbnail: langTranslationImg,
-    },
-    {
       title: "Road Extraction From Satellite Images",
       period: "Sep 2023 - Nov 2023",
       demoLink: "",
@@ -57,8 +48,8 @@ const Projects = () => {
       period: "2024",
       demoLink: "",
       codeLink: "https://github.com/Deep-De-coder/Transformers_deeplearning",
-      summary: "Deep learning project focused on Convolutional Neural Networks (CNNs) for binary image classification (dogs vs. cats) using PyTorch. Includes comprehensive data loading from Google Drive, model building, training, evaluation, and visualization of results. Features training and validation loss/accuracy curves and transformer architecture visualizations.",
-      techStack: ["PyTorch", "CNN", "Jupyter Notebook", "Google Colab", "Image Classification"],
+      summary: "Developed a language translation system for English to French using the Europarl Parallel Corpus with over 1 million rows. Fine-tuned Google T5 and Facebook M2M-100 models, creating 20 custom Transformers with unique positional encodings. Achieved a METEOR score of 0.109 and explored BLEU and COMET metrics. Deployed on Gradio for real-time interaction.",
+      techStack: ["PyTorch", "Google T5", "Facebook M2M-100", "Gradio"],
       thumbnail: transformersImg,
     },
     {
