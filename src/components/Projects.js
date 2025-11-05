@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Projects.css';
 import cubesImage from '../assets/projects/cubes.png';
-import langTranslationImg from '../assets/projects/langtranslation.png';
+import musicfiesta from '../assets/projects/musicfiesta.png';
 import roadextract from '../assets/projects/roadextract.png';
 import gdp from '../assets/projects/gdp.png';
 import novelchatbot from '../assets/projects/novelchatbot.png';
@@ -45,7 +45,7 @@ const Projects = () => {
     },
     {
       title: "Transformers Deep Learning",
-      period: "2024",
+      period: "Feb 2024 - Apr 2024",
       demoLink: "",
       codeLink: "https://github.com/Deep-De-coder/Transformers_deeplearning",
       summary: "Developed a language translation system for English to French using the Europarl Parallel Corpus with over 1 million rows. Fine-tuned Google T5 and Facebook M2M-100 models, creating 20 custom Transformers with unique positional encodings. Achieved a METEOR score of 0.109 and explored BLEU and COMET metrics. Deployed on Gradio for real-time interaction.",
@@ -78,6 +78,15 @@ const Projects = () => {
       summary: "Completed sales forecasting using ARIMA, LSTM, and FB Prophet. Led data cleaning for a dataset of 100,000+ rows. Conducting research under Dr. Chen Wang focusing on Gaussian Splatting for advanced rendering techniques. Developing methodologies to improve the efficiency and quality of rendering processes.",
       techStack: ["Python", "Google Colab", "Time Series Algorithm"],
       thumbnail: autoenvisionImg,
+    },
+    {
+      title: "Music Fiesta - Recommendation System",
+      period: "Sep 2021 - Apr 2022",
+      demoLink: "https://ieeexplore.ieee.org/document/9936009",
+      codeLink: "https://github.com/Deep-De-coder/Music-Recommendation",
+      summary: "I built a full-stack Flask music recommendation app that ingests a genre-labeled dataset, extracts audio features, and serves real-time personalized suggestions using a hybrid of popularity, content-based, and SVD collaborative filtering models. It includes user auth, a SQLite/SQLAlchemy backend, a built-in web music player, search/filter UI, and deployment scaffolding (requirements.txt, Procfile), with organized folders for datasets, extracted features/notebooks, and model code for easy reproducibility.",
+      techStack: ["Python", "Flask", "SQLite", "SQLAlchemy", "Popularity Filtering", "Content-Based Filtering", "SVD Collaborative Filtering"],
+      thumbnail: musicfiesta,
     },
     {
       title: "Car Price EDA",
