@@ -10,6 +10,7 @@ import healthcareImg from '../assets/projects/healthcare.png';
 import transformersImg from '../assets/projects/transformersdeeplearning.png';
 import autoenvisionImg from '../assets/projects/autoenvision.png';
 import carpriceedaImg from '../assets/projects/carpriceeda.png';
+import coineeImg from '../assets/projects/coinee.png';
 
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -105,6 +106,15 @@ const Projects = () => {
       summary: "Developed an AR application allowing real-time manipulation of ascending cubes. Demonstrated Unity and AR proficiency.",
       techStack: ["AR", "Unity", "C#"],
       thumbnail: cubesImage,
+    },
+    {
+      title: "Coinee",
+      period: "Oct 202 - Jan 2025",
+      demoLink: "https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US", 
+      codeLink: "", 
+      summary: "Built Coinee, a privacy-safe Android app to browse 300+ coins across 15+ countries with clean visuals and short facts—no sign-in or data collection.",
+      techStack: ["Android", "Kotlin", "Java", "Android SDK", "Material Components"],    
+      thumbnail: coineeImg,
     },
   ];
 
