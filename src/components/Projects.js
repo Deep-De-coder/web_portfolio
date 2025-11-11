@@ -109,10 +109,10 @@ const Projects = () => {
     },
     {
       title: "Coinee",
-      period: "Oct 202 - Jan 2025",
+      period: "Oct 2024 - Jan 2025",
       demoLink: "https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US", 
       codeLink: "", 
-      summary: "Built Coinee, a privacy-safe Android app to browse 300+ coins across 15+ countries with clean visuals and short facts—no sign-in or data collection.",
+      summary: "Coinee is a privacy-safe Android app to browse 300+ coins from 15+ countries with crisp visuals and concise facts.\nOptimized for offline use with fast on-device search, category filters, and smooth Material UI—no sign-in, no tracking.\nBuilt as a lightweight, read-only viewer to showcase numismatic collections and inspire casual learning.",
       techStack: ["Android", "Kotlin", "Java", "Android SDK", "Material Components"],    
       thumbnail: coineeImg,
     },
