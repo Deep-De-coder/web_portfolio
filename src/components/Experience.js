@@ -8,7 +8,7 @@ import captain_cool_logo from '../assets/captain cool logo.png';
 const Experience = () => {
   const experiences = [
     {
-      title: "Research Assistant",
+      title: "AI Research Assistant",
       company: "SAIR LAB at UB",
       period: "Aug 2024 - Present",
       description: `Exploring simulation, automation, and intelligent robotics for real-world impact. Achieved 16× speedup in drone 3D reconstruction by integrating 2D Gaussian Splatting into GPU-accelerated SLAM over video frame sequences, customizing a C++/CUDA surfel rasterizer for real-time aerial mapping. Researching NVIDIA Isaac Lab and developing humanoid robots with vision-language models (VLMs) like InstructBLIP2, Florence, etc., using PyTorch and RL for multimodal perception and decision-making.`,
@@ -16,7 +16,7 @@ const Experience = () => {
       logo: ub_logo,
     },
     {
-      title: "AI Engineer Intern",
+      title: "AI Engineer",
       company: "Bragr",
       period: "Aug 2024 - Jan 2025",
       description: `Startup developing AI chat solutions for live sports conversations. Architected and deployed a FastAPI + Azure OpenAI (RAG) backend, iterating prompt templates and system messages and retrieval thresholds, cutting response time 66% and improving answer quality. Built an async web scraping and semantic search pipeline using Python, aiohttp, and MongoDB, supporting 10+ concurrent users. Collaborated with frontend engineers on a microservices chat system, optimizing backend performance and deployment on Azure.`,
