@@ -45,7 +45,7 @@ const Sidebar = () => {
 
         {/* ✅ Navbar (Navigation Buttons) */}
         <div className="nav-buttons">
-          {["ask", "experience", "education", "publications", "projects", "skillset"].map((sectionId) => (
+          {["ask", "education", "experience", "publications", "projects", "skillset"].map((sectionId) => (
             <button key={sectionId} onClick={() => handleScrollTo(sectionId)}>
               {sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}
             </button>
