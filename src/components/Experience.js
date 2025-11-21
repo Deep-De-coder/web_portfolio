@@ -19,7 +19,7 @@ const Experience = () => {
       title: "AI Engineer",
       company: "Bragr",
       period: "Aug 2024 - Jan 2025",
-      description: `Startup developing AI chat solutions for live sports conversations. Architected and deployed a FastAPI + Azure OpenAI (RAG) backend, iterating prompt templates and system messages and retrieval thresholds, cutting response time 66% and improving answer quality. Built an async web scraping and semantic search pipeline using Python, aiohttp, and MongoDB, supporting 10+ concurrent users. Collaborated with frontend engineers on a microservices chat system, optimizing backend performance and deployment on Azure.`,
+      description: `Startup developing AI chat solutions for live sports conversations. Architected and deployed a FastAPI + Azure OpenAI (RAG) backend, wokred on data pipeline and iterating prompt templates and system messages and retrieval thresholds, cutting response time 66% and improving answer quality. Built an async web scraping and semantic search pipeline using Python, aiohttp, and MongoDB, supporting 10+ concurrent users. Collaborated with frontend engineers on a microservices chat system, optimizing backend performance and deployment on Azure.`,
       techStack: ["Python", "FastAPI", "Azure OpenAI", "MongoDB", "aiohttp", "RAG", "Microservices"],
       logo: bragr_logo,
     },
