@@ -149,7 +149,7 @@ const Ask = () => {
                     </a>
 
                     <a
-                        href="mailto:deepniti@buffalo.edu"
+                        href="mailto:esotericdeep@gmail.com"
                         className="mail-button"
                     >
                         Mail

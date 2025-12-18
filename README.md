@@ -156,7 +156,7 @@ src/
 - **Portfolio**: [Live Website](https://your-portfolio-url.com)
 - **GitHub**: [Deep-De-coder](https://github.com/Deep-De-coder)
 - **LinkedIn**: [Deep Shahane](https://www.linkedin.com/in/deep-shahane/)
-- **Email**: deepniti@buffalo.edu
+- **Email**: esotericdeep@gmail.com
 - **CV**: [Download Resume](https://drive.google.com/file/d/1HEcSVsRSDa37442Z091bWi7TaV9SMcjM/view?usp=sharing)
 
 ## 📄 License
@@ -170,7 +170,7 @@ Feel free to fork this project and submit pull requests for any improvements.
 ## 📞 Contact
 
 **Deep Shahane**
-- Email: deepniti@buffalo.edu
+- Email: esotericdeep@gmail.com
 - LinkedIn: [Deep Shahane](https://www.linkedin.com/in/deep-shahane/)
 - GitHub: [Deep-De-coder](https://github.com/Deep-De-coder)
 
