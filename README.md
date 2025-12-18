@@ -157,7 +157,7 @@ src/
 - **GitHub**: [Deep-De-coder](https://github.com/Deep-De-coder)
 - **LinkedIn**: [Deep Shahane](https://www.linkedin.com/in/deep-shahane/)
 - **Email**: deepniti@buffalo.edu
-- **CV**: [Download Resume](https://drive.google.com/file/d/1lQ9L5IVFcwmXWWHKi9Je-lQC6pdSwijW/view?usp=sharing)
+- **CV**: [Download Resume](https://drive.google.com/file/d/1HEcSVsRSDa37442Z091bWi7TaV9SMcjM/view?usp=sharing)
 
 ## 📄 License
 
