@@ -82,10 +82,23 @@ const Ask = () => {
             setIsInitializing(true);
             setModelProgress(0);
             
-            // Add timeout to prevent getting stuck
+            // Add timeout to prevent getting stuck (2 minutes)
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Model loading timeout')), 120000); // 2 minutes
+                setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000); // 2 minutes
             });
+            
+            // Show warning at 4 minutes if still loading
+            const warningTimeout = setTimeout(() => {
+                if (isInitializing) {
+                    setMessages((prev) => {
+                        const hasWarning = prev.some(msg => msg.type === 'warning');
+                        if (!hasWarning) {
+                            return [...prev, { type: 'warning', text: 'Model loading is taking longer than expected (4 minutes). Please wait or refresh the page.' }];
+                        }
+                        return prev;
+                    });
+                }
+            }, 240000); // 4 minutes
             
             // Update progress periodically as fallback
             const progressInterval = setInterval(() => {
@@ -104,8 +117,10 @@ const Ask = () => {
                     timeoutPromise
                 ]);
                 clearInterval(progressInterval);
+                clearTimeout(warningTimeout);
             } catch (err) {
                 clearInterval(progressInterval);
+                clearTimeout(warningTimeout);
                 throw err;
             }
             
@@ -365,7 +380,9 @@ Be concise, professional, and accurate.`;
                     {/* Model loading progress - only show if progress > 0 to avoid stuck at 0% */}
                     {isInitializing && modelProgress > 0 && (
                         <div className="model-progress">
-                            <div className="progress-text">Loading local model... {modelProgress}%</div>
+                            <div className="progress-text">
+                                Loading local model... {modelProgress}% (Timeout: 2 minutes)
+                            </div>
                             <div className="progress-bar">
                                 <div className="progress-fill" style={{ width: `${modelProgress}%` }}></div>
                             </div>

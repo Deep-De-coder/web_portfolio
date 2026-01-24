@@ -15,6 +15,7 @@
     box-sizing: border-box;
     /* box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5); */
     overflow: hidden;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
     font-family: 'Arial', sans-serif;
     font-size: 2rem;
     white-space: nowrap;
@@ -47,6 +48,7 @@
     align-items: flex-start;
     gap: 10px;
     overflow-y: auto;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
     background-color: #333;
     border-radius: 10px;
     box-sizing: border-box;
@@ -407,6 +409,9 @@ h1 {
     background-color: rgba(33, 33, 33, 0.8);
     border-radius: 8px;
     margin-bottom: 10px;
+    box-sizing: border-box;
+    overflow: hidden; /* Prevent horizontal overflow */
+    min-width: 0; /* Allow flexbox to shrink */
 }
 
 .progress-text {
@@ -462,6 +467,19 @@ h1 {
     color: #aaa;
     font-style: italic;
     background-color: transparent;
+}
+
+/* ✅ Warning message styling */
+.message.warning {
+    align-self: center;
+    color: #ffa500;
+    font-style: italic;
+    background-color: rgba(255, 165, 0, 0.1);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 90%;
+    text-align: center;
 }
 
 /* ✅ Disabled input state */
