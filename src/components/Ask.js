@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DOMPurify from 'dompurify';
+import ReactMarkdown from 'react-markdown';
 import './Ask.css';
 import {
   init as initWebLLM,
@@ -295,13 +296,33 @@ Be concise, professional, and accurate.`;
         }
     };
 
-    // Sanitize HTML for safe rendering
-    const sanitizeHTML = (html) => {
-        if (typeof window === 'undefined') return html;
-        return DOMPurify.sanitize(html, {
-            ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'code', 'pre'],
-            ALLOWED_ATTR: ['href', 'target', 'rel'],
-        });
+    // Render Markdown with proper formatting
+    const renderMarkdown = (text) => {
+        if (!text) return '';
+        
+        // Use react-markdown to parse and render Markdown
+        // It handles **bold**, _italic_, links, lists, etc. automatically
+        return (
+            <ReactMarkdown
+                components={{
+                    // Style links
+                    a: ({ node, ...props }) => (
+                        <a {...props} target="_blank" rel="noopener noreferrer" className="markdown-link" />
+                    ),
+                    // Style lists
+                    ul: ({ node, ...props }) => <ul {...props} className="markdown-list" />,
+                    ol: ({ node, ...props }) => <ol {...props} className="markdown-list" />,
+                    // Style code blocks
+                    code: ({ node, inline, ...props }) => (
+                        <code {...props} className={inline ? 'markdown-inline-code' : 'markdown-code-block'} />
+                    ),
+                    // Style paragraphs
+                    p: ({ node, ...props }) => <p {...props} className="markdown-paragraph" />,
+                }}
+            >
+                {text}
+            </ReactMarkdown>
+        );
     };
 
     return (
@@ -333,13 +354,14 @@ Be concise, professional, and accurate.`;
                                 </div>
                             );
                         } else if (msg.type === 'response') {
-                            // Assistant messages - sanitized HTML
+                            // Assistant messages - render Markdown properly
                             return (
                                 <div
                                     key={index}
                                     className={`message ${msg.type}`}
-                                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(msg.text) }}
-                                />
+                                >
+                                    {renderMarkdown(msg.text)}
+                                </div>
                             );
                         } else {
                             // Loading/error messages - plain text
