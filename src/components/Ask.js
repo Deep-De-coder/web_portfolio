@@ -1,15 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
+import DOMPurify from 'dompurify';
 import './Ask.css';
+import {
+  init as initWebLLM,
+  streamChat,
+  interruptGenerate,
+  isWebGPUSupported,
+  getModelId,
+} from '../utils/webllmClient';
 
 const Ask = () => {
     const [inputValue, setInputValue] = useState('');
     const [messages, setMessages] = useState([]);
     const [isChatActive, setIsChatActive] = useState(false);
     const [typedText, setTypedText] = useState('');
-    const fullText = 'Curious about my skills or experience? Ask, and I’ll explain!';
+    const [mode, setMode] = useState('unknown'); // 'local', 'server', 'unknown'
+    const [modelProgress, setModelProgress] = useState(0);
+    const [isStreaming, setIsStreaming] = useState(false);
+    const [isInitializing, setIsInitializing] = useState(false);
+    const fullText = `Curious about my skills or experience? Ask, and I'll explain!`;
 
-    // 🔥 Create a reference for the message area
     const messageEndRef = useRef(null);
+    const streamingAbortRef = useRef(false);
+    const webLLMAvailableRef = useRef(false);
+
+    // Check WebGPU support on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            webLLMAvailableRef.current = isWebGPUSupported();
+            if (!webLLMAvailableRef.current) {
+                setMode('server');
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const chatContainer = document.querySelector('.message-area');
@@ -18,7 +41,7 @@ const Ask = () => {
         }
     }, [messages]);
 
-    // Typing animation logic
+    // Typing animation logic for header
     useEffect(() => {
         let index = 0;
         const typeText = () => {
@@ -33,6 +56,7 @@ const Ask = () => {
 
     const handleInputChange = (event) => setInputValue(event.target.value);
 
+    // Simulate typing effect for backend fallback (kept for compatibility)
     const simulateTypingEffect = (fullText, callback) => {
         let index = 0;
         let currentText = "";
@@ -43,50 +67,116 @@ const Ask = () => {
                 index++;
                 callback(currentText);
             } else {
-                clearInterval(typingInterval); // Stop typing effect when done
+                clearInterval(typingInterval);
             }
-        }, 1); // Adjust speed (milliseconds per character)
+        }, 1);
     };
-    
-    const handleChatSubmit = async () => {
-        if (!inputValue.trim()) {
-            setMessages((prev) => [...prev, { type: 'error', text: 'Please type your message before submitting.' }]);
-            return;
+
+    // Initialize WebLLM on first use
+    const ensureWebLLMInitialized = async () => {
+        if (!webLLMAvailableRef.current) {
+            throw new Error('WebGPU not supported');
         }
-    
-        setIsChatActive(true);
-        const currentInput = inputValue;
-        setInputValue('');
-    
-        // ✅ Keep user's query message in chat history
-        setMessages((prev) => [
-            ...prev,
-            { type: 'query', text: currentInput }, 
-            { type: 'loading', text: 'Looking for Answer...' } // Loading message
-        ]);
-    
+
+        try {
+            setIsInitializing(true);
+            setModelProgress(0);
+            await initWebLLM((progress) => {
+                setModelProgress(progress);
+            });
+            setIsInitializing(false);
+            setMode('local');
+            webLLMAvailableRef.current = true;
+            return true;
+        } catch (error) {
+            console.error('WebLLM init failed:', error);
+            setIsInitializing(false);
+            setMode('server');
+            webLLMAvailableRef.current = false;
+            throw error;
+        }
+    };
+
+    // Handle local WebLLM streaming
+    const handleLocalChat = async (userPrompt) => {
+        streamingAbortRef.current = false;
+        setIsStreaming(true);
+
+        try {
+            // Build chat history from messages
+            const history = [];
+            for (let i = 0; i < messages.length; i++) {
+                if (messages[i].type === 'query') {
+                    history.push({ role: 'user', content: messages[i].text });
+                } else if (messages[i].type === 'response') {
+                    history.push({ role: 'assistant', content: messages[i].text });
+                }
+            }
+
+            // System prompt about the portfolio
+            const systemPrompt = `You are a helpful AI assistant for Deep Shahane's portfolio. 
+Answer questions about Deep's experience, projects, skills, and education based on the portfolio information.
+Be concise, professional, and accurate.`;
+
+            // Remove loading message and add empty response
+            setMessages((prev) => {
+                const filtered = prev.filter(msg => msg.type !== 'loading');
+                return [...filtered, { type: 'response', text: '' }];
+            });
+
+            let accumulatedText = '';
+
+            await streamChat({
+                systemPrompt,
+                history,
+                userPrompt,
+                onToken: (token) => {
+                    if (streamingAbortRef.current) return;
+                    accumulatedText += token;
+                    setMessages((prev) => {
+                        const updated = [...prev];
+                        const lastIdx = updated.length - 1;
+                        if (updated[lastIdx]?.type === 'response') {
+                            updated[lastIdx] = { type: 'response', text: accumulatedText };
+                        }
+                        return updated;
+                    });
+                },
+            });
+
+            setIsStreaming(false);
+        } catch (error) {
+            setIsStreaming(false);
+            if (!streamingAbortRef.current) {
+                throw error;
+            }
+        }
+    };
+
+    // Handle backend fallback
+    const handleBackendChat = async (userPrompt) => {
         const backendUrl = 'https://portfolio-backend-wt45.onrender.com/chat';
-    
+
         try {
             const response = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: currentInput })
+                body: JSON.stringify({ prompt: userPrompt })
             });
-    
+
             const data = await response.json();
-    
+
             if (!response.ok) throw new Error(data.error || 'An error occurred while fetching data.');
-    
+
             const generatedText = data.response || 'No response received.';
-    
-            // ✅ Remove "Looking for Answer..." before adding the response
-            setMessages((prev) => prev.slice(0, -1));
-    
-            // ✅ Simulate typing effect to display answer gradually
+
+            // Remove loading message
+            setMessages((prev) => prev.filter(msg => msg.type !== 'loading'));
+
+            // Simulate typing effect for backend (optional, for UX consistency)
             let responseMessage = { type: 'response', text: '' };
             setMessages((prev) => [...prev, responseMessage]);
-    
+
             simulateTypingEffect(generatedText, (updatedText) => {
                 setMessages((prev) => {
                     let updatedMessages = [...prev];
@@ -94,20 +184,124 @@ const Ask = () => {
                     return updatedMessages;
                 });
             });
-    
         } catch (error) {
-            // ✅ Ensure loading message is removed even on error
-            setMessages((prev) => prev.slice(0, -1));
-    
-            setMessages((prev) => [...prev, { type: 'error', text: `${error.message}. Try Again.` }]);
+            throw error;
         }
     };
-    
-    const handleKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            handleChatSubmit();
+
+    const handleChatSubmit = async () => {
+        if (!inputValue.trim()) {
+            setMessages((prev) => [...prev, { type: 'error', text: 'Please type your message before submitting.' }]);
+            return;
         }
+
+        setIsChatActive(true);
+        const currentInput = inputValue;
+        setInputValue('');
+
+        // Add user query
+        setMessages((prev) => [
+            ...prev,
+            { type: 'query', text: currentInput }
+        ]);
+
+        // Determine loading message
+        let loadingText = 'Looking for Answer...';
+        if (webLLMAvailableRef.current && isInitializing) {
+            loadingText = 'Loading local model...';
+        }
+
+        setMessages((prev) => [
+            ...prev,
+            { type: 'loading', text: loadingText }
+        ]);
+
+        // Try local WebLLM first
+        let useLocal = false;
+        if (webLLMAvailableRef.current) {
+            try {
+                // Ensure WebLLM is initialized
+                await ensureWebLLMInitialized();
+                useLocal = true;
+            } catch (error) {
+                console.log('WebLLM init failed, falling back to server:', error);
+                useLocal = false;
+            }
+        }
+
+        if (useLocal) {
+            try {
+                // Update loading message
+                setMessages((prev) => {
+                    const updated = [...prev];
+                    const lastIdx = updated.length - 1;
+                    if (updated[lastIdx]?.type === 'loading') {
+                        updated[lastIdx] = { type: 'loading', text: 'Generating response...' };
+                    }
+                    return updated;
+                });
+
+                await handleLocalChat(currentInput);
+            } catch (error) {
+                console.error('Local chat failed, falling back to server:', error);
+                // Remove loading and try backend
+                setMessages((prev) => prev.filter(msg => msg.type !== 'loading'));
+                setMessages((prev) => [
+                    ...prev,
+                    { type: 'loading', text: 'Looking for Answer...' }
+                ]);
+                setMode('server');
+                try {
+                    await handleBackendChat(currentInput);
+                } catch (backendError) {
+                    setMessages((prev) => {
+                        const filtered = prev.filter(msg => msg.type !== 'loading');
+                        return [...filtered, { type: 'error', text: `${backendError.message}. Try Again.` }];
+                    });
+                }
+            }
+        } else {
+            // Use backend directly
+            setMode('server');
+            try {
+                await handleBackendChat(currentInput);
+            } catch (error) {
+                setMessages((prev) => {
+                    const filtered = prev.filter(msg => msg.type !== 'loading');
+                    return [...filtered, { type: 'error', text: `${error.message}. Try Again.` }];
+                });
+            }
+        }
+    };
+
+    const handleCancel = () => {
+        if (isStreaming) {
+            streamingAbortRef.current = true;
+            interruptGenerate();
+            setIsStreaming(false);
+            setMessages((prev) => {
+                const filtered = prev.filter(msg => msg.type !== 'loading');
+                return filtered;
+            });
+        }
+    };
+
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            if (!isStreaming) {
+                handleChatSubmit();
+            }
+        }
+    };
+
+    // Sanitize HTML for safe rendering
+    const sanitizeHTML = (html) => {
+        if (typeof window === 'undefined') return html;
+        return DOMPurify.sanitize(html, {
+            ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'a', 'ul', 'ol', 'li', 'code', 'pre'],
+            ALLOWED_ATTR: ['href', 'target', 'rel'],
+        });
     };
 
     return (
@@ -115,14 +309,47 @@ const Ask = () => {
             {!isChatActive && <h1 className="ask-header">{typedText}</h1>}
             {isChatActive && (
                 <div className="message-area">
-                    {messages.map((msg, index) => (
-                        <div 
-                            key={index} 
-                            className={`message ${msg.type}`} 
-                            dangerouslySetInnerHTML={{ __html: msg.text }}
-                            ></div>                    
-                        ))}
-                    {/* 🔥 Add a reference at the bottom of the chat */}
+                    {/* Mode indicator */}
+                    {mode !== 'unknown' && (
+                        <div className="mode-badge">
+                            {mode === 'local' ? '🖥️ Local Mode' : '🌐 Server Fallback'}
+                        </div>
+                    )}
+                    {/* Model loading progress */}
+                    {isInitializing && (
+                        <div className="model-progress">
+                            <div className="progress-text">Loading local model... {modelProgress}%</div>
+                            <div className="progress-bar">
+                                <div className="progress-fill" style={{ width: `${modelProgress}%` }}></div>
+                            </div>
+                        </div>
+                    )}
+                    {messages.map((msg, index) => {
+                        if (msg.type === 'query') {
+                            // User messages - plain text (no HTML)
+                            return (
+                                <div key={index} className={`message ${msg.type}`}>
+                                    {msg.text}
+                                </div>
+                            );
+                        } else if (msg.type === 'response') {
+                            // Assistant messages - sanitized HTML
+                            return (
+                                <div
+                                    key={index}
+                                    className={`message ${msg.type}`}
+                                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(msg.text) }}
+                                />
+                            );
+                        } else {
+                            // Loading/error messages - plain text
+                            return (
+                                <div key={index} className={`message ${msg.type}`}>
+                                    {msg.text}
+                                </div>
+                            );
+                        }
+                    })}
                     <div ref={messageEndRef}></div>
                 </div>
             )}
@@ -135,28 +362,39 @@ const Ask = () => {
                         value={inputValue}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
+                        disabled={isStreaming || isInitializing}
                     />
                 </div>
                 <div className="button-group">
                     <div className="button-left">
-                    <a
-                        href="https://drive.google.com/file/d/1HEcSVsRSDa37442Z091bWi7TaV9SMcjM/view?usp=sharing"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="cv-button"
-                    >
-                        CV
-                    </a>
-
-                    <a
-                        href="mailto:esotericdeep@gmail.com"
-                        className="mail-button"
-                    >
-                        Mail
-                    </a>
-
+                        <a
+                            href="https://drive.google.com/file/d/1HEcSVsRSDa37442Z091bWi7TaV9SMcjM/view?usp=sharing"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="cv-button"
+                        >
+                            CV
+                        </a>
+                        <a
+                            href="mailto:esotericdeep@gmail.com"
+                            className="mail-button"
+                        >
+                            Mail
+                        </a>
                     </div>
-                    <button className="submit-button" onClick={handleChatSubmit}>↑</button>
+                    {isStreaming ? (
+                        <button className="cancel-button" onClick={handleCancel}>
+                            ✕
+                        </button>
+                    ) : (
+                        <button 
+                            className="submit-button" 
+                            onClick={handleChatSubmit}
+                            disabled={isInitializing}
+                        >
+                            ↑
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

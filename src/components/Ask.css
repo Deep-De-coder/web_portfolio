@@ -303,6 +303,89 @@ h1 {
     }
 }
 
+/* ✅ Mode Badge */
+.mode-badge {
+    align-self: center;
+    padding: 4px 12px;
+    background-color: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: #4CAF50;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+/* ✅ Model Progress Indicator */
+.model-progress {
+    width: 100%;
+    padding: 8px;
+    background-color: rgba(33, 33, 33, 0.8);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 6px;
+    text-align: center;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #444;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #8BC34A);
+    transition: width 0.3s ease;
+    border-radius: 3px;
+}
+
+/* ✅ Cancel Button */
+.cancel-button {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.cancel-button:hover {
+    background-color: #d32f2f;
+}
+
+.cancel-button:active {
+    background-color: #b71c1c;
+}
+
+/* ✅ Loading message styling */
+.message.loading {
+    align-self: center;
+    color: #aaa;
+    font-style: italic;
+    background-color: transparent;
+}
+
+/* ✅ Disabled input state */
+.ask-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* ✅ Extra small screen adjustments */
 @media (max-width: 400px) {
     .ask-container {
@@ -330,9 +413,18 @@ h1 {
         padding: 5px 9px;
     }
 
-    .submit-button {
+    .submit-button, .cancel-button {
         width: 34px;
         height: 34px;
         font-size: 13px;
+    }
+
+    .mode-badge {
+        font-size: 0.7rem;
+        padding: 3px 10px;
+    }
+
+    .progress-text {
+        font-size: 0.75rem;
     }
 }
