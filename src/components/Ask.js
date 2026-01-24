@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import DOMPurify from 'dompurify';
 import ReactMarkdown from 'react-markdown';
 import './Ask.css';
 import {
@@ -7,7 +6,6 @@ import {
   streamChat,
   interruptGenerate,
   isWebGPUSupported,
-  getModelId,
 } from '../utils/webllmClient';
 
 const Ask = () => {
@@ -53,7 +51,8 @@ const Ask = () => {
             }
         };
         typeText();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // fullText is a constant, no need to include in deps
 
     const handleInputChange = (event) => setInputValue(event.target.value);
 
@@ -306,8 +305,10 @@ Be concise, professional, and accurate.`;
             <ReactMarkdown
                 components={{
                     // Style links
-                    a: ({ node, ...props }) => (
-                        <a {...props} target="_blank" rel="noopener noreferrer" className="markdown-link" />
+                    a: ({ node, children, ...props }) => (
+                        <a {...props} target="_blank" rel="noopener noreferrer" className="markdown-link">
+                            {children}
+                        </a>
                     ),
                     // Style lists
                     ul: ({ node, ...props }) => <ul {...props} className="markdown-list" />,
