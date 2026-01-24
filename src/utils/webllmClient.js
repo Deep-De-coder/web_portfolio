@@ -57,10 +57,23 @@ export async function init(onProgress) {
         {
           initProgressCallback: (report) => {
             if (onProgress) {
-              const progress = Math.min(
-                100,
-                Math.round((report.progress / report.text.length) * 100)
-              );
+              // WebLLM progress callback structure
+              // report.progress is the current progress value
+              // report.text contains status messages
+              let progress = 0;
+              
+              // Try to extract progress from the report
+              if (typeof report.progress === 'number') {
+                progress = Math.min(100, Math.max(0, report.progress));
+              } else if (report.text) {
+                // If progress is in text format, try to parse it
+                const match = report.text.match(/(\d+)%/);
+                if (match) {
+                  progress = parseInt(match[1], 10);
+                }
+              }
+              
+              // Always call onProgress to update UI
               onProgress(progress);
             }
           },

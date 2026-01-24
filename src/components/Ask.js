@@ -81,9 +81,34 @@ const Ask = () => {
         try {
             setIsInitializing(true);
             setModelProgress(0);
-            await initWebLLM((progress) => {
-                setModelProgress(progress);
+            
+            // Add timeout to prevent getting stuck
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Model loading timeout')), 120000); // 2 minutes
             });
+            
+            // Update progress periodically as fallback
+            const progressInterval = setInterval(() => {
+                setModelProgress((prev) => {
+                    // Increment slowly if stuck
+                    if (prev < 5) return prev + 1;
+                    return prev;
+                });
+            }, 2000);
+            
+            try {
+                await Promise.race([
+                    initWebLLM((progress) => {
+                        setModelProgress(progress);
+                    }),
+                    timeoutPromise
+                ]);
+                clearInterval(progressInterval);
+            } catch (err) {
+                clearInterval(progressInterval);
+                throw err;
+            }
+            
             setIsInitializing(false);
             setMode('local');
             webLLMAvailableRef.current = true;
@@ -337,8 +362,8 @@ Be concise, professional, and accurate.`;
                             {mode === 'local' ? '🖥️ Local Mode' : '🌐 Server Fallback'}
                         </div>
                     )}
-                    {/* Model loading progress */}
-                    {isInitializing && (
+                    {/* Model loading progress - only show if progress > 0 to avoid stuck at 0% */}
+                    {isInitializing && modelProgress > 0 && (
                         <div className="model-progress">
                             <div className="progress-text">Loading local model... {modelProgress}%</div>
                             <div className="progress-bar">
