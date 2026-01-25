@@ -344,7 +344,10 @@ Be concise, professional, and accurate.`;
         const queries = {
             'education': 'Tell me about your education',
             'experience': 'Tell me about your work experience',
-            'leadership': 'Tell me about your leadership qualities'
+            'leadership': 'Tell me about your leadership qualities',
+            'projects': 'Tell me about your projects',
+            'skills': 'Tell me about your skills',
+            'publications': 'Tell me about your publications'
         };
         
         const query = queries[action];
@@ -470,7 +473,28 @@ Be concise, professional, and accurate.`;
                         onClick={() => handleQuickAction('leadership')}
                         disabled={isStreaming || isInitializing}
                     >
-                        Leadership Qualities
+                        Leadership
+                    </button>
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('projects')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Projects
+                    </button>
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('skills')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Skills
+                    </button>
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('publications')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Publications
                     </button>
                 </div>
                 <div className="button-group">

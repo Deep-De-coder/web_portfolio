@@ -222,24 +222,27 @@ a:hover {
 /* ✅ Quick Action Buttons */
 .quick-actions {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
     padding: 4px 0;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 }
 
 .quick-action-btn {
-    padding: 6px 12px;
+    flex: 1;
+    padding: 6px 8px;
     background-color: #555;
     color: white;
     border: 1px solid #666;
     border-radius: 15px;
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     transition: all 0.3s ease;
     white-space: nowrap;
+    text-align: center;
+    min-width: 0;
 }
 
 .quick-action-btn:hover:not(:disabled) {
@@ -395,13 +398,16 @@ h1 {
     }
 
     .quick-actions {
-        gap: 6px;
+        gap: 4px;
         padding: 3px 0;
+        flex-wrap: wrap;
     }
 
     .quick-action-btn {
-        font-size: 0.75rem;
-        padding: 5px 10px;
+        font-size: 0.7rem;
+        padding: 5px 6px;
+        flex: 1 1 calc(33.333% - 4px);
+        min-width: calc(33.333% - 4px);
     }
 }
 
@@ -440,9 +446,15 @@ h1 {
         font-size: 14px;
     }
 
+    .quick-actions {
+        gap: 3px;
+    }
+
     .quick-action-btn {
-        font-size: 0.7rem;
-        padding: 4px 8px;
+        font-size: 0.65rem;
+        padding: 4px 4px;
+        flex: 1 1 calc(33.333% - 3px);
+        min-width: calc(33.333% - 3px);
     }
 }
 
