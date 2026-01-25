@@ -229,15 +229,19 @@ Be concise, professional, and accurate.`;
         }
     };
 
-    const handleChatSubmit = async () => {
-        if (!inputValue.trim()) {
+    const handleChatSubmit = async (customQuery = null) => {
+        const queryToUse = customQuery || inputValue;
+        
+        if (!queryToUse.trim()) {
             setMessages((prev) => [...prev, { type: 'error', text: 'Please type your message before submitting.' }]);
             return;
         }
 
         setIsChatActive(true);
-        const currentInput = inputValue;
-        setInputValue('');
+        const currentInput = queryToUse;
+        if (!customQuery) {
+            setInputValue('');
+        }
 
         // Add user query
         setMessages((prev) => [
@@ -335,6 +339,21 @@ Be concise, professional, and accurate.`;
         }
     };
 
+    // Handle quick action button clicks
+    const handleQuickAction = (action) => {
+        const queries = {
+            'education': 'Tell me about your education',
+            'experience': 'Tell me about your work experience',
+            'leadership': 'Tell me about your leadership qualities'
+        };
+        
+        const query = queries[action];
+        if (query && !isStreaming && !isInitializing) {
+            // Directly submit with the query
+            handleChatSubmit(query);
+        }
+    };
+
     // Render Markdown with proper formatting
     const renderMarkdown = (text) => {
         if (!text) return '';
@@ -422,7 +441,7 @@ Be concise, professional, and accurate.`;
                 <div className="chat-bar">
                     <input
                         type="text"
-                        placeholder="Ask Junior"
+                        placeholder="Tell me about ..."
                         className="ask-input"
                         value={inputValue}
                         onChange={handleInputChange}
@@ -430,10 +449,34 @@ Be concise, professional, and accurate.`;
                         disabled={isStreaming || isInitializing}
                     />
                 </div>
+                {/* Quick Action Buttons */}
+                <div className="quick-actions">
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('education')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Education
+                    </button>
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('experience')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Experience
+                    </button>
+                    <button 
+                        className="quick-action-btn"
+                        onClick={() => handleQuickAction('leadership')}
+                        disabled={isStreaming || isInitializing}
+                    >
+                        Leadership Qualities
+                    </button>
+                </div>
                 <div className="button-group">
                     <div className="button-left">
                         <a
-                            href="https://drive.google.com/file/d/1HEcSVsRSDa37442Z091bWi7TaV9SMcjM/view?usp=sharing"
+                            href="https://drive.google.com/file/d/1huA6oTDVo2jL9u24RWxN6DAm_YVkURG2/view?usp=sharing"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="cv-button"

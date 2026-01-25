@@ -203,6 +203,7 @@ a:hover {
 /* ✅ Input Group */
 .input-group {
     width: 50%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -213,6 +214,47 @@ a:hover {
     border-radius: 30px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     margin-top: 10px;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Prevent horizontal scrollbar */
+    min-width: 0; /* Allow flexbox to shrink */
+}
+
+/* ✅ Quick Action Buttons */
+.quick-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 4px 0;
+    flex-wrap: wrap;
+}
+
+.quick-action-btn {
+    padding: 6px 12px;
+    background-color: #555;
+    color: white;
+    border: 1px solid #666;
+    border-radius: 15px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.quick-action-btn:hover:not(:disabled) {
+    background-color: #666;
+    border-color: #777;
+    transform: translateY(-1px);
+}
+
+.quick-action-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.quick-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 /* ✅ Chat Bar */
@@ -351,6 +393,16 @@ h1 {
         height: 38px;
         font-size: 16px;
     }
+
+    .quick-actions {
+        gap: 6px;
+        padding: 3px 0;
+    }
+
+    .quick-action-btn {
+        font-size: 0.75rem;
+        padding: 5px 10px;
+    }
 }
 
 /* ✅ Further adjustments for smaller screens */
@@ -386,6 +438,11 @@ h1 {
         width: 36px;
         height: 36px;
         font-size: 14px;
+    }
+
+    .quick-action-btn {
+        font-size: 0.7rem;
+        padding: 4px 8px;
     }
 }
 
