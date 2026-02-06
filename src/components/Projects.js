@@ -11,6 +11,7 @@ import transformersImg from '../assets/projects/transformersdeeplearning.png';
 import autoenvisionImg from '../assets/projects/autoenvision.png';
 import carpriceedaImg from '../assets/projects/carpriceeda.png';
 import coineeImg from '../assets/projects/coinee.png';
+import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -25,6 +26,15 @@ const Projects = () => {
       summary: "Built a production-ready wardrobe app on Next.js 14 (App Router, TypeScript, Tailwind) with Node serverless API routes on Vercel, delivering AI outfit suggestions and real-time photo analysis. Integrated Azure Vision and a private Ollama LLM (qwen2:1.5b) via a Fly.io HTTPS proxy with API-key auth; added timeouts/retries and server-only secrets for a secure, reliable pipeline. Built a mobile-first UI with drag-and-drop uploads, guardrail category detection, and fallback for low-bandwidth devices.",
       techStack: ["Next.js", "TypeScript", "Node.js", "Azure Vision", "Ollama", "Tailwind", "Vercel"],
       thumbnail: dresserImg,
+    },
+    {
+      title: "Lowlight Diffusion Restoration",
+      period: "Dec 2025 - Present",
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/lowlight_diffusion_restoration",
+      summary: "It is a camera-style pipeline that restores dark, noisy photos into clean, brighter images while preserving sharp details. It builds on a diffusion img2img backbone fine-tuned with LoRA on LOL/SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. The project also includes benchmarking, performance-focused inference optimizations, and profiling tools so it is  engineered as a measurable system—not just a demo.",
+      techStack: ["PyTorch", "Diffusers", "LoRA (PEFT)", "Stable Diffusion 2.1", "Accelerate", "CUDA", "PyTorch Profiler", "NVIDIA Nsight", "OpenCV"],
+      thumbnail: lowlightdiffusionImg,
     },
     {
       title: "Efficient Multimodal LLM Agent",
