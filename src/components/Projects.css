@@ -4,6 +4,27 @@
     padding-top: 0px;
 }
 
+/* Section heading */
+.projects-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 20px;
+    padding-left: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+.projects-heading::after {
+    content: '';
+    display: block;
+    margin-top: 6px;
+    height: 2px;
+    width: 60%;
+    background: linear-gradient(90deg, rgba(100, 150, 255, 0.8), transparent);
+    border-radius: 2px;
+}
+
 .projects-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -15,20 +36,31 @@
 
 /* Project Card */
 .project-card {
-    background: rgba(50, 50, 50, 0.8);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.10) 0%,
+        rgba(255, 255, 255, 0.04) 100%
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     padding: 15px;
     border-radius: 10px;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease-in-out;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transition: box-shadow 0.3s ease-in-out, border-color 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
     max-width: 100%;
+    cursor: pointer;
 }
 
-/* Hover Effect */
+/* Hover Effect — lift handled by Framer Motion whileHover */
 .project-card:hover {
-    transform: scale(1.03);
-    box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px rgba(100, 150, 255, 0.40),
+                0 0 0 1px rgba(100, 150, 255, 0.20),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    border-color: rgba(100, 160, 255, 0.50);
 }
 
 /* Web Layout: Thumbnail + Info in Row */
@@ -41,8 +73,8 @@
 
 /* Thumbnail Styling */
 .project-thumbnail {
-    width: 200px; /* Adjust size */
-    height: 120px; /* Keep it square */
+    width: 200px;
+    height: 120px;
     border-radius: 10px;
     object-fit: cover;
     flex-shrink: 0;
@@ -97,7 +129,8 @@
 }
 
 .tech-badge {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(100, 150, 255, 0.12);
+    border: 1px solid rgba(100, 150, 255, 0.25);
     color: white;
     padding: 6px 12px;
     border-radius: 15px;
@@ -107,13 +140,12 @@
     white-space: nowrap;
 }
 
-/* Summary Section - Initially Hidden in Mobile */
+/* Summary Section */
 .project-summary {
     font-size: 16px;
     color: #ddd;
-    
     margin-top: 10px;
-    display: block; /* Always visible in web */
+    display: block;
 }
 
 /* Hide summary in mobile view */
@@ -122,7 +154,6 @@
         display: none;
     }
 
-    /* Show summary only when expanded in mobile */
     .project-card.expanded .project-summary {
         display: block;
     }
@@ -146,13 +177,10 @@
 
 /* Dropdown Toggle for Mobile */
 .toggle-icon {
-    /* font-size: 16px;
-    font-weight: bold;
-    color: white; */
     display: none;
 }
 
-/* Mobile View: Cards in Column with Dropdown */
+/* Mobile View */
 @media (max-width: 768px) {
     .projects-container {
         display: flex;

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import './Projects.css';
 import cubesImage from '../assets/projects/cubes.png';
 import musicfiesta from '../assets/projects/musicfiesta.png';
@@ -16,6 +17,7 @@ import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const prefersReduced = useReducedMotion();
 
   const projects = [
     {
@@ -145,7 +147,15 @@ const Projects = () => {
 
   return (
     <div id="projects">
-      <h1>Projects</h1>
+      <motion.h1
+        initial={prefersReduced ? false : { opacity: 0, y: -20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="projects-heading"
+      >
+        Projects
+      </motion.h1>
       <div className="projects-container">
         {projects.map((proj, index) => {
           // Determine whether to show full summary or truncated
@@ -156,10 +166,15 @@ const Projects = () => {
             : `${proj.summary.substring(0, maxLength)}...`;
 
           return (
-            <div
+            <motion.div
               key={index}
               className={`project-card ${isExpanded ? 'expanded' : ''}`}
-              onClick={() => isMobile && toggleExpand(index)} // Only toggle in mobile view
+              onClick={() => isMobile && toggleExpand(index)}
+              initial={prefersReduced ? false : { opacity: 0, y: 32, scale: 0.96 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.12 }}
+              transition={{ duration: 0.55, delay: prefersReduced ? 0 : index * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
+              whileHover={prefersReduced ? {} : { y: -6 }}
             >
               {/* Thumbnail + Name in a row */}
               <div className="project-header">
@@ -205,7 +220,7 @@ const Projects = () => {
                   <span key={idx} className="tech-badge">{tech}</span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
