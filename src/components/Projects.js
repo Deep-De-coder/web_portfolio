@@ -1,5 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CardContainer, CardBody, CardItem } from './ui/3d-card';
+import { Meteors } from './ui/meteors';
 import './Projects.css';
 import cubesImage from '../assets/projects/cubes.png';
 import musicfiesta from '../assets/projects/musicfiesta.png';
@@ -14,10 +18,13 @@ import carpriceedaImg from '../assets/projects/carpriceeda.png';
 import coineeImg from '../assets/projects/coinee.png';
 import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 
+gsap.registerPlugin(ScrollTrigger, useGSAP);
+
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const prefersReduced = useReducedMotion();
+  const sectionRef = useRef(null);
+  const cardsRef = useRef([]);
 
   const projects = [
     {
@@ -34,7 +41,7 @@ const Projects = () => {
       period: "Dec 2025 - Present",
       demoLink: "",
       codeLink: "https://github.com/Deep-De-coder/lowlight_diffusion_restoration",
-      summary: "It is a camera-style pipeline that restores dark, noisy photos into clean, brighter images while preserving sharp details. It builds on a diffusion img2img backbone fine-tuned with LoRA on LOL/SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. The project also includes benchmarking, performance-focused inference optimizations, and profiling tools so it is  engineered as a measurable system—not just a demo.",
+      summary: "It is a camera-style pipeline that restores dark, noisy photos into clean, brighter images while preserving sharp details. It builds on a diffusion img2img backbone fine-tuned with LoRA on LOL/SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. The project also includes benchmarking, performance-focused inference optimizations, and profiling tools so it is engineered as a measurable system—not just a demo.",
       techStack: ["PyTorch", "Diffusers", "LoRA (PEFT)", "Stable Diffusion 2.1", "Accelerate", "CUDA", "PyTorch Profiler", "NVIDIA Nsight", "OpenCV"],
       thumbnail: lowlightdiffusionImg,
     },
@@ -104,8 +111,8 @@ const Projects = () => {
     {
       title: "Car Price EDA",
       period: "Sep 2022 - Nov 2022",
-      demoLink: "", 
-      codeLink: "https://github.com/Deep-De-coder/EDA-on-car-price-prediction", 
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/EDA-on-car-price-prediction",
       summary: "Performed in-depth EDA on a car price dataset with 11,900 rows and 16 columns. Used Matplotlib and Seaborn for data visualization.",
       techStack: ["Pandas", "NumPy", "Google Colab"],
       thumbnail: carpriceedaImg,
@@ -113,8 +120,8 @@ const Projects = () => {
     {
       title: "Flying Cubes",
       period: "Oct 2022 - Jan 2023",
-      demoLink: "", 
-      codeLink: "https://github.com/Deep-De-coder/FLying_Cubes", 
+      demoLink: "",
+      codeLink: "https://github.com/Deep-De-coder/FLying_Cubes",
       summary: "Developed an AR application allowing real-time manipulation of ascending cubes. Demonstrated Unity and AR proficiency.",
       techStack: ["AR", "Unity", "C#"],
       thumbnail: cubesImage,
@@ -122,105 +129,179 @@ const Projects = () => {
     {
       title: "Coinee",
       period: "Oct 2024 - Jan 2025",
-      demoLink: "https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US", 
-      codeLink: "", 
-      summary: "Coinee is a privacy-safe Android app to browse 300+ coins from 15+ countries with crisp visuals and concise facts.\nOptimized for offline use with fast on-device search, category filters, and smooth Material UI—no sign-in, no tracking.\nBuilt as a lightweight, read-only viewer to showcase numismatic collections and inspire casual learning.",
-      techStack: ["Android", "Kotlin", "Java", "Android SDK", "Material Components"],    
+      demoLink: "https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US",
+      codeLink: "",
+      summary: "Coinee is a privacy-safe Android app to browse 300+ coins from 15+ countries with crisp visuals and concise facts. Optimized for offline use with fast on-device search, category filters, and smooth Material UI—no sign-in, no tracking. Built as a lightweight, read-only viewer to showcase numismatic collections and inspire casual learning.",
+      techStack: ["Android", "Kotlin", "Java", "Android SDK", "Material Components"],
       thumbnail: coineeImg,
     },
   ];
 
-  // Detect mobile view for correct behavior
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Toggle expanded state for clicked project
   const toggleExpand = (index) => {
-    setExpandedIndex(expandedIndex === index ? null : index);
+    setExpandedIndex(prev => prev === index ? null : index);
   };
 
+  const handleSpotlight = useCallback((e) => {
+    const el = e.currentTarget;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+    el.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+  }, []);
+
+  const handleSpotlightLeave = useCallback((e) => {
+    e.currentTarget.style.setProperty('--mouse-x', '-400px');
+    e.currentTarget.style.setProperty('--mouse-y', '-400px');
+  }, []);
+
+  useGSAP(() => {
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced) return;
+
+    // Heading: stagger each character in from above
+    gsap.fromTo(
+      '.projects-heading .char',
+      { opacity: 0, y: -24 },
+      {
+        opacity: 1,
+        y: 0,
+        stagger: 0.04,
+        duration: 0.5,
+        ease: 'back.out(1.7)',
+        scrollTrigger: {
+          trigger: '.projects-heading',
+          start: 'top 85%',
+        },
+      }
+    );
+
+    // Cards: set to invisible immediately, reveal in batches as they scroll in
+    const cards = cardsRef.current.filter(Boolean);
+    gsap.set(cards, { opacity: 0, y: 50 });
+    ScrollTrigger.batch(cards, {
+      onEnter: (batch) => {
+        gsap.to(batch, {
+          opacity: 1,
+          y: 0,
+          duration: 0.65,
+          stagger: 0.1,
+          ease: 'power3.out',
+        });
+      },
+      start: 'top 90%',
+    });
+  }, { scope: sectionRef });
+
   return (
-    <div id="projects">
-      <motion.h1
-        initial={prefersReduced ? false : { opacity: 0, y: -20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.5, ease: 'easeOut' }}
-        className="projects-heading"
-      >
-        Projects
-      </motion.h1>
-      <div className="projects-container">
+    <div id="projects" ref={sectionRef}>
+      {/* Meteors streaking across the section background */}
+      <div className="meteors-bg">
+        <Meteors number={15} />
+      </div>
+
+      <h1 className="projects-heading">
+        {'Projects'.split('').map((char, i) => (
+          <span key={i} className="char">{char}</span>
+        ))}
+      </h1>
+
+      <div className="projects-grid">
         {projects.map((proj, index) => {
-          // Determine whether to show full summary or truncated
           const isExpanded = expandedIndex === index;
-          const maxLength = 100; // Character limit before "View More"
+          const maxLength = 100;
           const displayedSummary = isExpanded || isMobile
             ? proj.summary
             : `${proj.summary.substring(0, maxLength)}...`;
 
           return (
-            <motion.div
+            <div
               key={index}
-              className={`project-card ${isExpanded ? 'expanded' : ''}`}
-              onClick={() => isMobile && toggleExpand(index)}
-              initial={prefersReduced ? false : { opacity: 0, y: 32, scale: 0.96 }}
-              whileInView={{ opacity: 1, y: 0, scale: 1 }}
-              viewport={{ once: true, amount: 0.12 }}
-              transition={{ duration: 0.55, delay: prefersReduced ? 0 : index * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
-              whileHover={prefersReduced ? {} : { y: -6 }}
+              ref={el => { cardsRef.current[index] = el; }}
+              className="card-gsap-wrapper"
             >
-              {/* Thumbnail + Name in a row */}
-              <div className="project-header">
-                <img src={proj.thumbnail} alt={`${proj.title} Thumbnail`} className="project-thumbnail" />
-                <div className="project-info">
-                  <h3 className="project-name">{proj.title}</h3>
+              <CardContainer containerClassName="w-full p-0" className="w-full">
+                <CardBody className="w-full">
+                  <div
+                    className={`project-card${isExpanded ? ' expanded' : ''}`}
+                    onClick={() => isMobile && toggleExpand(index)}
+                    onMouseMove={handleSpotlight}
+                    onMouseLeave={handleSpotlightLeave}
+                  >
+                    <CardItem translateZ={30} className="w-full">
+                      <div className="project-header">
+                        <img
+                          src={proj.thumbnail}
+                          alt={`${proj.title} Thumbnail`}
+                          className="project-thumbnail"
+                        />
+                        <div className="project-info">
+                          <h3 className="project-name">{proj.title}</h3>
+                          <div className="project-links">
+                            {proj.demoLink && (
+                              <a
+                                href={proj.demoLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="project-link"
+                                onClick={e => e.stopPropagation()}
+                              >
+                                [DEMO]
+                              </a>
+                            )}
+                            {proj.codeLink && (
+                              <a
+                                href={proj.codeLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="project-link"
+                                onClick={e => e.stopPropagation()}
+                              >
+                                [CODE]
+                              </a>
+                            )}
+                          </div>
+                          <p className="project-duration">{proj.period}</p>
+                        </div>
+                        {isMobile && (
+                          <span className="toggle-icon">
+                            {isExpanded ? '▲' : '▼'}
+                          </span>
+                        )}
+                      </div>
+                    </CardItem>
 
-                  {/* DEMO and CODE links */}
-                  <div className="project-links">
-                    {proj.demoLink && (
-                      <a href={proj.demoLink} target="_blank" rel="noopener noreferrer" className="project-link">[DEMO]</a>
-                    )}
-                    {proj.codeLink && (
-                      <a href={proj.codeLink} target="_blank" rel="noopener noreferrer" className="project-link">[CODE]</a>
-                    )}
+                    <CardItem translateZ={15} className="w-full">
+                      <p className="project-summary">{displayedSummary}</p>
+                    </CardItem>
+
+                    <CardItem translateZ={10} className="w-fit">
+                      <button
+                        className="view-more-btn"
+                        onClick={e => {
+                          e.stopPropagation();
+                          toggleExpand(index);
+                        }}
+                      >
+                        {isExpanded ? 'View Less' : 'View More'}
+                      </button>
+                    </CardItem>
+
+                    <CardItem translateZ={20} className="w-full">
+                      <div className="tech-stack">
+                        {proj.techStack.map((tech, idx) => (
+                          <span key={idx} className="tech-badge">{tech}</span>
+                        ))}
+                      </div>
+                    </CardItem>
                   </div>
-
-
-                  {/* Project Duration */}
-                  <p className="project-duration">{proj.period}</p>
-                </div>
-                {/* Toggle Icon for Mobile */}
-                {isMobile && <span className="toggle-icon">{isExpanded ? "▲" : "▼"}</span>}
-              </div>
-
-              {/* Project Summary (Truncated for Web, Dropdown for Mobile) */}
-              <p className="project-summary">{displayedSummary}</p>
-
-              {/* View More Button for Web and Mobile */}
-              <button
-                className="view-more-btn"
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent card click from triggering mobile dropdown
-                  toggleExpand(index);
-                }}
-              >
-                {isExpanded ? "View Less" : "View More"}
-              </button>
-
-              {/* Tech Stack */}
-              <div className="tech-stack">
-                {proj.techStack.map((tech, idx) => (
-                  <span key={idx} className="tech-badge">{tech}</span>
-                ))}
-              </div>
-            </motion.div>
+                </CardBody>
+              </CardContainer>
+            </div>
           );
         })}
       </div>
