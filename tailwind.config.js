@@ -7,6 +7,10 @@ module.exports = {
   darkMode: "class",
   theme: {
     extend: {
+      fontFamily: {
+        grotesk: ['"Space Grotesk"', 'sans-serif'],
+        dm: ['"DM Sans"', 'sans-serif'],
+      },
       animation: {
         "meteor-effect": "meteor 5s linear infinite",
       },
