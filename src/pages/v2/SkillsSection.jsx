@@ -110,7 +110,7 @@ function SkillCard({ cat }) {
 
 export default function SkillsSection() {
   return (
-    <section id="skills" className="py-24 px-6" style={{ background: '#05050a' }}>
+    <section id="skills" className="py-24 px-6" style={{ background: 'transparent' }}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div

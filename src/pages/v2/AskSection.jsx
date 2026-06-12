@@ -139,7 +139,7 @@ export default function AskSection() {
   const hasMessages = messages.length > 0;
 
   return (
-    <section id="ask" className="py-24 px-6 relative" style={{ background: '#05050a' }}>
+    <section id="ask" className="py-24 px-6 relative" style={{ background: 'transparent' }}>
       <div
         className="absolute inset-0 pointer-events-none"
         style={{

@@ -238,7 +238,7 @@ export default function ProjectsSection() {
   const rest = PROJECTS.filter(p => !p.featured);
 
   return (
-    <section id="projects" ref={sectionRef} className="py-24 px-6" style={{ background: '#07070f' }}>
+    <section id="projects" ref={sectionRef} className="py-24 px-6" style={{ background: 'transparent' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <motion.div

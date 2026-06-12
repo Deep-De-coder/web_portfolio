@@ -127,7 +127,7 @@ export default function ExperienceSection() {
   }, { scope: sectionRef });
 
   return (
-    <section id="experience" ref={sectionRef} className="py-24 px-6" style={{ background: '#05050a' }}>
+    <section id="experience" ref={sectionRef} className="py-24 px-6" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div

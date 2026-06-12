@@ -87,7 +87,7 @@ function PubCard({ pub, index }) {
 
 export default function PublicationsSection() {
   return (
-    <section id="publications" className="py-24 px-6" style={{ background: '#07070f' }}>
+    <section id="publications" className="py-24 px-6" style={{ background: 'transparent' }}>
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <motion.div

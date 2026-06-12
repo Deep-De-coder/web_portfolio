@@ -77,7 +77,7 @@ function EduCard({ edu, index }) {
 
 export default function EducationSection() {
   return (
-    <section id="education" className="py-24 px-6" style={{ background: '#07070f' }}>
+    <section id="education" className="py-24 px-6" style={{ background: 'transparent' }}>
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <motion.div

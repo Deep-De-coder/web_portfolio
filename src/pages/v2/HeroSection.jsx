@@ -35,39 +35,8 @@ export default function HeroSection() {
     <section
       id="home"
       className="relative flex items-center justify-center overflow-hidden"
-      style={{ minHeight: '100vh', background: '#05050a' }}
+      style={{ minHeight: '100vh', background: 'transparent' }}
     >
-      {/* Indigo glow top-center */}
-      <div
-        className="absolute pointer-events-none"
-        aria-hidden="true"
-        style={{
-          top: '-5%', left: '10%', width: '80%', height: '75%',
-          background: 'radial-gradient(ellipse, rgba(99,102,241,0.13) 0%, transparent 68%)',
-          filter: 'blur(48px)',
-        }}
-      />
-      {/* Cyan glow bottom-right */}
-      <div
-        className="absolute pointer-events-none"
-        aria-hidden="true"
-        style={{
-          bottom: '-10%', right: '0%', width: '45%', height: '55%',
-          background: 'radial-gradient(ellipse, rgba(34,211,238,0.07) 0%, transparent 70%)',
-          filter: 'blur(64px)',
-        }}
-      />
-      {/* Dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        aria-hidden="true"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.13) 1px, transparent 1px)',
-          backgroundSize: '36px 36px',
-          opacity: 0.18,
-        }}
-      />
-
       <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
         {/* Label */}
         <motion.p

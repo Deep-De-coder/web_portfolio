@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+import SceneBackground from './v2/SceneBackground';
+import ChipCanvas from './v2/ChipCanvas';
 import NavBar from './v2/NavBar';
 import HeroSection from './v2/HeroSection';
 import AskSection from './v2/AskSection';
@@ -34,7 +36,10 @@ export default function V2() {
   }, []);
 
   return (
-    <div style={{ background: '#05050a', color: '#f1f5f9' }}>
+    <div style={{ background: '#05050a', color: '#f1f5f9', position: 'relative' }}>
+      <SceneBackground />
+      <ChipCanvas />
+      <div style={{ position: 'relative', zIndex: 10 }}>
       <NavBar />
       <HeroSection />
       <AskSection />
@@ -76,6 +81,7 @@ export default function V2() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }
