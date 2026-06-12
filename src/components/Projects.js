@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CardContainer, CardBody, CardItem } from './ui/3d-card';
@@ -159,45 +158,55 @@ const Projects = () => {
     e.currentTarget.style.setProperty('--mouse-y', '-400px');
   }, []);
 
-  useGSAP(() => {
+  useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
+    const scroller = document.querySelector('.main-content');
+    if (!scroller || !sectionRef.current) return;
 
-    // Heading: stagger each character in from above
-    gsap.fromTo(
-      '.projects-heading .char',
-      { opacity: 0, y: -24 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.04,
-        duration: 0.5,
-        ease: 'back.out(1.7)',
-        scrollTrigger: {
-          trigger: '.projects-heading',
-          start: 'top 85%',
-          scroller: '.main-content',
-        },
+    const triggers = [];
+    try {
+      const heading = sectionRef.current.querySelector('.projects-heading');
+      const chars = sectionRef.current.querySelectorAll('.projects-heading .char');
+      if (heading && chars.length) {
+        gsap.fromTo(
+          Array.from(chars),
+          { opacity: 0, y: -24 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.04,
+            duration: 0.5,
+            ease: 'back.out(1.7)',
+            scrollTrigger: {
+              trigger: heading,
+              start: 'top 85%',
+              scroller,
+            },
+          }
+        );
       }
-    );
 
-    // Cards: set to invisible immediately, reveal in batches as they scroll in
-    const cards = cardsRef.current.filter(Boolean);
-    gsap.set(cards, { opacity: 0, y: 50 });
-    ScrollTrigger.batch(cards, {
-      onEnter: (batch) => {
-        gsap.to(batch, {
-          opacity: 1,
-          y: 0,
-          duration: 0.65,
-          stagger: 0.1,
-          ease: 'power3.out',
-        });
-      },
-      start: 'top 90%',
-      scroller: '.main-content',
-    });
-  }, { scope: sectionRef });
+      const cards = cardsRef.current.filter(Boolean);
+      if (cards.length > 0) {
+        gsap.set(cards, { opacity: 0, y: 50 });
+        triggers.push(
+          ScrollTrigger.batch(cards, {
+            onEnter: (batch) => {
+              gsap.to(batch, { opacity: 1, y: 0, duration: 0.65, stagger: 0.1, ease: 'power3.out' });
+            },
+            start: 'top 90%',
+            scroller,
+          })
+        );
+      }
+    } catch (_) {}
+
+    return () => {
+      triggers.forEach(t => t && t.kill && t.kill());
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []);
 
   return (
     <div id="projects" ref={sectionRef}>
