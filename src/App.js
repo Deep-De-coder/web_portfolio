@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import V2 from './pages/V2';
 import Sidebar from './components/Sidebar'; // Sidebar component
 import Education from './components/Education';
 import Experience from './components/Experience';
@@ -28,6 +29,9 @@ function App() {
 
   return (
     <Router>
+      <Routes>
+        <Route path="/v2" element={<V2 />} />
+        <Route path="/" element={
       <div className="App">
         {/* Shooting Stars Background */}
         <div className="night">
@@ -67,6 +71,8 @@ function App() {
           </div>
         </div>
       </div>
+        } />
+      </Routes>
     </Router>
   );
 }

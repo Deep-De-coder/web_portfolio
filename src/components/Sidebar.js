@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import "./Sidebar.css";
 import { FaGithub, FaLinkedin } from "react-icons/fa"; // Import icons
 
@@ -50,6 +51,9 @@ const Sidebar = () => {
               {sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}
             </button>
           ))}
+          <Link to="/v2" style={{ textDecoration: 'none' }}>
+            <button>V2</button>
+          </Link>
         </div>
 
 
