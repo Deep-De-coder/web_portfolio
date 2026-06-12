@@ -18,7 +18,7 @@ import carpriceedaImg from '../assets/projects/carpriceeda.png';
 import coineeImg from '../assets/projects/coinee.png';
 import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
+gsap.registerPlugin(ScrollTrigger);
 
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
@@ -176,6 +176,7 @@ const Projects = () => {
         scrollTrigger: {
           trigger: '.projects-heading',
           start: 'top 85%',
+          scroller: '.main-content',
         },
       }
     );
@@ -194,6 +195,7 @@ const Projects = () => {
         });
       },
       start: 'top 90%',
+      scroller: '.main-content',
     });
   }, { scope: sectionRef });
 
