@@ -3,6 +3,7 @@ import SceneBackground from './v2/SceneBackground';
 import ChipCanvas from './v2/ChipCanvas';
 import NavBar from './v2/NavBar';
 import HeroSection from './v2/HeroSection';
+import ChipAssemblySection from './v2/ChipAssemblySection';
 import AskSection from './v2/AskSection';
 import ProjectsSection from './v2/ProjectsSection';
 import ExperienceSection from './v2/ExperienceSection';
@@ -22,9 +23,12 @@ export default function V2() {
     const prevBodyOverflow = body.style.overflow;
     const prevBodyHeight = body.style.height;
 
-    html.style.overflow = 'auto';
+    // NOTE: use 'visible', not 'auto'. When BOTH html and body are overflow:auto,
+    // Chromium creates two scroll containers and `position: sticky` silently
+    // stops pinning (breaks ChipAssemblySection). 'visible' still scrolls fine.
+    html.style.overflow = 'visible';
     html.style.height = 'auto';
-    body.style.overflow = 'auto';
+    body.style.overflow = 'visible';
     body.style.height = 'auto';
 
     return () => {
@@ -42,6 +46,7 @@ export default function V2() {
       <div style={{ position: 'relative', zIndex: 10 }}>
       <NavBar />
       <HeroSection />
+      <ChipAssemblySection />
       <AskSection />
       <ProjectsSection />
       <ExperienceSection />

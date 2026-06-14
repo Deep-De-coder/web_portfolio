@@ -30,8 +30,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<V2 />} />
-        <Route path="/v1" element={
+        <Route path="/v2" element={<V2 />} />
+        <Route path="/" element={
       <div className="App">
         {/* Shooting Stars Background */}
         <div className="night">
