@@ -32,43 +32,56 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 15px;
+  gap: 12px;
   margin-top: 8px;
   margin-bottom: 20px;
   padding: 10px;
 }
 
-/* ✅ Individual Icon Styling */
+/* ✅ Individual Icon Styling — icon fills the circular border */
 .social-icons a {
-  color: white;
+  position: relative;
+  color: #ffffff !important;
   transition: all 0.3s ease-in-out;
-  display: inline-flex;
+  display: flex;
   justify-content: center;
   align-items: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid #444;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid #666;
   border-radius: 50%;
-  text-decoration: none;
+  text-decoration: none !important;
   box-sizing: border-box;
   line-height: 0;
   overflow: hidden;
+  font-size: 0;
 }
 
-/* ✅ Keep SVG icons centered inside the circle */
+/* ✅ SVG fills and is centered in the circle */
 .social-icons a svg,
 .social-icons a .icon {
-  width: 22px;
-  height: 22px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px !important;
+  height: 24px !important;
   display: block;
-  flex-shrink: 0;
+  margin: 0;
+  padding: 0;
 }
 
 /* ✅ Hover Effects */
 .social-icons a:hover {
-  color: black;
-  background-color: white;
-  transform: scale(1.1);
+  color: #000000 !important;
+  background-color: #ffffff;
+  border-color: #ffffff;
+}
+
+.social-icons a:hover svg {
+  transform: translate(-50%, -50%);
 }
 
 
