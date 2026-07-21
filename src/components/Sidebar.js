@@ -35,10 +35,10 @@ const Sidebar = () => {
             {/* ✅ GitHub & LinkedIn Icons (Clickable) */}
             <div className="social-icons">
               <a href="https://github.com/Deep-De-coder" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                <FaGithub size={24} className="icon" />
+                <FaGithub size={28} className="icon" />
               </a>
               <a href="https://www.linkedin.com/in/deep-shahane/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                <FaLinkedin size={24} className="icon" />
+                <FaLinkedin size={28} className="icon" />
               </a>
             </div>
           </div>
