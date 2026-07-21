@@ -31,32 +31,44 @@
 .social-icons {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 15px;
   margin-top: 8px;
-  padding: 10px;  /* Adds space inside the border */
+  margin-bottom: 20px;
+  padding: 10px;
 }
 
 /* ✅ Individual Icon Styling */
 .social-icons a {
   color: white;
-  font-size: 35px;
   transition: all 0.3s ease-in-out;
-  margin-bottom: 20px;
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 40px; /* Fixed width */
-  height: 40px; /* Fixed height */
-  border: 1px solid #444; /* White border around each icon */
-  border-radius: 30%; /* Makes each icon circular */
-  text-decoration: none; /* Removes underline */
+  width: 42px;
+  height: 42px;
+  border: 1px solid #444;
+  border-radius: 50%;
+  text-decoration: none;
+  box-sizing: border-box;
+  line-height: 0;
+  overflow: hidden;
+}
+
+/* ✅ Keep SVG icons centered inside the circle */
+.social-icons a svg,
+.social-icons a .icon {
+  width: 22px;
+  height: 22px;
+  display: block;
+  flex-shrink: 0;
 }
 
 /* ✅ Hover Effects */
 .social-icons a:hover {
-  color: black; /* Change color on hover */
-  background-color: white; /* Background changes on hover */
-  transform: scale(1.1); /* Slight zoom-in effect */
+  color: black;
+  background-color: white;
+  transform: scale(1.1);
 }
 
 
