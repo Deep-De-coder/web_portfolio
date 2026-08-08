@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
-import { FaGithub, FaLinkedin } from "react-icons/fa"; // Import icons
+import { FaGithub, FaLinkedin, FaCopy, FaCheck } from "react-icons/fa";
+
+const GITHUB_URL = "https://github.com/Deep-De-coder";
+const LINKEDIN_URL = "https://www.linkedin.com/in/deep-shahane/";
 
 const Sidebar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [copied, setCopied] = useState(false);
 
   // Detect screen size changes
   useEffect(() => {
@@ -23,6 +27,17 @@ const Sidebar = () => {
     }
   };
 
+  const handleCopyLinks = async () => {
+    const text = `GitHub: ${GITHUB_URL}\nLinkedIn: ${LINKEDIN_URL}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy links:", err);
+    }
+  };
+
   return (
     <>
       <nav className={`sidebar ${isMobile ? "mobile-navbar" : ""}`}>
@@ -34,13 +49,24 @@ const Sidebar = () => {
 
             {/* ✅ GitHub & LinkedIn Icons (Clickable) */}
             <div className="social-icons">
-              <a href="https://github.com/Deep-De-coder" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <FaGithub size={32} className="icon" />
               </a>
-              <a href="https://www.linkedin.com/in/deep-shahane/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <FaLinkedin size={32} className="icon" />
               </a>
             </div>
+
+            {/* ✅ Copy both links */}
+            <button
+              type="button"
+              className={`copy-links-btn ${copied ? "copied" : ""}`}
+              onClick={handleCopyLinks}
+              aria-label="Copy GitHub and LinkedIn links"
+            >
+              {copied ? <FaCheck size={12} /> : <FaCopy size={12} />}
+              {copied ? "Copied!" : "Copy Links"}
+            </button>
           </div>
         )}
 
@@ -62,10 +88,10 @@ const Sidebar = () => {
           <div className="name-bar">
             <h3 className="sidebar-name">Deep Shahane</h3>
             <div className="mobile-icons">
-              <a href="https://github.com/Deep-De-coder" target="_blank" rel="noopener noreferrer">
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
                 <FaGithub />
               </a>
-              <a href="https://www.linkedin.com/in/deep-shahane/" target="_blank" rel="noopener noreferrer">
+              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
                 <FaLinkedin />
               </a>
             </div>

@@ -34,8 +34,37 @@
   align-items: center;
   gap: 12px;
   margin-top: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   padding: 10px;
+}
+
+/* ✅ Copy Links button below social icons */
+.copy-links-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto !important;
+  padding: 6px 14px !important;
+  margin-bottom: 16px;
+  background-color: #444 !important;
+  border: 1px solid #666 !important;
+  border-bottom: 1px solid #666 !important;
+  border-radius: 16px;
+  color: white;
+  font-size: 0.8rem !important;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.copy-links-btn:hover {
+  background-color: #555 !important;
+  border-color: #888 !important;
+}
+
+.copy-links-btn.copied {
+  background-color: #2e7d32 !important;
+  border-color: #4caf50 !important;
 }
 
 /* ✅ Individual Icon Styling — icon fills the circular border */
