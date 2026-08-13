@@ -31,38 +31,46 @@
 .social-icons {
   display: flex;
   justify-content: center;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 16px;
   margin-top: 8px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
   padding: 10px;
 }
 
-/* ✅ Copy Links button below social icons */
-.copy-links-btn {
+.social-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ✅ Per-icon copy button */
+.copy-link-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   width: auto !important;
-  padding: 6px 14px !important;
-  margin-bottom: 16px;
+  min-width: 72px;
+  padding: 4px 10px !important;
   background-color: #444 !important;
   border: 1px solid #666 !important;
   border-bottom: 1px solid #666 !important;
-  border-radius: 16px;
+  border-radius: 12px;
   color: white;
-  font-size: 0.8rem !important;
+  font-size: 0.7rem !important;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
+  white-space: nowrap;
 }
 
-.copy-links-btn:hover {
+.copy-link-btn:hover {
   background-color: #555 !important;
   border-color: #888 !important;
 }
 
-.copy-links-btn.copied {
+.copy-link-btn.copied {
   background-color: #2e7d32 !important;
   border-color: #4caf50 !important;
 }

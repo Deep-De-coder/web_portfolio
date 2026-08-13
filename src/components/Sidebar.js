@@ -8,7 +8,7 @@ const LINKEDIN_URL = "https://www.linkedin.com/in/deep-shahane/";
 
 const Sidebar = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const [copied, setCopied] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(null); // 'github' | 'linkedin' | null
 
   // Detect screen size changes
   useEffect(() => {
@@ -27,14 +27,13 @@ const Sidebar = () => {
     }
   };
 
-  const handleCopyLinks = async () => {
-    const text = `GitHub: ${GITHUB_URL}\nLinkedIn: ${LINKEDIN_URL}`;
+  const handleCopyLink = async (type, url) => {
     try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      await navigator.clipboard.writeText(url);
+      setCopiedLink(type);
+      setTimeout(() => setCopiedLink(null), 2000);
     } catch (err) {
-      console.error("Failed to copy links:", err);
+      console.error("Failed to copy link:", err);
     }
   };
 
@@ -47,26 +46,37 @@ const Sidebar = () => {
           <div className="sidebar-name-container">
             <h3 className="sidebar-name">Deep Shahane</h3>
 
-            {/* ✅ GitHub & LinkedIn Icons (Clickable) */}
+            {/* ✅ GitHub & LinkedIn Icons with separate copy buttons */}
             <div className="social-icons">
-              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-                <FaGithub size={32} className="icon" />
-              </a>
-              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-                <FaLinkedin size={32} className="icon" />
-              </a>
+              <div className="social-item">
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                  <FaGithub size={32} className="icon" />
+                </a>
+                <button
+                  type="button"
+                  className={`copy-link-btn ${copiedLink === "github" ? "copied" : ""}`}
+                  onClick={() => handleCopyLink("github", GITHUB_URL)}
+                  aria-label="Copy GitHub link"
+                >
+                  {copiedLink === "github" ? <FaCheck size={10} /> : <FaCopy size={10} />}
+                  {copiedLink === "github" ? "Copied!" : "GitHub"}
+                </button>
+              </div>
+              <div className="social-item">
+                <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                  <FaLinkedin size={32} className="icon" />
+                </a>
+                <button
+                  type="button"
+                  className={`copy-link-btn ${copiedLink === "linkedin" ? "copied" : ""}`}
+                  onClick={() => handleCopyLink("linkedin", LINKEDIN_URL)}
+                  aria-label="Copy LinkedIn link"
+                >
+                  {copiedLink === "linkedin" ? <FaCheck size={10} /> : <FaCopy size={10} />}
+                  {copiedLink === "linkedin" ? "Copied!" : "LinkedIn"}
+                </button>
+              </div>
             </div>
-
-            {/* ✅ Copy both links */}
-            <button
-              type="button"
-              className={`copy-links-btn ${copied ? "copied" : ""}`}
-              onClick={handleCopyLinks}
-              aria-label="Copy GitHub and LinkedIn links"
-            >
-              {copied ? <FaCheck size={12} /> : <FaCopy size={12} />}
-              {copied ? "Copied!" : "Copy Links"}
-            </button>
           </div>
         )}
 
