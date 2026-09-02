@@ -1,47 +1,44 @@
-# Portfolio – Full Visual Redesign
+# Portfolio Rebuild — Deep Shahane
 
-## Stack
-- CRA React 19, plain CSS (migrating to Tailwind)
-- framer-motion, gsap, @gsap/react installed
-- Tailwind CSS installed with color variables plugin
-- Aceternity UI: copy-paste from ui.aceternity.com/components into src/components/ui/
-- cn() utility at src/utils/cn.js
-- Space/night theme — shooting stars background in ShootingStars.css
+## Mission
+This is NOT a redesign. This is a complete rebuild from scratch.
+Forget the existing components. We are building something new.
 
-## Run
-npm start → localhost:3000
+## Person
+- Name: Deep Shahane
+- Has an in-browser LLM (WebGPU powered) — this is the most unique thing on the portfolio
+- Space/dark theme is the identity — keep it
 
-## Vision
-Jaw-dropping. Moving. Atmospheric. Space theme throughout.
-Think: aurora backgrounds, 3D card tilt on hover, magnetic cursor,
-scroll-triggered staggered reveals, glowing text effects, depth and parallax.
-NOT: subtle tweaks, border changes, small hover effects.
+## The vision
+Think: first time someone saw an Apple product demo.
+Not "nice portfolio" — "how did they build that?"
 
-## Aceternity components that fit this project
-- Aurora Background → wrap entire app background
-- Sparkles → hero/name section  
-- Text Generate Effect → section headings
-- 3D Card Effect → Projects cards
-- Tracing Beam → scroll guide down the page
-- Moving Border → skill badges
-- Background Beams → Experience section
-- Lamp Effect → section headers
-- Infinite Moving Cards → skills/publications
+Reference points:
+- https://linear.app (motion, atmosphere, depth)
+- https://stripe.com (scroll storytelling)
+- https://vercel.com (dark, technical, confident)
 
-## Rebuild order
-1. Background system (Aurora + enhanced shooting stars)
-2. Hero/name area (Sparkles + Text Generate)  
-3. Projects (3D Card Effect + Card Hover)
-4. Experience (Background Beams)
-5. Skills (Moving Border badges + Infinite scroll)
-6. Sidebar (animated nav)
+## Tech stack for the rebuild
+- React 19 (keep existing)
+- framer-motion (installed)
+- gsap + @gsap/react (installed)  
+- Tailwind CSS (installed)
+- 21st.dev Magic MCP — use /ui to generate components
+- Aceternity UI components where needed
+
+## What to build
+1. Full-screen cinematic hero — name, title, animated tagline, the LLM feature front and center
+2. Scroll-driven narrative — sections reveal as stories, not as cards
+3. Projects — each project gets a moment, not a card in a grid
+4. Experience — timeline with depth, not a list
+5. Skills — motion, not badges
+6. The Ask/LLM section — make this the showstopper, it's genuinely unique
 
 ## Rules
-- Full rebuilds only — no patching
-- One component per session
-- Tailwind for all new code
-- Framer Motion for component animations
+- Start fresh. Do not import or reference old component files.
+- Use /ui [description] to generate components via 21st.dev Magic
+- Use Tailwind for all styling
+- Framer Motion for all animations
 - GSAP ScrollTrigger for scroll sequences
-- Never touch utils/ or workers/
-- Confirm npm start after every change
-- Commit after every successful change
+- Keep the WebLLM worker files untouched (utils/ and workers/)
+- Commit after each section is complete
