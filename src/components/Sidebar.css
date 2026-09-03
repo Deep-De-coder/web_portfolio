@@ -1,11 +1,12 @@
-/* ✅ SIDEBAR FOR DESKTOP */
+/* ✅ SIDEBAR FOR DESKTOP
+   (single source of truth — App.css no longer redefines .sidebar) */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
   width: 240px;
-  height: 100vh;
-  background-color: #333;
+  height: 100%;
+  background-color: rgba(51, 51, 51, 0.9);
   color: white;
   display: flex;
   flex-direction: column;
@@ -14,7 +15,8 @@
   box-sizing: border-box;
   overflow-y: auto;
   transition: left 0.3s ease-in-out;
-  z-index: 1000;
+  z-index: 3;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
 }
 
 /* ✅ Name (Always Visible in Web View) */
@@ -152,19 +154,23 @@
 /* ✅ MOBILE VIEW FIXES */
 @media (max-width: 768px) {
 
+  /* Collapsed container; the fixed .nav-buttons and .name-bar inside it
+     render the visible mobile navbar (single source of truth — App.css no
+     longer redefines mobile .sidebar) */
   .sidebar {
-    width: 100%;
-    height: auto;
+    width: 0;
+    height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     top: 0;
     left: 0;
-    z-index: 1000;
+    z-index: 4;
     background-color: #222;
-    transition: height 0.3s ease-in-out;
-    position: fixed;
+    overflow: hidden;
+    transition: width 0.3s ease-in-out;
+    position: absolute;
     padding: 0;
   }
 

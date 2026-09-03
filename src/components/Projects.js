@@ -19,11 +19,14 @@ import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const MOBILE_QUERY = '(max-width: 767px)'; // matches the previous innerWidth < 768 check
+
 const Projects = () => {
   const [expandedIndex, setExpandedIndex] = useState(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
   const sectionRef = useRef(null);
   const cardsRef = useRef([]);
+  const spotlightFrameRef = useRef(null);
 
   const projects = [
     {
@@ -137,9 +140,21 @@ const Projects = () => {
   ];
 
   useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const mediaQuery = window.matchMedia(MOBILE_QUERY);
+    const handleChange = (event) => setIsMobile(event.matches);
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+
+  // Cancel any pending spotlight frame on unmount
+  useEffect(() => {
+    return () => {
+      if (spotlightFrameRef.current !== null) {
+        cancelAnimationFrame(spotlightFrameRef.current);
+        spotlightFrameRef.current = null;
+      }
+    };
   }, []);
 
   const toggleExpand = (index) => {
@@ -147,13 +162,22 @@ const Projects = () => {
   };
 
   const handleSpotlight = useCallback((e) => {
+    if (spotlightFrameRef.current !== null) return; // frame already pending
     const el = e.currentTarget;
-    const rect = el.getBoundingClientRect();
-    el.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-    el.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+    const { clientX, clientY } = e;
+    spotlightFrameRef.current = requestAnimationFrame(() => {
+      spotlightFrameRef.current = null;
+      const rect = el.getBoundingClientRect();
+      el.style.setProperty('--mouse-x', `${clientX - rect.left}px`);
+      el.style.setProperty('--mouse-y', `${clientY - rect.top}px`);
+    });
   }, []);
 
   const handleSpotlightLeave = useCallback((e) => {
+    if (spotlightFrameRef.current !== null) {
+      cancelAnimationFrame(spotlightFrameRef.current);
+      spotlightFrameRef.current = null;
+    }
     e.currentTarget.style.setProperty('--mouse-x', '-400px');
     e.currentTarget.style.setProperty('--mouse-y', '-400px');
   }, []);
@@ -169,29 +193,33 @@ const Projects = () => {
       const heading = sectionRef.current.querySelector('.projects-heading');
       const chars = sectionRef.current.querySelectorAll('.projects-heading .char');
       if (heading && chars.length) {
-        gsap.fromTo(
-          Array.from(chars),
-          { opacity: 0, y: -24 },
-          {
-            opacity: 1,
-            y: 0,
-            stagger: 0.04,
-            duration: 0.5,
-            ease: 'back.out(1.7)',
-            scrollTrigger: {
-              trigger: heading,
-              start: 'top 85%',
-              scroller,
-            },
-          }
+        triggers.push(
+          gsap.fromTo(
+            Array.from(chars),
+            { opacity: 0, y: -24 },
+            {
+              opacity: 1,
+              y: 0,
+              stagger: 0.04,
+              duration: 0.5,
+              ease: 'back.out(1.7)',
+              scrollTrigger: {
+                trigger: heading,
+                start: 'top 85%',
+                scroller,
+              },
+            }
+          )
         );
       }
 
       const cards = cardsRef.current.filter(Boolean);
       if (cards.length > 0) {
         gsap.set(cards, { opacity: 0, y: 50 });
+        // ScrollTrigger.batch returns an array of triggers — spread so each
+        // one is killed individually on cleanup
         triggers.push(
-          ScrollTrigger.batch(cards, {
+          ...ScrollTrigger.batch(cards, {
             onEnter: (batch) => {
               gsap.to(batch, { opacity: 1, y: 0, duration: 0.65, stagger: 0.1, ease: 'power3.out' });
             },
@@ -203,8 +231,9 @@ const Projects = () => {
     } catch (_) {}
 
     return () => {
+      // Kill only this component's tween/triggers — a global
+      // ScrollTrigger.getAll() kill would destroy other components' triggers
       triggers.forEach(t => t && t.kill && t.kill());
-      ScrollTrigger.getAll().forEach(t => t.kill());
     };
   }, []);
 
@@ -240,6 +269,15 @@ const Projects = () => {
                   <div
                     className={`project-card${isExpanded ? ' expanded' : ''}`}
                     onClick={() => isMobile && toggleExpand(index)}
+                    role={isMobile ? 'button' : undefined}
+                    tabIndex={isMobile ? 0 : undefined}
+                    aria-expanded={isMobile ? isExpanded : undefined}
+                    onKeyDown={isMobile ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleExpand(index);
+                      }
+                    } : undefined}
                     onMouseMove={handleSpotlight}
                     onMouseLeave={handleSpotlightLeave}
                   >

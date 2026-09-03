@@ -53,27 +53,41 @@ const Experience = () => {
   );
 };
 
+const MOBILE_QUERY = '(max-width: 767px)'; // matches the previous innerWidth < 768 check
+
 const ExperienceCard = ({ experience }) => {
   const [expanded, setExpanded] = useState(false);
   const [viewMore, setViewMore] = useState(false);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
   const maxLength = 200; // Limit for collapsed text
 
-  // Update isMobile state when window resizes
+  // Update isMobile when the breakpoint is crossed (fires only on change,
+  // unlike a per-card resize listener)
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const mediaQuery = window.matchMedia(MOBILE_QUERY);
+    const handleChange = (event) => setIsMobile(event.matches);
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
   }, []);
 
   return (
     <div className={`experience-card ${expanded ? "expanded" : ""}`}>
       {/* Mobile View: Entire Bar is Clickable */}
       {isMobile ? (
-        <div className="mobile-view" onClick={() => setExpanded(!expanded)}>
+        <div
+          className="mobile-view"
+          role="button"
+          tabIndex={0}
+          aria-expanded={expanded}
+          onClick={() => setExpanded(!expanded)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              setExpanded(!expanded);
+            }
+          }}
+        >
           <img src={experience.logo} alt={`${experience.company} Logo`} className="company-logo" />
           <div className="company-info">
             <h3 className="company-name">{experience.company}</h3>

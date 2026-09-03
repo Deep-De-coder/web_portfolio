@@ -178,15 +178,15 @@
 .response h2 { font-size: 1.3em; }
 .response h3 { font-size: 1.1em; }
 
-/* ✅ Change link color to teal blue */
-a {
+/* ✅ Change link color to teal blue (scoped to the Ask section only) */
+.ask-container a {
     color: #00bcd4 !important; /* Teal blue color */
     text-decoration: none; /* Removes underline */
     font-weight: bold;
 }
 
 /* ✅ Change color on hover */
-a:hover {
+.ask-container a:hover {
     color: #008ba3 !important; /* Darker teal on hover */
     text-decoration: underline;
 }
@@ -323,13 +323,10 @@ a:hover {
     margin-left: auto;
 }
 
-/* ✅ Typing animation for header */
-h1 {
-    font-family: 'Arial', sans-serif;
-    font-size: 2rem;
-    color: white;
-    overflow: hidden;
-    white-space: nowrap;
+/* ✅ Typing animation for the Ask header only (scoped so other sections'
+   h1 headings do not get the blinking cursor). Only the cursor/animation
+   props live here — .ask-header keeps its own wrapping behavior. */
+.ask-container h1 {
     border-right: 2px solid white;
     animation: blink-header 0.9s step-end infinite;
 }
@@ -347,7 +344,8 @@ h1 {
 /* ✅ Mobile Responsiveness */
 @media (max-width: 768px) {
     .ask-container {
-        margin-top: 40px;
+        /* margin-top removed: .main-content now carries padding-top for the
+           fixed mobile navbar + name bar, so no per-section compensation */
         padding: 10px;
         height: auto;
         font-size: 1.5rem;

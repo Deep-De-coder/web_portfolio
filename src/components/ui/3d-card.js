@@ -1,30 +1,54 @@
 import { cn } from "../../utils/cn";
-import React, { createContext, useState, useContext, useRef, useEffect } from "react";
+import React, { createContext, useState, useContext, useRef, useEffect, useMemo } from "react";
 
 const MouseEnterContext = createContext(undefined);
 
 export const CardContainer = ({ children, className, containerClassName }) => {
   const containerRef = useRef(null);
+  const frameRef = useRef(null);
   const [isMouseEntered, setIsMouseEntered] = useState(false);
 
+  // Cancel any pending transform frame on unmount
+  useEffect(() => {
+    return () => {
+      if (frameRef.current !== null) {
+        cancelAnimationFrame(frameRef.current);
+        frameRef.current = null;
+      }
+    };
+  }, []);
+
+  // Throttle transform writes to one per animation frame
   const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
-    const { left, top, width, height } = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX - left - width / 2) / 25;
-    const y = (e.clientY - top - height / 2) / 25;
-    containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+    if (!containerRef.current || frameRef.current !== null) return;
+    const { clientX, clientY } = e;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      if (!containerRef.current) return;
+      const { left, top, width, height } = containerRef.current.getBoundingClientRect();
+      const x = (clientX - left - width / 2) / 25;
+      const y = (clientY - top - height / 2) / 25;
+      containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${-y}deg)`;
+    });
   };
 
   const handleMouseEnter = () => setIsMouseEntered(true);
 
   const handleMouseLeave = () => {
     setIsMouseEntered(false);
+    if (frameRef.current !== null) {
+      cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
     if (!containerRef.current) return;
     containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
   };
 
+  // Stable context value so consumers don't re-render on every container render
+  const contextValue = useMemo(() => [isMouseEntered, setIsMouseEntered], [isMouseEntered]);
+
   return (
-    <MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>
+    <MouseEnterContext.Provider value={contextValue}>
       <div
         className={cn("flex items-center justify-center", containerClassName)}
         style={{ perspective: "1000px" }}

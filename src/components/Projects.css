@@ -169,7 +169,9 @@
   margin-top: 10px;
 }
 
-.tech-badge {
+/* Scoped under #projects so these rules do not leak into other sections
+   (Experience has its own .tech-badge / .view-more-btn / .toggle-icon) */
+#projects .tech-badge {
   background: rgba(100, 150, 255, 0.12);
   border: 1px solid rgba(100, 150, 255, 0.25);
   color: white;
@@ -181,7 +183,7 @@
 }
 
 /* View More */
-.view-more-btn {
+#projects .view-more-btn {
   background: none;
   border: none;
   color: #4CAF50;
@@ -193,11 +195,13 @@
   padding: 0;
 }
 
-.view-more-btn:hover {
+#projects .view-more-btn:hover {
   text-decoration: underline;
 }
 
-.toggle-icon {
+/* Chevron only renders on mobile; hidden by default, shown in the mobile
+   media query below */
+#projects .toggle-icon {
   display: none;
 }
 
@@ -225,5 +229,15 @@
   .project-thumbnail {
     width: 120px;
     height: 100px;
+  }
+
+  /* Show the expand/collapse chevron on mobile cards */
+  #projects .toggle-icon {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 }

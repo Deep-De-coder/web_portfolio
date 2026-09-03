@@ -6,17 +6,19 @@ import { FaGithub, FaLinkedin, FaCopy, FaCheck } from "react-icons/fa";
 const GITHUB_URL = "https://github.com/Deep-De-coder";
 const LINKEDIN_URL = "https://www.linkedin.com/in/deep-shahane/";
 
+const MOBILE_QUERY = "(max-width: 767px)"; // matches the previous innerWidth < 768 check
+
 const Sidebar = () => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
   const [copiedLink, setCopiedLink] = useState(null); // 'github' | 'linkedin' | null
 
-  // Detect screen size changes
+  // Detect screen size changes (media query "change" fires only at the breakpoint)
   useEffect(() => {
-    const updateMedia = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    window.addEventListener("resize", updateMedia);
-    return () => window.removeEventListener("resize", updateMedia);
+    const mediaQuery = window.matchMedia(MOBILE_QUERY);
+    const updateMedia = (event) => setIsMobile(event.matches);
+    setIsMobile(mediaQuery.matches);
+    mediaQuery.addEventListener("change", updateMedia);
+    return () => mediaQuery.removeEventListener("change", updateMedia);
   }, []);
 
   // Smooth scrolling to sections
@@ -33,7 +35,7 @@ const Sidebar = () => {
       setCopiedLink(type);
       setTimeout(() => setCopiedLink(null), 2000);
     } catch (err) {
-      console.error("Failed to copy link:", err);
+      // Clipboard unavailable (permissions/insecure context) — ignore silently
     }
   };
 
@@ -98,10 +100,10 @@ const Sidebar = () => {
           <div className="name-bar">
             <h3 className="sidebar-name">Deep Shahane</h3>
             <div className="mobile-icons">
-              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <FaGithub />
               </a>
-              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
+              <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <FaLinkedin />
               </a>
             </div>

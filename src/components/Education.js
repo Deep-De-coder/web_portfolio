@@ -18,9 +18,22 @@ const educationData = [
     gpa: "3.5",
     courses: ["Information Retrieval", "Computer Vision", "Deep Learning", "Pattern Recognition"],
     year: "2023",
+    endYear: "2025",
     position: "left",
   },
 ];
+
+// Timeline year markers derived from the data: each entry's start year, plus
+// the final entry's end year (the timeline runs bottom-to-top).
+const timelineYears = [
+  ...educationData.map((edu) => edu.year),
+  educationData[educationData.length - 1].endYear,
+].filter(Boolean);
+
+// Distribute markers evenly between the bottom (2%) and top (85%) of the
+// timeline, matching the original 3-marker layout.
+const markerBottom = (index, count) =>
+  count > 1 ? 2 + (index * (85 - 2)) / (count - 1) : 50;
 
 const Education = () => {
   return (
@@ -30,10 +43,16 @@ const Education = () => {
         {/* Vertical Dashed Line */}
         <div className="timeline-line"></div>
 
-        {/* Year Markers */}
-        <div className="timeline-year" style={{ bottom: "2%" }}>2019</div>
-        <div className="timeline-year" style={{ bottom: "42%" }}>2023</div>
-        <div className="timeline-year" style={{ bottom: "85%" }}>2025</div>
+        {/* Year Markers (generated from educationData) */}
+        {timelineYears.map((year, index) => (
+          <div
+            key={year}
+            className="timeline-year"
+            style={{ bottom: `${markerBottom(index, timelineYears.length)}%` }}
+          >
+            {year}
+          </div>
+        ))}
 
         {/* Timeline Items */}
         {educationData.map((edu, index) => (

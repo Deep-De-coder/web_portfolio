@@ -22,6 +22,8 @@ const Ask = () => {
     const messageEndRef = useRef(null);
     const streamingAbortRef = useRef(false);
     const webLLMAvailableRef = useRef(false);
+    const webLLMInitializedRef = useRef(false);
+    const typingEffectRef = useRef(null);
 
     // Check WebGPU support on mount
     useEffect(() => {
@@ -34,7 +36,7 @@ const Ask = () => {
     }, []);
 
     useEffect(() => {
-        const chatContainer = document.querySelector('.message-area');
+        const chatContainer = messageEndRef.current?.parentElement;
         if (chatContainer) {
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
@@ -43,33 +45,52 @@ const Ask = () => {
     // Typing animation logic for header
     useEffect(() => {
         let index = 0;
+        let cancelled = false;
+        let timeoutId = null;
         const typeText = () => {
+            if (cancelled) return;
             if (index <= fullText.length) {
                 setTypedText(fullText.slice(0, index));
                 index++;
-                setTimeout(typeText, 50);
+                timeoutId = setTimeout(typeText, 50);
             }
         };
         typeText();
+        return () => {
+            cancelled = true;
+            if (timeoutId !== null) clearTimeout(timeoutId);
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []); // fullText is a constant, no need to include in deps
+
+    // Clear any pending simulated-typing frame on unmount
+    useEffect(() => {
+        return () => {
+            if (typingEffectRef.current !== null) {
+                cancelAnimationFrame(typingEffectRef.current);
+                typingEffectRef.current = null;
+            }
+        };
+    }, []);
 
     const handleInputChange = (event) => setInputValue(event.target.value);
 
     // Simulate typing effect for backend fallback (kept for compatibility)
-    const simulateTypingEffect = (fullText, callback) => {
+    const simulateTypingEffect = (textToType, callback) => {
         let index = 0;
-        let currentText = "";
-        
-        const typingInterval = setInterval(() => {
-            if (index < fullText.length) {
-                currentText += fullText[index];
-                index++;
-                callback(currentText);
+        const chunkSize = 4;
+
+        const step = () => {
+            if (index < textToType.length) {
+                index = Math.min(index + chunkSize, textToType.length);
+                callback(textToType.slice(0, index));
+                typingEffectRef.current = requestAnimationFrame(step);
             } else {
-                clearInterval(typingInterval);
+                typingEffectRef.current = null;
             }
-        }, 1);
+        };
+
+        typingEffectRef.current = requestAnimationFrame(step);
     };
 
     // Initialize WebLLM on first use
@@ -83,23 +104,11 @@ const Ask = () => {
             setModelProgress(0);
             
             // Add timeout to prevent getting stuck (2 minutes)
+            let raceTimeoutId = null;
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000); // 2 minutes
+                raceTimeoutId = setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000); // 2 minutes
             });
-            
-            // Show warning at 4 minutes if still loading
-            const warningTimeout = setTimeout(() => {
-                if (isInitializing) {
-                    setMessages((prev) => {
-                        const hasWarning = prev.some(msg => msg.type === 'warning');
-                        if (!hasWarning) {
-                            return [...prev, { type: 'warning', text: 'Model loading is taking longer than expected (4 minutes). Please wait or refresh the page.' }];
-                        }
-                        return prev;
-                    });
-                }
-            }, 240000); // 4 minutes
-            
+
             // Update progress periodically as fallback
             const progressInterval = setInterval(() => {
                 setModelProgress((prev) => {
@@ -117,16 +126,17 @@ const Ask = () => {
                     timeoutPromise
                 ]);
                 clearInterval(progressInterval);
-                clearTimeout(warningTimeout);
+                clearTimeout(raceTimeoutId);
             } catch (err) {
                 clearInterval(progressInterval);
-                clearTimeout(warningTimeout);
+                clearTimeout(raceTimeoutId);
                 throw err;
             }
-            
+
             setIsInitializing(false);
             setMode('local');
             webLLMAvailableRef.current = true;
+            webLLMInitializedRef.current = true;
             return true;
         } catch (error) {
             console.error('WebLLM init failed:', error);
@@ -195,38 +205,43 @@ Be concise, professional, and accurate.`;
 
     // Handle backend fallback
     const handleBackendChat = async (userPrompt) => {
-        const backendUrl = 'https://portfolio-backend-wt45.onrender.com/chat';
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
 
+        const controller = new AbortController();
+        const fetchTimeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+
+        let data;
+        let response;
         try {
-            const response = await fetch(backendUrl, {
+            response = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: userPrompt })
+                body: JSON.stringify({ prompt: userPrompt }),
+                signal: controller.signal
             });
 
-            const data = await response.json();
-
-            if (!response.ok) throw new Error(data.error || 'An error occurred while fetching data.');
-
-            const generatedText = data.response || 'No response received.';
-
-            // Remove loading message
-            setMessages((prev) => prev.filter(msg => msg.type !== 'loading'));
-
-            // Simulate typing effect for backend (optional, for UX consistency)
-            let responseMessage = { type: 'response', text: '' };
-            setMessages((prev) => [...prev, responseMessage]);
-
-            simulateTypingEffect(generatedText, (updatedText) => {
-                setMessages((prev) => {
-                    let updatedMessages = [...prev];
-                    updatedMessages[updatedMessages.length - 1] = { type: 'response', text: updatedText };
-                    return updatedMessages;
-                });
-            });
-        } catch (error) {
-            throw error;
+            data = await response.json();
+        } finally {
+            clearTimeout(fetchTimeoutId);
         }
+
+        if (!response.ok) throw new Error(data.error || 'An error occurred while fetching data.');
+
+        const generatedText = data.response || 'No response received.';
+
+        // Remove loading message
+        setMessages((prev) => prev.filter(msg => msg.type !== 'loading'));
+
+        // Simulate typing effect for backend (optional, for UX consistency)
+        setMessages((prev) => [...prev, { type: 'response', text: '' }]);
+
+        simulateTypingEffect(generatedText, (updatedText) => {
+            setMessages((prev) => {
+                let updatedMessages = [...prev];
+                updatedMessages[updatedMessages.length - 1] = { type: 'response', text: updatedText };
+                return updatedMessages;
+            });
+        });
     };
 
     const handleChatSubmit = async (customQuery = null) => {
@@ -249,9 +264,9 @@ Be concise, professional, and accurate.`;
             { type: 'query', text: currentInput }
         ]);
 
-        // Determine loading message
+        // Determine loading message: local model still needs to load on first use
         let loadingText = 'Looking for Answer...';
-        if (webLLMAvailableRef.current && isInitializing) {
+        if (webLLMAvailableRef.current && !webLLMInitializedRef.current) {
             loadingText = 'Loading local model...';
         }
 
@@ -268,7 +283,6 @@ Be concise, professional, and accurate.`;
                 await ensureWebLLMInitialized();
                 useLocal = true;
             } catch (error) {
-                console.log('WebLLM init failed, falling back to server:', error);
                 useLocal = false;
             }
         }
@@ -287,7 +301,6 @@ Be concise, professional, and accurate.`;
 
                 await handleLocalChat(currentInput);
             } catch (error) {
-                console.error('Local chat failed, falling back to server:', error);
                 // Remove loading and try backend
                 setMessages((prev) => prev.filter(msg => msg.type !== 'loading'));
                 setMessages((prev) => [
@@ -319,6 +332,10 @@ Be concise, professional, and accurate.`;
     };
 
     const handleCancel = () => {
+        if (typingEffectRef.current !== null) {
+            cancelAnimationFrame(typingEffectRef.current);
+            typingEffectRef.current = null;
+        }
         if (isStreaming) {
             streamingAbortRef.current = true;
             interruptGenerate();
@@ -375,10 +392,16 @@ Be concise, professional, and accurate.`;
                     // Style lists
                     ul: ({ node, ...props }) => <ul {...props} className="markdown-list" />,
                     ol: ({ node, ...props }) => <ol {...props} className="markdown-list" />,
-                    // Style code blocks
-                    code: ({ node, inline, ...props }) => (
-                        <code {...props} className={inline ? 'markdown-inline-code' : 'markdown-code-block'} />
-                    ),
+                    // Style code blocks (react-markdown v9 removed the `inline` prop,
+                    // so detect blocks via language-* className or embedded newlines)
+                    code: ({ node, className, children, ...props }) => {
+                        const isBlock = /language-/.test(className || '') || /\n/.test(String(children));
+                        return (
+                            <code {...props} className={isBlock ? 'markdown-code-block' : 'markdown-inline-code'}>
+                                {children}
+                            </code>
+                        );
+                    },
                     // Style paragraphs
                     p: ({ node, ...props }) => <p {...props} className="markdown-paragraph" />,
                 }}
@@ -392,7 +415,7 @@ Be concise, professional, and accurate.`;
         <div className={`ask-container ${isChatActive ? 'active-chat' : ''}`}>
             {!isChatActive && <h1 className="ask-header">{typedText}</h1>}
             {isChatActive && (
-                <div className="message-area">
+                <div className="message-area" role="log" aria-live="polite">
                     {/* Mode indicator */}
                     {mode !== 'unknown' && (
                         <div className="mode-badge">
@@ -445,6 +468,7 @@ Be concise, professional, and accurate.`;
                     <input
                         type="text"
                         placeholder="Tell me about ..."
+                        aria-label="Ask a question about Deep's portfolio"
                         className="ask-input"
                         value={inputValue}
                         onChange={handleInputChange}
@@ -515,14 +539,15 @@ Be concise, professional, and accurate.`;
                         </a>
                     </div>
                     {isStreaming ? (
-                        <button className="cancel-button" onClick={handleCancel}>
+                        <button className="cancel-button" onClick={handleCancel} aria-label="Cancel response">
                             ✕
                         </button>
                     ) : (
-                        <button 
-                            className="submit-button" 
-                            onClick={handleChatSubmit}
+                        <button
+                            className="submit-button"
+                            onClick={() => handleChatSubmit()}
                             disabled={isInitializing}
+                            aria-label="Send message"
                         >
                             ↑
                         </button>

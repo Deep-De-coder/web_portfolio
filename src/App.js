@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import V2 from './pages/V2';
 import Sidebar from './components/Sidebar'; // Sidebar component
@@ -12,21 +12,6 @@ import './App.css';
 import './ShootingStars.css';
 
 function App() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // Function to adjust main content margin based on sidebar state
-  const toggleContentMargin = (isOpen) => {
-    setIsSidebarOpen(isOpen); // Track sidebar state
-    const mainContent = document.querySelector('.main-content');
-    if (mainContent) {
-      if (isOpen) {
-        mainContent.classList.add('shifted'); // Add shifted class
-      } else {
-        mainContent.classList.remove('shifted'); // Remove shifted class
-      }
-    }
-  };
-
   return (
     <Router>
       <Routes>
@@ -49,24 +34,28 @@ function App() {
         </div>
 
         {/* Sidebar */}
-        <Sidebar toggleContentMargin={toggleContentMargin} />
-        <div className={`main-content ${isSidebarOpen ? 'shifted' : ''}`}>
+        <Sidebar />
+        <div className="main-content">
+          {/* Ask keeps its wrapper id: the Ask component has no id of its own,
+              and both App.css (#ask) and Sidebar scrolling rely on it.
+              The other sections' components carry their own ids, so the
+              wrappers stay id-less to avoid duplicate DOM ids. */}
           <div id="ask">
             <Ask />
           </div>
-          <div id="education">
+          <div>
             <Education />
           </div>
-          <div id="experience">
+          <div>
             <Experience />
           </div>
-          <div id="publications">
+          <div>
             <Publications />
           </div>
-          <div id="projects">
+          <div>
             <Projects />
           </div>
-          <div id="skillset">
+          <div>
             <Skillset />
           </div>
         </div>
