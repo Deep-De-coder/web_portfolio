@@ -1,24 +1,7 @@
 import React from 'react';
 import { FaExternalLinkAlt } from 'react-icons/fa';
 import './Publications.css';
-
-const publicationsData = [
-  {
-    title: "Car Sales Forecasting Using ML Time Series Algorithm",
-    link: "https://link.springer.com/chapter/10.1007/978-981-99-3982-4_41",
-    tags: ["Time Series", "LSTM", "ARIMA"]
-  },
-  {
-    title: "Music Fiesta the Recommendation System",
-    link: "https://ieeexplore.ieee.org/document/9936009",
-    tags: ["Collaborative Filtering", "Deep Learning", "NLP"]
-  },
-  {
-    title: "Gaussian Splatting for Advanced Rendering",
-    link: "https://cse.buffalo.edu/tech-reports/2025-09.pdf",
-    tags: ["3D Rendering", "Gaussian Splatting", "Computer Vision"]
-  }
-];
+import { publications as publicationsData } from '../data/publications';
 
 const Publications = () => {
   return (

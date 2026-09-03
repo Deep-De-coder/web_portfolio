@@ -1,57 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-
-const CATEGORIES = [
-  {
-    title: 'Deep Learning & AI',
-    icon: '◈',
-    span: 'wide',
-    color: '#6366f1',
-    skills: ['Machine Learning', 'Deep Learning', 'TensorFlow', 'PyTorch', 'LangChain', 'Transformers'],
-  },
-  {
-    title: 'Frontend',
-    icon: '◻',
-    span: 'square',
-    color: '#22d3ee',
-    skills: ['React', 'Next.js', 'TypeScript', 'JavaScript', 'Tailwind CSS', 'Figma'],
-  },
-  {
-    title: 'Backend',
-    icon: '◈',
-    span: 'square',
-    color: '#10b981',
-    skills: ['Python', 'FastAPI', 'Flask', 'Node.js', 'Express.js', 'Hugging Face'],
-  },
-  {
-    title: 'Databases',
-    icon: '◻',
-    span: 'wide',
-    color: '#f59e0b',
-    skills: ['PostgreSQL', 'MySQL', 'MongoDB', 'SQL Server', 'SQLAlchemy', 'FAISS'],
-  },
-  {
-    title: 'Cloud & DevOps',
-    icon: '◈',
-    span: 'wide',
-    color: '#818cf8',
-    skills: ['AWS (EC2, S3)', 'GCP (Compute Engine)', 'Azure (OpenAI, Blob, Maps)', 'Docker', 'Linux', 'ROS'],
-  },
-  {
-    title: 'Mobile',
-    icon: '◻',
-    span: 'square',
-    color: '#f43f5e',
-    skills: ['Kotlin', 'Android SDK', 'Flutter', 'Firebase', 'Material UI'],
-  },
-  {
-    title: 'Soft Skills',
-    icon: '◈',
-    span: 'square',
-    color: '#a78bfa',
-    skills: ['Research', 'Leadership', 'Critical Thinking', 'Communication'],
-  },
-];
+import { skillCategories as CATEGORIES } from '../../data/skills';
 
 const containerVariants = {
   hidden: {},

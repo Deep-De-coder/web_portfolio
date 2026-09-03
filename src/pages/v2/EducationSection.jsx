@@ -1,30 +1,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { education } from '../../data/education';
 
-const EDU = [
-  {
-    institution: 'University at Buffalo, SUNY',
-    short: 'UB',
-    degree: 'MS Computer Science',
-    period: 'Aug 2023 – Jun 2025',
-    gpa: '3.5 / 4.0',
-    courses: ['Information Retrieval', 'Computer Vision', 'Deep Learning', 'Pattern Recognition'],
-    color: '#6366f1',
-    accent: 'rgba(99,102,241,0.12)',
-    border: 'rgba(99,102,241,0.22)',
-  },
-  {
-    institution: 'Vidyalankar Institute of Technology, Mumbai University',
-    short: 'VIT',
-    degree: 'BE Computer Engineering',
-    period: 'Aug 2019 – Jun 2023',
-    gpa: '3.8 / 4.0',
-    courses: ['Machine Learning', 'Big Data Analytics', 'Artificial Intelligence', 'Algorithms & Data Structures'],
-    color: '#22d3ee',
-    accent: 'rgba(34,211,238,0.1)',
-    border: 'rgba(34,211,238,0.2)',
-  },
-];
+// Adapter: the shared data is ordered chronologically for the v1 timeline;
+// this section shows newest first and renders the condensed name variants.
+const EDU = [...education].reverse().map(e => ({
+  institution: e.institutionShort || e.institution,
+  short: e.short,
+  degree: e.degreeShort,
+  period: e.period,
+  gpa: e.gpa,
+  courses: e.courses,
+  color: e.color,
+  accent: e.accent,
+  border: e.border,
+}));
 
 function EduCard({ edu, index }) {
   return (

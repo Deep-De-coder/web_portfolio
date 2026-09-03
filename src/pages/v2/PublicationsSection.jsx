@@ -1,32 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { publications } from '../../data/publications';
 
-const PUBS = [
-  {
-    title: 'Gaussian Splatting for Advanced Rendering',
-    venue: 'UB Technical Report 2025-09',
-    tags: ['3D Rendering', 'Gaussian Splatting', 'Computer Vision'],
-    link: 'https://cse.buffalo.edu/tech-reports/2025-09.pdf',
-    year: '2025',
-    color: '#6366f1',
-  },
-  {
-    title: 'Car Sales Forecasting Using ML Time Series Algorithm',
-    venue: 'Springer LNNS',
-    tags: ['Time Series', 'LSTM', 'ARIMA'],
-    link: 'https://link.springer.com/chapter/10.1007/978-981-99-3982-4_41',
-    year: '2023',
-    color: '#22d3ee',
-  },
-  {
-    title: 'Music Fiesta the Recommendation System',
-    venue: 'IEEE Xplore',
-    tags: ['Collaborative Filtering', 'Deep Learning', 'NLP'],
-    link: 'https://ieeexplore.ieee.org/document/9936009',
-    year: '2022',
-    color: '#10b981',
-  },
-];
+// Adapter: the shared data keeps the v1 list order; this section renders
+// newest first.
+const PUBS = [...publications].sort((a, b) => Number(b.year) - Number(a.year));
 
 function PubCard({ pub, index }) {
   return (

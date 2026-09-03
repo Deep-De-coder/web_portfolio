@@ -1,51 +1,13 @@
 import React from 'react';
 import './Skillset.css';
+import { skillCategories as skillCategoriesData } from '../data/skills';
 
-const skillCategories = [
-  {
-    title: "Deep learning & AI",
-    stats: "6+ Technologies",
-    skills: ["Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Langchain", "Transformers"],
-    className: "wide" // Wide card
-},
-{
-    title: "Frontend Development",
-    stats: "4+ Frameworks",
-    skills: ["React", "JavaScript", "HTML", "CSS", "Figma"],
-    className: "square" // Square card
-},
-{
-    title: "Backend Development",
-    stats: "6+ Tools",
-    skills: ["Flask", "Python", "Node.js", "Express.js", "Postman", "Hugging Face"],
-    className: "square"
-},
-{
-    title: "Database Management",
-    stats: "4+ Databases",
-    skills: ["MySQL", "PostgreSQL", "MongoDB", "SQL Server"],
-    className: "wide"
-},
-{
-    title: "Cloud & DevOps",
-    stats: "6+ Platforms",
-    skills: ["AWS (EC2, S3)", "GCP (Compute Engine, Cloud Storage)", "Azure (Q&A Maker, Blob Storage, Maps)", "Docker", "Linux", "ROS (Robot Operating System)"],
-    className: "wide"
-},
-{
-    title: "Android Development",
-    stats: "3+ Technologies",
-    skills: ["Kotlin", "Flutter", "Firebase", "Android Studio"],
-    className: "square"
-},
-{
-    title: "Soft Skills",
-    stats: "4+ Skills",
-    skills: ["Adaptability", "Leadership", "Critical Thinking", "Communication"],
-    className: "square"
-}
-
-];
+// Adapter: the shared data exposes the card size as `span`; this component's
+// markup/CSS expects it as `className`.
+const skillCategories = skillCategoriesData.map(({ span, ...category }) => ({
+  ...category,
+  className: span,
+}));
 
 const Skillset = () => {
   return (

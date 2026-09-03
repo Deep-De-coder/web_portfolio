@@ -4,46 +4,20 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
+import { experiences } from '../../data/experience';
+
 gsap.registerPlugin(ScrollTrigger);
 
-const EXPERIENCES = [
-  {
-    title: 'AI Research Assistant',
-    company: 'SAIR Lab at UB',
-    period: 'Aug 2024 – Present',
-    description:
-      'Achieved 16× speedup in drone 3D reconstruction by integrating 2D Gaussian Splatting into GPU-accelerated SLAM over video frame sequences, customizing a C++/CUDA surfel rasterizer for real-time aerial mapping. Researching NVIDIA Isaac Lab and developing humanoid robots with vision-language models (VLMs) like InstructBLIP2 and Florence using PyTorch and RL for multimodal perception and decision-making.',
-    tech: ['Python', 'C++', 'CUDA', 'PyTorch', 'Gaussian Splatting', 'SLAM', 'Computer Vision', 'Robotics'],
-    color: '#6366f1',
-  },
-  {
-    title: 'AI Engineer',
-    company: 'Bragr',
-    period: 'Aug 2024 – Jan 2025',
-    description:
-      'Architected and deployed a FastAPI + Azure OpenAI (RAG) backend for a live sports AI chat startup, cutting response time 66% and improving answer quality. Built an async web scraping and semantic search pipeline using Python, aiohttp, and MongoDB, supporting 10+ concurrent users.',
-    tech: ['Python', 'FastAPI', 'Azure OpenAI', 'MongoDB', 'aiohttp', 'RAG', 'Microservices'],
-    color: '#22d3ee',
-  },
-  {
-    title: 'ML Intern',
-    company: 'Captain Cool',
-    period: 'Dec 2021 – Feb 2023',
-    description:
-      'Built a full-stack Python + Flask + PostgreSQL platform for order and inventory management handling 1K+ daily transactions. Developed time-series demand forecasting models using PyTorch and scikit-learn, improving stock prediction accuracy by 18%.',
-    tech: ['Python', 'Flask', 'PostgreSQL', 'PyTorch', 'scikit-learn', 'Time Series'],
-    color: '#f59e0b',
-  },
-  {
-    title: 'ML Intern',
-    company: 'VIT',
-    period: 'Jun 2021 – Aug 2021',
-    description:
-      'Launched an internship portal with a TF-IDF + cosine similarity recommendation system, improving match relevance by 25%. Built a Flask + PostgreSQL backend with SQLAlchemy, integrating scraped Internshala data. Deployed on Azure with Q&A Maker, Blob, Maps, and Speech-to-Text.',
-    tech: ['Python', 'Flask', 'PostgreSQL', 'SQLAlchemy', 'TF-IDF', 'Azure'],
-    color: '#10b981',
-  },
-];
+// Adapter: map the shared canonical records onto the compact shape this
+// section renders (condensed description, condensed tech list where defined).
+const EXPERIENCES = experiences.map(e => ({
+  title: e.title,
+  company: e.company,
+  period: e.period,
+  description: e.shortDescription,
+  tech: e.techHighlights || e.techStack,
+  color: e.color,
+}));
 
 function ExpCard({ exp, index }) {
   return (

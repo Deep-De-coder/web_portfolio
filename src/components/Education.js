@@ -1,27 +1,6 @@
 import React from 'react';
 import './Education.css';
-
-const educationData = [
-  {
-    institution: "Mumbai University, Vidyalankar Institute Of Technology",
-    degree: "Bachelor of Engineering in Computer Engineering",
-    period: "Aug 2019 - June 2023",
-    gpa: "3.8",
-    courses: ["Machine Learning", "Big Data Analytics", "Artificial Intelligence", "Algorithms and Data Structures"],
-    year: "2019",
-    position: "right",
-  },
-  {
-    institution: "University at Buffalo, The State University of New York",
-    degree: "Master of Science in Computer Science",
-    period: "Aug 2023 - June 2025",
-    gpa: "3.5",
-    courses: ["Information Retrieval", "Computer Vision", "Deep Learning", "Pattern Recognition"],
-    year: "2023",
-    endYear: "2025",
-    position: "left",
-  },
-];
+import { education as educationData } from '../data/education';
 
 // Timeline year markers derived from the data: each entry's start year, plus
 // the final entry's end year (the timeline runs bottom-to-top).

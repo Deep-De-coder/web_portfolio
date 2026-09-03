@@ -4,143 +4,22 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
-import dresserImg from '../../assets/projects/dresser.png';
-import lowlightImg from '../../assets/projects/lowlightdiffusion.png';
-import healthcareImg from '../../assets/projects/healthcare.png';
-import roadImg from '../../assets/projects/roadextract.png';
-import transformersImg from '../../assets/projects/transformersdeeplearning.png';
-import novelImg from '../../assets/projects/novelchatbot.png';
-import gdpImg from '../../assets/projects/gdp.png';
-import autoImg from '../../assets/projects/autoenvision.png';
-import musicImg from '../../assets/projects/musicfiesta.png';
-import carpImg from '../../assets/projects/carpriceeda.png';
-import cubesImg from '../../assets/projects/cubes.png';
-import coineeImg from '../../assets/projects/coinee.png';
+import { projects } from '../../data/projects';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PROJECTS = [
-  {
-    title: 'Dresser Smart Wardrobe App',
-    period: 'Jun 2025 – Aug 2025',
-    summary: 'Production-ready wardrobe app with AI outfit suggestions and real-time photo analysis. Next.js 14, Azure Vision, and a private Ollama LLM via Fly.io HTTPS proxy with API-key auth.',
-    tech: ['Next.js', 'TypeScript', 'Azure Vision', 'Ollama', 'Vercel'],
-    demo: 'https://dresser-pi.vercel.app/',
-    code: '',
-    img: dresserImg,
-    featured: true,
-  },
-  {
-    title: 'Lowlight Diffusion Restoration',
-    period: 'Dec 2025 – Present',
-    summary: 'Camera-style pipeline restoring dark/noisy photos using diffusion img2img fine-tuned with LoRA on LOL/SID. Includes benchmarking, inference optimizations, and profiling tools.',
-    tech: ['PyTorch', 'Diffusers', 'LoRA (PEFT)', 'Stable Diffusion 2.1', 'CUDA'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/lowlight_diffusion_restoration',
-    img: lowlightImg,
-    featured: true,
-  },
-  {
-    title: 'Efficient Multimodal LLM Agent',
-    period: 'Feb 2025 – May 2025',
-    summary: 'Multimodal medical assistant using RAG + vLLM for radiology reports and X-rays. Reduced LLM latency 40% (920ms→540ms) with FlashAttention + PagedAttention; 88% accuracy on clinical QA.',
-    tech: ['vLLM', 'FlashAttention', 'RAG', 'FAISS', 'LLaMA-2', 'CLIP'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/efficient-multimodal-healthcare-llm-agent',
-    img: healthcareImg,
-    featured: true,
-  },
-  {
-    title: 'Road Extraction From Satellite Images',
-    period: 'Sep 2023 – Nov 2023',
-    summary: 'Fusion model combining ResNet50 and VGG with advanced preprocessing, achieving 95.3% validation accuracy. Post-processing via Edge Detection for enhanced output quality.',
-    tech: ['OpenCV', 'VGG', 'ResNet', 'UNet', 'Google Colab'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/road_extraction_using_satellite_images',
-    img: roadImg,
-    featured: false,
-  },
-  {
-    title: 'Transformers Deep Learning',
-    period: 'Feb 2024 – Apr 2024',
-    summary: 'English→French translation system on 1M+ row Europarl corpus. 20 custom Transformers with unique positional encodings; deployed on Gradio for real-time interaction.',
-    tech: ['PyTorch', 'Google T5', 'Facebook M2M-100', 'Gradio'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/Transformers_deeplearning',
-    img: transformersImg,
-    featured: false,
-  },
-  {
-    title: 'Novel Chatbot (RAG)',
-    period: 'Oct 2023 – Nov 2023',
-    summary: 'Flask chatbot trained on 15 Gutenberg novels. Random Forest classifier routes queries; integrates BlenderBot, GPT-3.5, and TF-IDF cosine similarity for context retrieval. Deployed on GCP.',
-    tech: ['RAG', 'Random Forest', 'Hugging Face', 'GPT-3.5', 'GCP'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/novel_chatbot_RAG',
-    img: novelImg,
-    featured: false,
-  },
-  {
-    title: 'GDP Prediction System',
-    period: 'Feb 2024 – Apr 2024',
-    summary: 'XGBoost + Linear Regression GDP forecasting from energy consumption data. Flask GUI for real-time predictions with feature selection optimization.',
-    tech: ['XGBoost', 'Linear Regression', 'Flask', 'Python'],
-    demo: 'https://gdp-prediction-app.onrender.com/',
-    code: 'https://github.com/Deep-De-coder/gdp_prediction',
-    img: gdpImg,
-    featured: false,
-  },
-  {
-    title: 'Auto Envision',
-    period: 'Sep 2022 – Apr 2023',
-    summary: 'Sales forecasting using ARIMA, LSTM, and FB Prophet on 100K+ rows. Published research on Gaussian Splatting for advanced rendering at Springer.',
-    tech: ['Python', 'ARIMA', 'LSTM', 'FB Prophet'],
-    demo: 'https://doi.org/10.1007/978-981-99-3982-4_41',
-    code: 'https://github.com/Deep-De-coder/Auto-Envision',
-    img: autoImg,
-    featured: false,
-  },
-  {
-    title: 'Music Fiesta — Recommendation System',
-    period: 'Sep 2021 – Apr 2022',
-    summary: 'Full-stack Flask music recommendation app with popularity, content-based, and SVD collaborative filtering. Published at IEEE; includes user auth, SQLite, built-in player.',
-    tech: ['Flask', 'SQLite', 'SVD Collaborative Filtering', 'TF-IDF'],
-    demo: 'https://ieeexplore.ieee.org/document/9936009',
-    code: 'https://github.com/Deep-De-coder/Music-Recommendation',
-    img: musicImg,
-    featured: false,
-  },
-  {
-    title: 'Car Price EDA',
-    period: 'Sep 2022 – Nov 2022',
-    summary: 'In-depth EDA on 11,900-row car price dataset with 16 features. Comprehensive Matplotlib/Seaborn visualizations and statistical analysis.',
-    tech: ['Pandas', 'NumPy', 'Matplotlib', 'Seaborn'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/EDA-on-car-price-prediction',
-    img: carpImg,
-    featured: false,
-  },
-  {
-    title: 'Flying Cubes (AR)',
-    period: 'Oct 2022 – Jan 2023',
-    summary: 'AR application enabling real-time manipulation of ascending cubes. Demonstrates Unity + ARCore proficiency for interactive mixed-reality experiences.',
-    tech: ['AR', 'Unity', 'C#', 'ARCore'],
-    demo: '',
-    code: 'https://github.com/Deep-De-coder/FLying_Cubes',
-    img: cubesImg,
-    featured: false,
-  },
-  {
-    title: 'Coinee',
-    period: 'Oct 2024 – Jan 2025',
-    summary: 'Privacy-safe Android app browsing 300+ coins from 15+ countries. Optimized for offline use with fast on-device search and Material UI. On Google Play.',
-    tech: ['Android', 'Kotlin', 'Java', 'Material Components'],
-    demo: 'https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US',
-    code: '',
-    img: coineeImg,
-    featured: false,
-  },
-];
+// Adapter: map the shared canonical records onto the compact shape this
+// section renders (condensed summary/tech, shorter field names).
+const PROJECTS = projects.map(p => ({
+  title: p.title,
+  period: p.period,
+  summary: p.shortSummary,
+  tech: p.techHighlights,
+  demo: p.demoLink,
+  code: p.codeLink,
+  img: p.thumbnail,
+  featured: p.featured,
+}));
 
 function ProjectCard({ project, index }) {
   const [expanded, setExpanded] = useState(false);
