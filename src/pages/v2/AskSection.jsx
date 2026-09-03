@@ -28,36 +28,62 @@ export default function AskSection() {
 
   const gpuSupported = useRef(typeof window !== 'undefined' ? isWebGPUSupported() : false);
   const webLLMReady = useRef(false);
-  const abortRef = useRef(false);
+  // Generation counter: every new stream bumps it; stale callbacks compare
+  // against their captured value and bail, so a cancelled/superseded stream
+  // can never write into a newer bubble (or into an unmounted component).
+  const genRef = useRef(0);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     if (!gpuSupported.current) setMode('server');
   }, []);
 
+  // Invalidate any in-flight stream on unmount so it can't setState afterwards.
   useEffect(() => {
+    const gen = genRef; // stable ref object; .current is a counter, not a node
+    return () => {
+      gen.current++;
+    };
+  }, []);
+
+  // Scroll only when a message is added/removed — not on every streamed token,
+  // and never on initial mount.
+  useEffect(() => {
+    if (messages.length === 0) return;
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages.length]);
+
+  const INIT_TIMEOUT_MS = 120000;
 
   const ensureWebLLM = async () => {
     if (webLLMReady.current) return;
     setIsInitializing(true);
     setProgress(0);
+    let timeoutId;
     try {
-      await initWebLLM((p) => setProgress(p));
+      await Promise.race([
+        initWebLLM((p) => setProgress(p)),
+        new Promise((_, reject) => {
+          timeoutId = setTimeout(
+            () => reject(new Error('WebLLM initialization timed out')),
+            INIT_TIMEOUT_MS
+          );
+        }),
+      ]);
       webLLMReady.current = true;
-      setIsInitializing(false);
       setMode('local');
     } catch (err) {
-      setIsInitializing(false);
       gpuSupported.current = false;
       setMode('server');
       throw err;
+    } finally {
+      clearTimeout(timeoutId);
+      setIsInitializing(false);
     }
   };
 
   const runLocalChat = async (userQ) => {
-    abortRef.current = false;
+    const gen = ++genRef.current;
     setIsStreaming(true);
     const history = [];
     for (const m of messages) {
@@ -66,22 +92,25 @@ export default function AskSection() {
     }
     setMessages(p => [...p.filter(m => m.role !== 'loading'), { role: 'ai', text: '' }]);
     let acc = '';
-    await streamChat({
-      systemPrompt: `You are an AI assistant embedded in Deep Shahane's portfolio. Deep is an AI researcher with expertise in computer vision, LLMs, and robotics. Answer questions about his education (VIT Bachelor's + UB Master's), experience (SAIR Lab, Bragr, Captain Cool, VIT), projects, and skills concisely and professionally.`,
-      history,
-      userPrompt: userQ,
-      onToken: (tok) => {
-        if (abortRef.current) return;
-        acc += tok;
-        setMessages(p => {
-          const next = [...p];
-          const last = next[next.length - 1];
-          if (last?.role === 'ai') next[next.length - 1] = { role: 'ai', text: acc };
-          return next;
-        });
-      },
-    });
-    setIsStreaming(false);
+    try {
+      await streamChat({
+        systemPrompt: `You are an AI assistant embedded in Deep Shahane's portfolio. Deep is an AI researcher with expertise in computer vision, LLMs, and robotics. Answer questions about his education (VIT Bachelor's + UB Master's), experience (SAIR Lab, Bragr, Captain Cool, VIT), projects, and skills concisely and professionally.`,
+        history,
+        userPrompt: userQ,
+        onToken: (tok) => {
+          if (genRef.current !== gen) return;
+          acc += tok;
+          setMessages(p => {
+            const next = [...p];
+            const last = next[next.length - 1];
+            if (last?.role === 'ai') next[next.length - 1] = { role: 'ai', text: acc };
+            return next;
+          });
+        },
+      });
+    } finally {
+      if (genRef.current === gen) setIsStreaming(false);
+    }
   };
 
   const runServerChat = async (userQ) => {
@@ -110,6 +139,14 @@ export default function AskSection() {
         await runLocalChat(query);
       } catch {
         setMode('server');
+        // Strip the pre-pushed empty/partial ai bubble from the failed local
+        // stream (the server path only filters 'loading'), and restore the
+        // loading indicator while the server responds.
+        setMessages(p => {
+          const next = p.filter(m => m.role !== 'loading');
+          if (next.length && next[next.length - 1].role === 'ai') next.pop();
+          return [...next, { role: 'loading', text: '' }];
+        });
         try { await runServerChat(query); }
         catch (e) {
           setMessages(p => [
@@ -130,7 +167,7 @@ export default function AskSection() {
   };
 
   const cancel = () => {
-    abortRef.current = true;
+    genRef.current++;
     interruptGenerate();
     setIsStreaming(false);
     setMessages(p => p.filter(m => m.role !== 'loading'));
@@ -277,19 +314,19 @@ export default function AskSection() {
                     >
                       <ReactMarkdown
                         components={{
-                          a: ({ children, ...p }) => (
+                          a: ({ node, children, ...p }) => (
                             <a {...p} target="_blank" rel="noopener noreferrer" className="text-indigo-400 underline">
                               {children}
                             </a>
                           ),
-                          ul: ({ ...p }) => <ul {...p} className="list-disc list-inside mt-1 space-y-0.5" />,
-                          ol: ({ ...p }) => <ol {...p} className="list-decimal list-inside mt-1 space-y-0.5" />,
-                          code: ({ inline, children, ...p }) =>
-                            inline ? (
-                              <code {...p} className="rounded px-1 py-0.5 text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>
-                                {children}
-                              </code>
-                            ) : (
+                          ul: ({ node, ...p }) => <ul {...p} className="list-disc list-inside mt-1 space-y-0.5" />,
+                          ol: ({ node, ...p }) => <ol {...p} className="list-decimal list-inside mt-1 space-y-0.5" />,
+                          // react-markdown v9 removed the `inline` prop; detect
+                          // block code via a language- className or a newline.
+                          code: ({ node, className, children, ...p }) => {
+                            const isBlock =
+                              /language-/.test(className || '') || /\n/.test(String(children));
+                            return isBlock ? (
                               <code
                                 {...p}
                                 className="block rounded text-xs mt-2 p-3 overflow-x-auto"
@@ -297,8 +334,13 @@ export default function AskSection() {
                               >
                                 {children}
                               </code>
-                            ),
-                          p: ({ ...p }) => <p {...p} className="mb-2 last:mb-0" />,
+                            ) : (
+                              <code {...p} className="rounded px-1 py-0.5 text-xs" style={{ background: 'rgba(255,255,255,0.1)' }}>
+                                {children}
+                              </code>
+                            );
+                          },
+                          p: ({ node, ...p }) => <p {...p} className="mb-2 last:mb-0" />,
                         }}
                       >
                         {msg.text}

@@ -9,6 +9,7 @@ import { createWebLLMWorker } from "./createWebLLMWorker";
 const DEFAULT_MODEL_ID = "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC";
 
 let engine = null;
+let worker = null;
 let isInitializing = false;
 let initPromise = null;
 
@@ -47,8 +48,8 @@ export async function init(onProgress) {
 
   initPromise = (async () => {
     try {
-      // Create worker using blob URL for Create React App compatibility
-      const worker = createWebLLMWorker();
+      // Create the module worker (kept module-level so unload() can terminate it)
+      worker = createWebLLMWorker();
 
       // Create engine with progress callback
       engine = await CreateWebWorkerMLCEngine(
@@ -62,9 +63,10 @@ export async function init(onProgress) {
               // report.text contains status messages
               let progress = 0;
               
-              // Try to extract progress from the report
+              // Try to extract progress from the report.
+              // WebLLM reports progress as a fraction 0-1; convert to percent.
               if (typeof report.progress === 'number') {
-                progress = Math.min(100, Math.max(0, report.progress));
+                progress = Math.min(100, Math.max(0, Math.round(report.progress * 100)));
               } else if (report.text) {
                 // If progress is in text format, try to parse it
                 const match = report.text.match(/(\d+)%/);
@@ -85,6 +87,10 @@ export async function init(onProgress) {
     } catch (error) {
       isInitializing = false;
       initPromise = null;
+      if (worker) {
+        worker.terminate();
+        worker = null;
+      }
       throw error;
     }
   })();
@@ -166,15 +172,23 @@ export async function resetChat() {
 /**
  * Unload the engine
  */
-export function unload() {
+export async function unload() {
   if (engine) {
     if (engine.unload) {
-      engine.unload();
+      try {
+        await engine.unload();
+      } catch (e) {
+        // Engine may already be in a broken state; still tear down the worker.
+      }
     }
     engine = null;
-    isInitializing = false;
-    initPromise = null;
   }
+  if (worker) {
+    worker.terminate();
+    worker = null;
+  }
+  isInitializing = false;
+  initPromise = null;
 }
 
 /**

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -42,15 +42,35 @@ export default function ChipAssemblySection() {
   const canvasRef = useRef(null);
   const scrollProgressRef = useRef(0);
 
+  const [reduce, setReduce] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  );
+  const [loadFailed, setLoadFailed] = useState(false);
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end end'],
   });
 
+  // Track breakpoint / reduced-motion changes live instead of once at mount.
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const isMobile = window.innerWidth < 768;
-    if (reduce || isMobile) return;
+    const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const mqMobile = window.matchMedia('(max-width: 767px)');
+    const onReduce = (e) => setReduce(e.matches);
+    const onMobile = (e) => setIsMobile(e.matches);
+    mqReduce.addEventListener('change', onReduce);
+    mqMobile.addEventListener('change', onMobile);
+    return () => {
+      mqReduce.removeEventListener('change', onReduce);
+      mqMobile.removeEventListener('change', onMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (reduce || isMobile || loadFailed) return;
 
     const canvas = canvasRef.current;
     const section = sectionRef.current;
@@ -75,8 +95,33 @@ export default function ChipAssemblySection() {
 
     /* ---- Image-based lighting (reflections, zero asset weight) ---- */
     const pmrem = new THREE.PMREMGenerator(renderer);
-    const envRT = pmrem.fromScene(new RoomEnvironment(), 0.04);
+    const roomEnv = new RoomEnvironment();
+    const envRT = pmrem.fromScene(roomEnv, 0.04);
     scene.environment = envRT.texture;
+
+    /* ---- Async-load guards + shared disposal helper ---- */
+    let alive = true;
+    let modelErrorLogged = false;
+    const disposeObject = (root) => {
+      root.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => {
+            Object.values(m).forEach((v) => v && v.isTexture && v.dispose());
+            m.dispose();
+          });
+        }
+      });
+    };
+    const onModelError = (err) => {
+      if (!alive) return;
+      if (!modelErrorLogged) {
+        modelErrorLogged = true;
+        console.error('ChipAssemblySection: failed to load 3D model, showing static fallback.', err);
+      }
+      setLoadFailed(true);
+    };
 
     /* ---- Restrained, realistic studio lighting (no neon) ---- */
     const ambient = new THREE.AmbientLight(0x20232e, 0.6);
@@ -111,6 +156,11 @@ export default function ChipAssemblySection() {
 
     const loader = new GLTFLoader();
     loader.load(boardUrl, (gltf) => {
+      if (!alive) {
+        // Arrived after cleanup — free the GPU resources instead of adding it.
+        disposeObject(gltf.scene);
+        return;
+      }
       const root = gltf.scene;
       // normalize size → ~9 units wide hero
       let box = new THREE.Box3().setFromObject(root);
@@ -148,7 +198,7 @@ export default function ChipAssemblySection() {
       boardGroup.add(accentGlow);
       accentLight.position.set(0.4, boardTopY + 1.4, 0);
       boardGroup.userData.ready = true;
-    });
+    }, undefined, onModelError);
 
     /* ---- Boot-screen canvas texture ---- */
     const screenCanvas = document.createElement('canvas');
@@ -164,6 +214,10 @@ export default function ChipAssemblySection() {
     const laptopMats = [];
 
     loader.load(laptopUrl, (gltf) => {
+      if (!alive) {
+        disposeObject(gltf.scene);
+        return;
+      }
       const root = gltf.scene;
       root.scale.setScalar(2.7);
       let screenMesh = null;
@@ -203,7 +257,7 @@ export default function ChipAssemblySection() {
         screenMesh.add(sp);
         laptopGroup.userData.screenPlaneMat = spMat;
       }
-    });
+    }, undefined, onModelError);
 
     /* ---- Camera keyframes (calm, well-eased) ---- */
     const camKeys = [
@@ -313,34 +367,29 @@ export default function ChipAssemblySection() {
 
     /* ---- Cleanup ---- */
     return () => {
+      alive = false;
       cancelAnimationFrame(rafId);
       window.removeEventListener('resize', onResize);
       io.disconnect();
       unsubScroll();
-      scene.traverse((obj) => {
-        if (obj.geometry) obj.geometry.dispose();
-        if (obj.material) {
-          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-          mats.forEach((m) => { Object.values(m).forEach((v) => v && v.isTexture && v.dispose()); m.dispose(); });
-        }
-      });
+      disposeObject(scene);
+      disposeObject(roomEnv);
       screenTex.dispose();
       envRT.dispose();
       pmrem.dispose();
       composer.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
     };
-    // scrollYProgress is a stable MotionValue; run setup once on mount.
+    // scrollYProgress is a stable MotionValue; re-run only when the
+    // environment flags flip the section between 3D and static fallback.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [reduce, isMobile, loadFailed]);
 
-  /* ---- Static fallback (reduced-motion / mobile) ---- */
-  const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-  if (reduce || isMobile) {
+  /* ---- Static fallback (reduced-motion / mobile / model load failure) ---- */
+  if (reduce || isMobile || loadFailed) {
     return (
-      <section className="relative flex items-center justify-center px-6" style={{ minHeight: '70vh', background: 'transparent' }}>
+      <section ref={sectionRef} className="relative flex items-center justify-center px-6" style={{ minHeight: '70vh', background: 'transparent' }}>
         <div className="text-center max-w-md">
           <ChipGlyph />
           <h2 className="font-grotesk font-bold text-white mt-6" style={{ fontSize: 'clamp(1.6rem,6vw,2.4rem)' }}>

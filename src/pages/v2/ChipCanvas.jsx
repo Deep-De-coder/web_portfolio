@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const BUSES = [
   { y: 0.285, reveal: 0.22 },
@@ -127,8 +127,20 @@ function buildLayout(W, H) {
 export default function ChipCanvas() {
   const canvasRef = useRef(null);
 
+  const [reduce, setReduce] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  // React to reduced-motion changes live instead of a single mount-time read.
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (e) => setReduce(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduce) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -143,6 +155,9 @@ export default function ChipCanvas() {
     let layout = null;
     let particles = [];
     let particlesReady = false;
+    // Cached in size() — reading document.body.scrollHeight inside the rAF
+    // loop forces a layout every frame.
+    let docScrollMax = 0;
     const startTime = Date.now();
 
     const spawnParticles = () => {
@@ -176,11 +191,20 @@ export default function ChipCanvas() {
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      docScrollMax = document.body.scrollHeight - window.innerHeight;
       layout = buildLayout(W, H);
       if (Date.now() - startTime > ASSEMBLY_MS) spawnParticles();
       else particlesReady = false;
     };
     size();
+
+    // Recompute the cached scroll height once the rest of the page has
+    // rendered (it grows after this component mounts).
+    const recomputeScrollMax = () => {
+      docScrollMax = document.body.scrollHeight - window.innerHeight;
+    };
+    const scrollMaxTimer = setTimeout(recomputeScrollMax, 1000);
+    window.addEventListener('load', recomputeScrollMax);
 
     let resizeTimer;
     const onResize = () => {
@@ -198,8 +222,7 @@ export default function ChipCanvas() {
       lastTime = now;
 
       const assembly = easeOutQuart(clamp((now - startTime) / ASSEMBLY_MS, 0, 1));
-      const docScroll = document.body.scrollHeight - window.innerHeight;
-      const scrollRatio = docScroll > 0 ? clamp(window.scrollY / docScroll, 0, 1) : 0;
+      const scrollRatio = docScrollMax > 0 ? clamp(window.scrollY / docScrollMax, 0, 1) : 0;
       const speedMul = 1 + scrollRatio * 0.7;
 
       const { blocks, traces, buses, nodes, edges } = layout;
@@ -267,7 +290,6 @@ export default function ChipCanvas() {
 
         for (const p of particles) {
           p.t += p.speed * speedMul * dt;
-          edges[p.edgeIndex].lastPassed = now;
           const a = nodes[p.fromNode];
           const b = nodes[p.toNode];
           const tt = Math.min(p.t, 1);
@@ -277,6 +299,8 @@ export default function ChipCanvas() {
           if (p.trail.length > TRAIL_LEN) p.trail.pop();
 
           if (p.t >= 1) {
+            // Stamp the edge only on completion so the glow can fade.
+            edges[p.edgeIndex].lastPassed = now;
             nodes[p.toNode].activatedAt = now;
             const opts = nodes[p.toNode].edges.filter((e) => e !== p.edgeIndex);
             const next = opts.length ? opts[(Math.random() * opts.length) | 0] : (Math.random() * edges.length) | 0;
@@ -302,23 +326,31 @@ export default function ChipCanvas() {
           ctx.stroke();
         }
 
-        // Particle trails
+        // Particle trails — no shadow, every 2nd point (cheap).
         for (const p of particles) {
-          for (let i = 0; i < p.trail.length; i++) {
+          ctx.fillStyle = p.color;
+          for (let i = 1; i < p.trail.length; i += 2) {
             const [tx, ty] = p.trail[i];
             const f = 1 - i / p.trail.length;
-            ctx.beginPath();
-            if (i === 0) {
-              ctx.shadowBlur = 8;
-              ctx.shadowColor = p.color;
-            }
-            ctx.fillStyle = p.color;
             ctx.globalAlpha = f * 0.9;
+            ctx.beginPath();
             ctx.arc(tx, ty, f * 2.5, 0, Math.PI * 2);
             ctx.fill();
-            if (i === 0) ctx.shadowBlur = 0;
           }
         }
+        // Glowing particle heads — shadowBlur set once for the whole pass.
+        ctx.shadowBlur = 8;
+        ctx.globalAlpha = 0.9;
+        for (const p of particles) {
+          if (!p.trail.length) continue;
+          const [hx, hy] = p.trail[0];
+          ctx.shadowColor = p.color;
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.shadowBlur = 0;
         ctx.globalAlpha = 1;
 
         // Node flashes
@@ -343,9 +375,12 @@ export default function ChipCanvas() {
     return () => {
       cancelAnimationFrame(frameId);
       clearTimeout(resizeTimer);
+      clearTimeout(scrollMaxTimer);
+      window.removeEventListener('load', recomputeScrollMax);
       window.removeEventListener('resize', onResize);
+      ctx.clearRect(0, 0, W, H);
     };
-  }, []);
+  }, [reduce]);
 
   return (
     <canvas

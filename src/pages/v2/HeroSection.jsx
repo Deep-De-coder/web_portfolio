@@ -13,7 +13,19 @@ export default function HeroSection() {
   const [displayed, setDisplayed] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  const [reduceMotion, setReduceMotion] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
   useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (e) => setReduceMotion(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduceMotion) return; // static tagline, no typewriter
     const current = ROLES[roleIdx];
     let t;
     if (!deleting && displayed.length < current.length) {
@@ -27,7 +39,7 @@ export default function HeroSection() {
       setRoleIdx(i => (i + 1) % ROLES.length);
     }
     return () => clearTimeout(t);
-  }, [displayed, deleting, roleIdx]);
+  }, [displayed, deleting, roleIdx, reduceMotion]);
 
   const name = 'Deep Shahane';
 
@@ -80,8 +92,10 @@ export default function HeroSection() {
           className="font-dm mb-10"
           style={{ fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', color: '#94a3b8', minHeight: '2rem' }}
         >
-          {displayed}
-          <span style={{ color: '#818cf8', animation: 'hero-blink 1s step-end infinite' }}>|</span>
+          {reduceMotion ? ROLES[0] : displayed}
+          {!reduceMotion && (
+            <span style={{ color: '#818cf8', animation: 'hero-blink 1s step-end infinite' }}>|</span>
+          )}
         </motion.div>
 
         {/* CTAs */}
@@ -152,12 +166,19 @@ export default function HeroSection() {
         aria-hidden="true"
       >
         <span className="font-dm text-[10px] tracking-[0.22em] uppercase text-slate-700">scroll</span>
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.7, ease: 'easeInOut' }}
-          className="w-px h-8"
-          style={{ background: 'linear-gradient(to bottom, #334155, transparent)' }}
-        />
+        {reduceMotion ? (
+          <div
+            className="w-px h-8"
+            style={{ background: 'linear-gradient(to bottom, #334155, transparent)' }}
+          />
+        ) : (
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ repeat: Infinity, duration: 1.7, ease: 'easeInOut' }}
+            className="w-px h-8"
+            style={{ background: 'linear-gradient(to bottom, #334155, transparent)' }}
+          />
+        )}
       </motion.div>
 
       <style>{`

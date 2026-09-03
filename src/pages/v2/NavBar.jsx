@@ -49,7 +49,7 @@ export default function NavBar() {
             </a>
           ))}
           <a
-            href="/v1"
+            href="/"
             className="px-3 py-1.5 rounded-lg font-dm text-sm text-slate-500 hover:text-slate-300 transition-colors duration-150 cursor-pointer"
           >
             Classic ↗

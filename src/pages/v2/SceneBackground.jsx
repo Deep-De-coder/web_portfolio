@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 
 const VERTEX_SHADER = `
@@ -27,8 +27,20 @@ const FRAGMENT_SHADER = `
 export default function SceneBackground() {
   const mountRef = useRef(null);
 
+  const [reduce, setReduce] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  // React to reduced-motion changes live instead of a single mount-time read.
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (e) => setReduce(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduce) return;
     const mount = mountRef.current;
     if (!mount) return;
 
@@ -75,21 +87,51 @@ export default function SceneBackground() {
     scene.add(points);
 
     // Neural connection lines — static topology computed once.
+    // Spatial hash grid (cell = neighbor threshold) replaces the O(n^2)
+    // all-pairs scan: only the 27 surrounding cells can hold a neighbor.
     const linePositions = [];
     const maxEdges = 4000;
     let edgeCount = 0;
-    const threshSq = 120 * 120;
-    for (let i = 0; i < count && edgeCount < maxEdges; i++) {
-      for (let j = i + 1; j < count && edgeCount < maxEdges; j++) {
-        const dx = pts[i][0] - pts[j][0];
-        const dy = pts[i][1] - pts[j][1];
-        const dz = pts[i][2] - pts[j][2];
-        if (dx * dx + dy * dy + dz * dz < threshSq) {
-          linePositions.push(pts[i][0], pts[i][1], pts[i][2], pts[j][0], pts[j][1], pts[j][2]);
-          edgeCount++;
+    const thresh = 120;
+    const threshSq = thresh * thresh;
+    const grid = new Map();
+    const cellKey = (cx, cy, cz) => `${cx},${cy},${cz}`;
+    for (let i = 0; i < count; i++) {
+      const key = cellKey(
+        Math.floor(pts[i][0] / thresh),
+        Math.floor(pts[i][1] / thresh),
+        Math.floor(pts[i][2] / thresh)
+      );
+      let cell = grid.get(key);
+      if (!cell) grid.set(key, (cell = []));
+      cell.push(i);
+    }
+    const buildEdges = () => {
+      for (let i = 0; i < count; i++) {
+        const cx = Math.floor(pts[i][0] / thresh);
+        const cy = Math.floor(pts[i][1] / thresh);
+        const cz = Math.floor(pts[i][2] / thresh);
+        for (let ox = -1; ox <= 1; ox++) {
+          for (let oy = -1; oy <= 1; oy++) {
+            for (let oz = -1; oz <= 1; oz++) {
+              const cell = grid.get(cellKey(cx + ox, cy + oy, cz + oz));
+              if (!cell) continue;
+              for (const j of cell) {
+                if (j <= i) continue; // each pair once, mirroring i<j order
+                const dx = pts[i][0] - pts[j][0];
+                const dy = pts[i][1] - pts[j][1];
+                const dz = pts[i][2] - pts[j][2];
+                if (dx * dx + dy * dy + dz * dz < threshSq) {
+                  linePositions.push(pts[i][0], pts[i][1], pts[i][2], pts[j][0], pts[j][1], pts[j][2]);
+                  if (++edgeCount >= maxEdges) return;
+                }
+              }
+            }
+          }
         }
       }
-    }
+    };
+    buildEdges();
     const lineGeometry = new THREE.BufferGeometry();
     lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
     const lineMaterial = new THREE.LineBasicMaterial({
@@ -144,9 +186,10 @@ export default function SceneBackground() {
       lineGeometry.dispose();
       lineMaterial.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
       if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [reduce]);
 
   return (
     <div
