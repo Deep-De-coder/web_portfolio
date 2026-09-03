@@ -4,7 +4,7 @@ A modern, interactive portfolio website showcasing my work in AI/ML, computer vi
 
 ## 🌟 Live Demo
 
-Visit my portfolio: [Portfolio Website](https://your-portfolio-url.com)
+Visit my portfolio: [deep-portfolio-three.vercel.app](https://deep-portfolio-three.vercel.app)
 
 ## 🚀 Features
 
@@ -153,7 +153,7 @@ src/
 
 ## 🔗 Links
 
-- **Portfolio**: [Live Website](https://your-portfolio-url.com)
+- **Portfolio**: [Live Website](https://deep-portfolio-three.vercel.app)
 - **GitHub**: [Deep-De-coder](https://github.com/Deep-De-coder)
 - **LinkedIn**: [Deep Shahane](https://www.linkedin.com/in/deep-shahane/)
 - **Email**: esotericdeep@gmail.com
