@@ -1,5 +1,5 @@
 /* Projects Section */
-#projects {
+.App #projects {
   position: relative;
   margin-top: 50px;
   padding-top: 0;
@@ -171,7 +171,7 @@
 
 /* Scoped under #projects so these rules do not leak into other sections
    (Experience has its own .tech-badge / .view-more-btn / .toggle-icon) */
-#projects .tech-badge {
+.App #projects .tech-badge {
   background: rgba(100, 150, 255, 0.12);
   border: 1px solid rgba(100, 150, 255, 0.25);
   color: white;
@@ -183,7 +183,7 @@
 }
 
 /* View More */
-#projects .view-more-btn {
+.App #projects .view-more-btn {
   background: none;
   border: none;
   color: #4CAF50;
@@ -195,13 +195,13 @@
   padding: 0;
 }
 
-#projects .view-more-btn:hover {
+.App #projects .view-more-btn:hover {
   text-decoration: underline;
 }
 
 /* Chevron only renders on mobile; hidden by default, shown in the mobile
    media query below */
-#projects .toggle-icon {
+.App #projects .toggle-icon {
   display: none;
 }
 
@@ -232,7 +232,7 @@
   }
 
   /* Show the expand/collapse chevron on mobile cards */
-  #projects .toggle-icon {
+  .App #projects .toggle-icon {
     display: inline-block;
     font-size: 16px;
     font-weight: bold;

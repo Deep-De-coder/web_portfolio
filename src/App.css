@@ -49,7 +49,7 @@ html, body {
 }
 
 /* Sections */
-#ask, #experience, #education,#publications, #projects, #skillset {
+.App #ask, .App #experience, .App #education, .App #publications, .App #projects, .App #skillset {
   min-height: 100vh;
   box-sizing: border-box;
 }

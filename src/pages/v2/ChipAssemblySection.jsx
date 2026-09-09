@@ -390,12 +390,12 @@ export default function ChipAssemblySection() {
   if (reduce || isMobile || loadFailed) {
     return (
       <section ref={sectionRef} className="relative flex items-center justify-center px-6" style={{ minHeight: '70vh', background: 'transparent' }}>
-        <div className="text-center max-w-md">
+        <div className="text-center" style={{ maxWidth: '30rem' }}>
           <ChipGlyph />
-          <h2 className="font-grotesk font-bold text-white mt-6" style={{ fontSize: 'clamp(1.6rem,6vw,2.4rem)' }}>
-            AI in Your Browser
+          <h2 className="v2-h2" style={{ marginTop: '1.75rem' }}>
+            AI in your browser
           </h2>
-          <p className="font-dm text-slate-400 mt-3" style={{ fontSize: '0.95rem' }}>
+          <p className="v2-lede" style={{ marginInline: 'auto' }}>
             A neural engine, on your device. WebGPU-powered, zero latency, no data leaves your machine.
           </p>
         </div>
@@ -404,7 +404,7 @@ export default function ChipAssemblySection() {
   }
 
   return (
-    <section ref={sectionRef} style={{ height: '500vh', position: 'relative', background: '#05050a' }}>
+    <section ref={sectionRef} style={{ height: '500vh', position: 'relative', background: 'var(--v2-bg)' }}>
       <div style={{ position: 'sticky', top: 0, height: '100vh', overflow: 'hidden' }}>
         <canvas
           ref={canvasRef}
@@ -437,25 +437,58 @@ function PhaseOverlay({ phase, scrollYProgress }) {
       style={{ opacity, y, position: 'absolute', left: 'clamp(1.5rem, 6vw, 6rem)', bottom: 'clamp(3rem, 12vh, 8rem)', maxWidth: 'min(90vw, 460px)' }}
     >
       <div
-        className="px-6 py-5 rounded-2xl"
-        style={{
-          background: 'rgba(8,8,16,0.5)',
-          backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)',
-          border: '1px solid rgba(34,211,238,0.18)',
-          boxShadow: '0 8px 50px rgba(0,0,0,0.5)',
-        }}
+        className="v2-card"
+        style={{ padding: 'clamp(1.25rem, 3vw, 1.75rem)', borderColor: 'rgba(34,211,238,0.16)' }}
       >
-        <div className="flex items-center gap-2 mb-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 flex-shrink-0" style={{ boxShadow: '0 0 8px #22d3ee' }} />
-          <span className="font-dm tracking-[0.18em] uppercase" style={{ fontSize: '0.62rem', color: '#22d3ee' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
+          <span
+            aria-hidden="true"
+            style={{
+              width: 5,
+              height: 5,
+              borderRadius: '50%',
+              background: 'var(--v2-live)',
+              boxShadow: '0 0 8px var(--v2-live)',
+              flexShrink: 0,
+            }}
+          />
+          <span
+            style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: '0.625rem',
+              fontWeight: 500,
+              letterSpacing: '0.2em',
+              textTransform: 'uppercase',
+              color: 'var(--v2-live)',
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
             {phase.readout}
             {phase.counter && <motion.span style={{ marginLeft: 8 }}>{topsText}</motion.span>}
           </span>
         </div>
-        <h2 className="font-grotesk font-bold text-white leading-tight" style={{ fontSize: 'clamp(1.5rem, 4vw, 2.6rem)', letterSpacing: '-0.02em' }}>
+        <h2
+          style={{
+            fontFamily: "'Space Grotesk', system-ui, sans-serif",
+            fontWeight: 600,
+            fontSize: 'clamp(1.5rem, 3.6vw, 2.375rem)',
+            lineHeight: 1.08,
+            letterSpacing: '-0.032em',
+            color: 'var(--v2-text)',
+            margin: 0,
+          }}
+        >
           {phase.title}
         </h2>
-        <p className="font-dm text-slate-400 mt-2" style={{ fontSize: 'clamp(0.85rem, 2vw, 1.05rem)' }}>
+        <p
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: 'clamp(0.875rem, 1.8vw, 1rem)',
+            lineHeight: 1.6,
+            color: 'var(--v2-text-2)',
+            margin: '0.625rem 0 0',
+          }}
+        >
           {phase.sub}
         </p>
       </div>

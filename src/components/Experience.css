@@ -1,5 +1,5 @@
 /* Experience Section */
-#experience {
+.App #experience {
     margin-top: 50px; /* Adjust this value as needed */
     padding-top: 0px; /* Adds spacing without affecting layout */
 }

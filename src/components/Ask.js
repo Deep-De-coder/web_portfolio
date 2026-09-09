@@ -208,7 +208,10 @@ Be concise, professional, and accurate.`;
         const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
 
         const controller = new AbortController();
-        const fetchTimeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+        // 75s: the backend is a free Render instance that spins down when
+        // idle, and a cold start alone can take ~45s. A 30s deadline aborted
+        // requests that would have succeeded.
+        const fetchTimeoutId = setTimeout(() => controller.abort(), 75000);
 
         let data;
         let response;

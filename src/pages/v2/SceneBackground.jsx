@@ -1,26 +1,52 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 
+// Both shaders fade geometry out with distance from the camera. Without it
+// every star and every edge draws at full strength, the far field reads as
+// loud as the near field, and the whole thing flattens into visual noise.
 const VERTEX_SHADER = `
   uniform float uTime;
   varying vec3 vColor;
+  varying float vFade;
   void main() {
     vec3 p = position;
     p.y += sin(uTime * 0.6 + position.x * 0.01) * 0.4;
     vec4 mvPosition = modelViewMatrix * vec4(p, 1.0);
-    gl_PointSize = clamp(300.0 / -mvPosition.z, 1.0, 4.0);
+    gl_PointSize = clamp(240.0 / -mvPosition.z, 0.6, 2.6);
     gl_Position = projectionMatrix * mvPosition;
-    vColor = mix(vec3(1.0), vec3(0.38, 0.40, 0.95), clamp(-position.z / 600.0, 0.0, 1.0));
+    vColor = mix(vec3(0.86, 0.88, 1.0), vec3(0.36, 0.38, 0.92), clamp(-position.z / 600.0, 0.0, 1.0));
+    vFade = 1.0 - smoothstep(160.0, 820.0, -mvPosition.z);
   }
 `;
 
 const FRAGMENT_SHADER = `
   varying vec3 vColor;
+  varying float vFade;
   void main() {
     float d = length(gl_PointCoord - vec2(0.5));
-    float alpha = 1.0 - smoothstep(0.3, 0.5, d);
-    if (alpha <= 0.0) discard;
+    float alpha = 1.0 - smoothstep(0.22, 0.5, d);
+    alpha *= vFade * 0.72;
+    if (alpha <= 0.001) discard;
     gl_FragColor = vec4(vColor, alpha);
+  }
+`;
+
+const LINE_VERTEX_SHADER = `
+  varying float vFade;
+  void main() {
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_Position = projectionMatrix * mvPosition;
+    vFade = 1.0 - smoothstep(120.0, 700.0, -mvPosition.z);
+  }
+`;
+
+const LINE_FRAGMENT_SHADER = `
+  uniform float uOpacity;
+  varying float vFade;
+  void main() {
+    float a = uOpacity * vFade;
+    if (a <= 0.001) discard;
+    gl_FragColor = vec4(0.42, 0.44, 0.96, a);
   }
 `;
 
@@ -57,7 +83,9 @@ export default function SceneBackground() {
     renderer.setClearColor(0x000000, 0);
     mount.appendChild(renderer.domElement);
 
-    const count = window.innerWidth > 768 ? 2500 : 1200;
+    // Deliberately sparse. The earlier 2500/4000 density filled every part of
+    // the frame; a quieter field reads as atmosphere instead of wallpaper.
+    const count = window.innerWidth > 768 ? 1400 : 700;
     const positions = new Float32Array(count * 3);
     const pts = [];
     for (let i = 0; i < count; i++) {
@@ -90,9 +118,9 @@ export default function SceneBackground() {
     // Spatial hash grid (cell = neighbor threshold) replaces the O(n^2)
     // all-pairs scan: only the 27 surrounding cells can hold a neighbor.
     const linePositions = [];
-    const maxEdges = 4000;
+    const maxEdges = 1300;
     let edgeCount = 0;
-    const thresh = 120;
+    const thresh = 110;
     const threshSq = thresh * thresh;
     const grid = new Map();
     const cellKey = (cx, cy, cz) => `${cx},${cy},${cz}`;
@@ -134,10 +162,12 @@ export default function SceneBackground() {
     buildEdges();
     const lineGeometry = new THREE.BufferGeometry();
     lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
-    const lineMaterial = new THREE.LineBasicMaterial({
-      color: 0x6366f1,
+    const lineUniforms = { uOpacity: { value: 0.05 } };
+    const lineMaterial = new THREE.ShaderMaterial({
+      uniforms: lineUniforms,
+      vertexShader: LINE_VERTEX_SHADER,
+      fragmentShader: LINE_FRAGMENT_SHADER,
       transparent: true,
-      opacity: 0.06,
       depthWrite: false,
     });
     const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
@@ -166,7 +196,7 @@ export default function SceneBackground() {
       const t = clock.getElapsedTime();
       uniforms.uTime.value = t;
       scene.rotation.y += 0.00015;
-      lineMaterial.opacity = 0.06 + Math.sin(t * 0.4) * 0.03;
+      lineUniforms.uOpacity.value = 0.05 + Math.sin(t * 0.4) * 0.022;
 
       camera.rotation.x += (my * -0.08 - camera.rotation.x) * 0.04;
       camera.rotation.y += (mx * 0.12 - camera.rotation.y) * 0.04;
@@ -192,10 +222,25 @@ export default function SceneBackground() {
   }, [reduce]);
 
   return (
-    <div
-      ref={mountRef}
-      aria-hidden="true"
-      style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
-    />
+    <>
+      <div
+        ref={mountRef}
+        aria-hidden="true"
+        style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
+      />
+      {/* Vignette. Pulls the corners down so the eye is held in the centre of
+          the frame — the field no longer runs flat to the edges of the screen. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 1,
+          pointerEvents: 'none',
+          background:
+            'radial-gradient(75% 60% at 50% 42%, transparent 0%, rgba(6,6,10,0.35) 62%, rgba(6,6,10,0.82) 100%)',
+        }}
+      />
+    </>
   );
 }

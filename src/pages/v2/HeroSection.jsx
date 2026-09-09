@@ -8,6 +8,8 @@ const ROLES = [
   '16× speedup in drone 3D reconstruction',
 ];
 
+const EASE = [0.16, 1, 0.3, 1];
+
 export default function HeroSection() {
   const [roleIdx, setRoleIdx] = useState(0);
   const [displayed, setDisplayed] = useState('');
@@ -41,117 +43,179 @@ export default function HeroSection() {
     return () => clearTimeout(t);
   }, [displayed, deleting, roleIdx, reduceMotion]);
 
-  const name = 'Deep Shahane';
+  const words = 'Deep Shahane'.split(' ');
 
   return (
     <section
       id="home"
       className="relative flex items-center justify-center overflow-hidden"
-      style={{ minHeight: '100vh', background: 'transparent' }}
+      style={{ minHeight: '100svh', background: 'transparent' }}
     >
-      <div className="relative z-10 text-center px-6 w-full max-w-5xl mx-auto">
-        {/* Label */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="font-dm text-xs font-medium tracking-[0.2em] text-indigo-400 uppercase mb-7"
-        >
-          MS Computer Science · University at Buffalo
-        </motion.p>
+      {/* Soft key light behind the wordmark — gives the type something to sit
+          in front of so it reads as lit rather than pasted on. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: '50%',
+          top: '46%',
+          width: 'min(120vw, 1100px)',
+          height: 'min(70vh, 560px)',
+          transform: 'translate(-50%, -50%)',
+          background:
+            'radial-gradient(50% 50% at 50% 50%, rgba(99,102,241,0.13) 0%, rgba(99,102,241,0.05) 42%, transparent 72%)',
+          pointerEvents: 'none',
+        }}
+      />
 
-        {/* Name — letter stagger */}
-        <h1
-          className="font-grotesk font-bold text-white leading-none mb-6 select-none"
-          style={{ fontSize: 'clamp(3rem, 10vw, 7.5rem)', letterSpacing: '-0.025em' }}
+      <div
+        className="relative text-center w-full"
+        style={{ zIndex: 3, maxWidth: '68rem', margin: '0 auto', padding: '0 var(--v2-gutter)' }}
+      >
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            marginBottom: 'clamp(1.25rem, 3vh, 2rem)',
+          }}
         >
-          {name.split('').map((char, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, y: 56, filter: 'blur(6px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{
-                duration: 0.55,
-                delay: 0.35 + i * 0.035,
-                type: 'spring',
-                stiffness: 170,
-                damping: 18,
-              }}
-              style={{ display: char === ' ' ? 'inline' : 'inline-block', whiteSpace: 'pre' }}
-            >
-              {char}
-            </motion.span>
+          <span
+            aria-hidden="true"
+            style={{ width: 28, height: 1, background: 'linear-gradient(90deg, transparent, var(--v2-accent-bright))' }}
+          />
+          <span
+            style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: '0.6875rem',
+              fontWeight: 500,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: 'var(--v2-accent-bright)',
+            }}
+          >
+            MS Computer Science · University at Buffalo
+          </span>
+          <span
+            aria-hidden="true"
+            style={{ width: 28, height: 1, background: 'linear-gradient(90deg, var(--v2-accent-bright), transparent)' }}
+          />
+        </motion.div>
+
+        {/* Wordmark — each word rises out of its own mask. A clipped reveal
+            reads more considered than a blur-in, and it keeps the baseline
+            perfectly stable while it animates. */}
+        <h1
+          className="v2-display"
+          style={{ margin: '0 0 clamp(1rem, 2.5vh, 1.75rem)', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0 0.28em' }}
+        >
+          {words.map((word, i) => (
+            <span key={word} style={{ display: 'block', overflow: 'hidden', paddingBottom: '0.06em' }}>
+              <motion.span
+                style={{ display: 'block' }}
+                initial={reduceMotion ? false : { y: '105%' }}
+                animate={{ y: '0%' }}
+                transition={{ duration: 1, delay: 0.3 + i * 0.09, ease: EASE }}
+              >
+                {word}
+              </motion.span>
+            </span>
           ))}
         </h1>
 
-        {/* Typewriter */}
+        {/* Typewriter. min-height is reserved so the CTAs never shift as the
+            line grows and deletes. */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.95, duration: 0.4 }}
-          className="font-dm mb-10"
-          style={{ fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', color: '#94a3b8', minHeight: '2rem' }}
+          transition={{ delay: 0.85, duration: 0.5 }}
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: 'clamp(1rem, 2.1vw, 1.25rem)',
+            lineHeight: 1.5,
+            color: 'var(--v2-text-2)',
+            minHeight: '3rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 'clamp(1.75rem, 4vh, 2.75rem)',
+          }}
         >
-          {reduceMotion ? ROLES[0] : displayed}
-          {!reduceMotion && (
-            <span style={{ color: '#818cf8', animation: 'hero-blink 1s step-end infinite' }}>|</span>
-          )}
+          <span>
+            {reduceMotion ? ROLES[0] : displayed}
+            {!reduceMotion && (
+              <span
+                aria-hidden="true"
+                style={{
+                  display: 'inline-block',
+                  width: '1.5px',
+                  height: '1.1em',
+                  marginLeft: '3px',
+                  verticalAlign: 'text-bottom',
+                  background: 'var(--v2-accent-bright)',
+                  animation: 'hero-blink 1.05s step-end infinite',
+                }}
+              />
+            )}
+          </span>
         </motion.div>
 
         {/* CTAs */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.15, duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-wrap items-center justify-center gap-3 mb-10"
+          transition={{ delay: 1.05, duration: 0.7, ease: EASE }}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '0.75rem',
+            marginBottom: 'clamp(1.75rem, 4vh, 2.5rem)',
+          }}
         >
-          <a
-            href="#ask"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-dm font-medium text-sm text-white cursor-pointer transition-transform duration-200 hover:-translate-y-0.5"
-            style={{
-              background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
-              boxShadow: '0 0 36px rgba(99,102,241,0.38)',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+          <a href="#ask" className="v2-btn v2-btn--primary">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 2a10 10 0 1 0 10 10" />
+              <path d="M12 6v6l4 2" />
             </svg>
-            Try the In-Browser AI
+            Try the in-browser AI
           </a>
-          <a
-            href="#projects"
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-dm font-medium text-sm cursor-pointer transition-transform duration-200 hover:-translate-y-0.5"
-            style={{ border: '1px solid rgba(255,255,255,0.14)', color: '#cbd5e1', background: 'rgba(255,255,255,0.03)' }}
-          >
-            View Projects
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
+          <a href="#projects" className="v2-btn v2-btn--ghost">
+            View projects
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h13M12 5.5 18.5 12 12 18.5" />
             </svg>
           </a>
         </motion.div>
 
-        {/* Status badges */}
+        {/* Proof chips */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.93 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1.4, duration: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-3"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.35, duration: 0.6 }}
+          style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
         >
-          <span
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-dm text-xs"
-            style={{ border: '1px solid rgba(34,211,238,0.25)', background: 'rgba(34,211,238,0.06)', color: '#22d3ee' }}
-          >
+          <span className="v2-tag v2-tag--live" style={{ gap: '0.4375rem', padding: '0.5rem 0.75rem' }}>
             <span
-              className="w-1.5 h-1.5 rounded-full bg-cyan-400 flex-shrink-0"
-              style={{ animation: 'hero-pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' }}
+              aria-hidden="true"
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: '50%',
+                background: 'var(--v2-live)',
+                boxShadow: '0 0 8px rgba(34,211,238,0.9)',
+                animation: 'hero-pulse 2.4s cubic-bezier(0.4,0,0.6,1) infinite',
+              }}
             />
-            WebGPU Powered
+            WebGPU powered
           </span>
-          <span
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full font-dm text-xs"
-            style={{ border: '1px solid rgba(255,255,255,0.09)', background: 'rgba(255,255,255,0.03)', color: '#64748b' }}
-          >
-            LLM runs locally · No data leaves your device
+          <span className="v2-tag" style={{ padding: '0.5rem 0.75rem' }}>
+            Runs locally · no data leaves your device
           </span>
         </motion.div>
       </div>
@@ -160,30 +224,54 @@ export default function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.4, duration: 0.7 }}
-        className="absolute bottom-8 flex flex-col items-center gap-2"
-        style={{ left: '50%', transform: 'translateX(-50%)' }}
+        transition={{ delay: 2.1, duration: 0.8 }}
         aria-hidden="true"
+        style={{
+          position: 'absolute',
+          bottom: 'clamp(1.5rem, 4vh, 2.5rem)',
+          // Auto-margin centring rather than translateX(-50%), so a future
+          // transform animation on this element can't knock it off-centre.
+          left: 0,
+          right: 0,
+          marginInline: 'auto',
+          width: 'fit-content',
+          zIndex: 3,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '0.625rem',
+        }}
       >
-        <span className="font-dm text-[10px] tracking-[0.22em] uppercase text-slate-700">scroll</span>
-        {reduceMotion ? (
-          <div
-            className="w-px h-8"
-            style={{ background: 'linear-gradient(to bottom, #334155, transparent)' }}
-          />
-        ) : (
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 1.7, ease: 'easeInOut' }}
-            className="w-px h-8"
-            style={{ background: 'linear-gradient(to bottom, #334155, transparent)' }}
-          />
-        )}
+        <span
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '0.625rem',
+            letterSpacing: '0.28em',
+            textTransform: 'uppercase',
+            color: 'var(--v2-text-4)',
+          }}
+        >
+          Scroll
+        </span>
+        <div style={{ position: 'relative', width: 1, height: 40, background: 'var(--v2-line)', overflow: 'hidden' }}>
+          {!reduceMotion && (
+            <motion.div
+              animate={{ y: ['-100%', '200%'] }}
+              transition={{ repeat: Infinity, duration: 2.1, ease: 'easeInOut' }}
+              style={{
+                position: 'absolute',
+                inset: '0 0 auto',
+                height: '50%',
+                background: 'linear-gradient(to bottom, transparent, var(--v2-accent-bright))',
+              }}
+            />
+          )}
+        </div>
       </motion.div>
 
       <style>{`
         @keyframes hero-blink { 0%,100%{opacity:1} 50%{opacity:0} }
-        @keyframes hero-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+        @keyframes hero-pulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
       `}</style>
     </section>
   );

@@ -239,7 +239,7 @@ export default function ChipCanvas() {
         ctx.save();
         ctx.setLineDash([len]);
         ctx.lineDashOffset = len * (1 - lp);
-        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.22})`;
+        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.1})`;
         ctx.lineWidth = 0.7;
         ctx.beginPath();
         ctx.moveTo(bus.x0, bus.y);
@@ -256,7 +256,7 @@ export default function ChipCanvas() {
         ctx.save();
         ctx.setLineDash([len]);
         ctx.lineDashOffset = len * (1 - lp);
-        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.18})`;
+        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.085})`;
         ctx.lineWidth = 0.6;
         ctx.beginPath();
         ctx.moveTo(tr.x, tr.y0);
@@ -273,12 +273,17 @@ export default function ChipCanvas() {
         ctx.save();
         ctx.setLineDash([perim]);
         ctx.lineDashOffset = perim * (1 - lp);
-        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.22})`;
+        ctx.strokeStyle = `rgba(99,102,241,${lp * 0.1})`;
         ctx.lineWidth = 0.7;
-        ctx.strokeRect(b.x, b.y, b.w, b.h);
+        // Rounded so the blocks read as components on a board rather than as
+        // bare wireframe rectangles sitting behind the copy.
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') ctx.roundRect(b.x, b.y, b.w, b.h, 3);
+        else ctx.rect(b.x, b.y, b.w, b.h);
+        ctx.stroke();
         ctx.restore();
         if (lp > 0.8) {
-          ctx.fillStyle = 'rgba(99,102,241,0.18)';
+          ctx.fillStyle = 'rgba(99,102,241,0.09)';
           ctx.font = "8px 'Courier New', monospace";
           ctx.fillText(b.label, b.x + 8, b.y + 13);
         }

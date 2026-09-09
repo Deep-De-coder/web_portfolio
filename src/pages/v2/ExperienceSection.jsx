@@ -1,12 +1,8 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useGSAP } from '@gsap/react';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { experiences } from '../../data/experience';
-
-gsap.registerPlugin(ScrollTrigger);
+import './theme.css';
 
 // Adapter: map the shared canonical records onto the compact shape this
 // section renders (condensed description, condensed tech list where defined).
@@ -19,129 +15,171 @@ const EXPERIENCES = experiences.map(e => ({
   color: e.color,
 }));
 
-function ExpCard({ exp, index }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 30 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      className="exp-item relative pl-12 pb-14 last:pb-0"
-    >
-      {/* Dot on timeline */}
-      <div
-        className="absolute left-0 top-1 w-3 h-3 rounded-full flex-shrink-0"
-        style={{
-          background: exp.color,
-          boxShadow: `0 0 12px ${exp.color}80`,
-          transform: 'translateX(calc(-50% + 1px))',
-          marginLeft: '0.5px',
-        }}
-      />
+const EASE = [0.16, 1, 0.3, 1];
+const VIEWPORT = { once: true, margin: '-80px' };
 
-      {/* Content card */}
-      <div
-        className="rounded-2xl p-5 transition-all duration-200 hover:border-white/[0.12]"
-        style={{ border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.025)' }}
-      >
-        <div className="flex flex-wrap items-start justify-between gap-2 mb-3">
-          <div>
-            <h3 className="font-grotesk font-semibold text-white" style={{ fontSize: '1.05rem' }}>{exp.title}</h3>
-            <p className="font-dm text-sm mt-0.5" style={{ color: exp.color }}>{exp.company}</p>
-          </div>
-          <span
-            className="font-dm text-xs px-3 py-1.5 rounded-full flex-shrink-0"
-            style={{ border: '1px solid rgba(255,255,255,0.09)', color: '#64748b', background: 'rgba(255,255,255,0.03)' }}
-          >
-            {exp.period}
-          </span>
-        </div>
-        <p className="font-dm text-slate-400 leading-relaxed mb-4" style={{ fontSize: '0.9rem' }}>
-          {exp.description}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          {exp.tech.map(t => (
-            <span
-              key={t}
-              className="font-dm text-[10px] px-2 py-1 rounded-full"
-              style={{ border: '1px solid rgba(255,255,255,0.08)', color: '#64748b', background: 'rgba(255,255,255,0.03)' }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-      </div>
-    </motion.div>
+// The saturated per-role accents read well as 8px timeline nodes but several
+// of them (indigo especially) fall just under 4.5:1 as text on the dark
+// ground. Mixing toward white keeps each role identifiable while clearing AA.
+function tint(hex, amount = 0.42) {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
+  if (!m) return hex;
+  const mix = (c) => Math.round(parseInt(c, 16) + (255 - parseInt(c, 16)) * amount);
+  return `rgb(${mix(m[1])}, ${mix(m[2])}, ${mix(m[3])})`;
+}
+
+function useReducedMotion() {
+  const [reduced, setReduced] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const onChange = (e) => setReduced(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  return reduced;
+}
+
+// One entrance for the whole page: 16px rise, 600ms, the system easing.
+// With reduced motion the transform is dropped and only the fade remains.
+function rise(reduced, i = 0) {
+  if (reduced) {
+    return {
+      initial: { opacity: 0 },
+      whileInView: { opacity: 1 },
+      viewport: VIEWPORT,
+      transition: { duration: 0.4, ease: EASE },
+    };
+  }
+  return {
+    initial: { opacity: 0, y: 16 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: VIEWPORT,
+    transition: { duration: 0.6, ease: EASE, delay: i * 0.06 },
+  };
+}
+
+/* ------------------------------------------------------------------ spine */
+
+/* The rail is a 1px line at x = 7px, so its centre falls on 7.5px. A 15px node
+   pinned to left: 0 centres on that at every breakpoint, which keeps the spine
+   true however the copy reflows. The dark ring punches the node out of the
+   rail rather than letting the line run through it. */
+function Node({ color }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="absolute left-0 top-7 block h-[15px] w-[15px] rounded-full md:top-8"
+      style={{
+        background: 'rgba(6,6,10,0.92)',
+        border: `1px solid ${color}`,
+        boxShadow: `0 0 0 4px rgba(6,6,10,0.55), 0 0 16px ${color}59`,
+      }}
+    >
+      <span className="absolute inset-[3px] rounded-full" style={{ background: color }} />
+    </span>
   );
 }
 
+// Fades out at both ends so the spine reads as a continuing thread rather than
+// a bar with two hard stops.
+const RAIL =
+  'linear-gradient(180deg, rgba(99,102,241,0) 0%, rgba(99,102,241,0.45) 12%, ' +
+  'rgba(99,102,241,0.26) 52%, rgba(99,102,241,0.1) 88%, rgba(99,102,241,0) 100%)';
+
+/* ------------------------------------------------------------------ entry */
+
+function Role({ exp, index, reduced }) {
+  return (
+    <motion.li {...rise(reduced, index)} className="relative pl-9 md:pl-14">
+      <Node color={exp.color} />
+
+      <article className="v2-card" style={{ padding: 'clamp(1.5rem, 3.5vw, 1.875rem)' }}>
+        <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
+          <div className="min-w-0">
+            <h3 className="v2-h3" style={{ fontSize: 'clamp(1.0625rem, 1.7vw, 1.1875rem)' }}>
+              {exp.title}
+            </h3>
+            <p
+              style={{
+                margin: '0.375rem 0 0',
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: '0.875rem',
+                fontWeight: 500,
+                letterSpacing: '0.005em',
+                color: tint(exp.color),
+              }}
+            >
+              {exp.company}
+            </p>
+          </div>
+
+          {/* ml-auto keeps the period right-aligned even once it wraps to its
+              own line on narrow cards. */}
+          <span className="v2-meta ml-auto shrink-0" style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
+            {exp.period}
+          </span>
+        </div>
+
+        <p className="v2-body" style={{ margin: '1.125rem 0 0', maxWidth: '64ch', lineHeight: 1.7 }}>
+          {exp.description}
+        </p>
+
+        <ul className="flex list-none flex-wrap items-center gap-2" style={{ margin: '1.375rem 0 0', padding: 0 }}>
+          {exp.tech.map(t => (
+            <li key={t} className="v2-tag">{t}</li>
+          ))}
+        </ul>
+      </article>
+    </motion.li>
+  );
+}
+
+/* ----------------------------------------------------------------- section */
+
 export default function ExperienceSection() {
-  const sectionRef = useRef(null);
-  const lineRef = useRef(null);
-
-  useGSAP(() => {
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) return;
-    if (!lineRef.current) return;
-
-    gsap.fromTo(
-      lineRef.current,
-      { scaleY: 0, transformOrigin: 'top center' },
-      {
-        scaleY: 1,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          end: 'bottom 80%',
-          scrub: 0.4,
-        },
-      }
-    );
-  }, { scope: sectionRef });
+  const reduced = useReducedMotion();
 
   return (
-    <section id="experience" ref={sectionRef} className="py-24 px-6" style={{ background: 'transparent' }}>
-      <div className="max-w-3xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="mb-14"
-        >
-          <div className="flex items-center gap-3 mb-5">
-            <span className="font-dm text-[11px] tracking-[0.16em] text-slate-600 uppercase">03</span>
-            <div className="w-6 h-px bg-slate-700" />
-            <span className="font-dm text-[11px] tracking-[0.16em] text-slate-600 uppercase">Career</span>
-          </div>
-          <h2
-            className="font-grotesk font-bold text-white leading-tight"
-            style={{ fontSize: 'clamp(1.8rem, 4.5vw, 3rem)', letterSpacing: '-0.022em' }}
-          >
-            Experience
-          </h2>
-        </motion.div>
+    <section id="experience" className="v2-section" style={{ background: 'transparent' }}>
+      <div className="v2-container">
+        <motion.header {...rise(reduced)} className="mb-12 sm:mb-14">
+          <p className="v2-eyebrow" style={{ margin: 0 }}>
+            <span className="v2-eyebrow__index">03</span>
+            <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
+            Career
+          </p>
+          <h2 className="v2-h2">Experience</h2>
+          <p className="v2-lede">
+            {EXPERIENCES.length} roles across research labs, startups, and industry.
+          </p>
+        </motion.header>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Vertical line */}
-          <div
-            ref={lineRef}
-            className="absolute top-0 bottom-0"
-            style={{
-              left: '0',
-              width: '1px',
-              background: 'linear-gradient(to bottom, rgba(99,102,241,0.5), rgba(99,102,241,0.1))',
-              transformOrigin: 'top center',
-            }}
+        {/* Measure is capped well below the container so descriptions keep a
+            readable line length on wide screens. */}
+        <div className="relative" style={{ maxWidth: '780px' }}>
+          <motion.span
+            aria-hidden="true"
+            className="absolute bottom-0 left-[7px] top-0 w-px"
+            style={{ background: RAIL, transformOrigin: 'top' }}
+            {...(reduced
+              ? {}
+              : {
+                  initial: { scaleY: 0 },
+                  whileInView: { scaleY: 1 },
+                  viewport: VIEWPORT,
+                  transition: { duration: 0.6, ease: EASE },
+                })}
           />
-          <div className="space-y-0">
+
+          <ul className="flex list-none flex-col gap-7 md:gap-8" style={{ margin: 0, padding: 0 }}>
             {EXPERIENCES.map((exp, i) => (
-              <ExpCard key={exp.company} exp={exp} index={i} />
+              <Role key={`${exp.company}-${exp.title}`} exp={exp} index={i} reduced={reduced} />
             ))}
-          </div>
+          </ul>
         </div>
       </div>
     </section>
