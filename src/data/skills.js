@@ -1,8 +1,10 @@
 // Canonical skills data, single source of truth shared by
 // v1 (src/components/Skillset.js) and v2 (src/pages/v2/SkillsSection.jsx).
 //
-// `span` is the card size ('wide' | 'square'); v1 maps it to its `className`
-// prop. `stats` is rendered by v1 only; `icon` and `color` by v2 only.
+// `span` is the card size ('wide' | 'square') for v1's three-column masonry,
+// where 'wide' spans two columns: the four categories tile as 2+1 / 2+1 with
+// no orphaned cells. v2 lays the same four out as a uniform two-by-two and
+// ignores `span`. `stats` is rendered by v1 only; `icon` and `color` by v2.
 
 export const skillCategories = [
   {
@@ -29,7 +31,7 @@ export const skillCategories = [
   {
     title: 'ML and Vision',
     stats: '8 technologies',
-    span: 'wide',
+    span: 'square',
     icon: '◻',
     color: '#8b5cf6',
     skills: [

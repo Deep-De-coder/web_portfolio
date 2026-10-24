@@ -7,6 +7,8 @@
 // - `thumbnail` is the shared image import; `featured` drives the v2 layout.
 
 import dresserImg from '../assets/projects/dresser.png';
+import wardreamImg from '../assets/projects/wardream.png';
+import agmImg from '../assets/projects/agentguardmemory.png';
 import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 import healthcareImg from '../assets/projects/healthcare.png';
 import roadextract from '../assets/projects/roadextract.png';
@@ -41,14 +43,18 @@ export const projects = [
     title: 'WarDream',
     demoLink: '',
     codeLink: '',
-    summary: 'Behaviour-cloning game agent.',
-    shortSummary: 'Behaviour-cloning game agent.',
+    summary:
+      "WarDream is a turn-based tactics environment and the experiment harness around it, built to test whether a neural policy learns tactics or just finds a hole in the reward. Units carry health, morale, tech tier and ammo as separate state, so a force breaks before it dies and local numerical superiority matters more than global parity. A shared per-unit network (one set of weights applied to each unit's own egocentric view, so it runs at any army size) is trained by behaviour cloning on a hand-written doctrine and ends up beating its teacher: 67.2% win rate against the doctrine's 57.2% over 400 paired episodes, reproduced across four training seeds (p < 0.01, paired bootstrap), using 40% fewer parameters than a monolithic baseline that scores 6 points lower. Every run is fingerprinted against the environment's reward constants and scored for action diversity, which is how a 75.5% PPO result was identified as a corner-camping exploit (92% of its moves on one action) and withdrawn rather than published.",
+    shortSummary:
+      'A multi-attribute tactics environment: health, morale, tech and terrain, not one health bar, plus the harness that decides whether a result is real. A shared per-unit policy cloned from a hand-written doctrine beats its teacher 67.2% to 57.2% over 400 paired episodes with 40% fewer parameters than a monolithic net; a higher-scoring PPO run was caught as a reward exploit and withdrawn.',
     highlights: [
-      '67.2% win rate vs 57.2% baseline',
-      'Caught 3 reward-hacking exploits during training',
+      "67.2% win rate against the doctrine's 57.2% over 400 paired episodes, reproduced across four training seeds (p < 0.01, paired bootstrap)",
+      '40% fewer parameters than a monolithic baseline that scores 6 points lower',
+      'Every run is fingerprinted against the reward constants and scored for action diversity, which caught a higher-scoring PPO run as a corner-camping exploit and got it withdrawn',
     ],
-    techStack: ['Behaviour cloning'],
-    techHighlights: ['Behaviour cloning'],
+    techStack: ['Python', 'PyTorch', 'NumPy', 'CMA-ES', 'pygame', 'pytest', 'JavaScript', 'Canvas'],
+    techHighlights: ['Python', 'PyTorch', 'NumPy', 'CMA-ES', 'pygame'],
+    thumbnail: wardreamImg,
     featured: true,
   },
   {
@@ -60,6 +66,9 @@ export const projects = [
     shortSummary: 'MCP memory server for AI agents, published on PyPI.',
     techStack: ['MCP'],
     techHighlights: ['MCP'],
+    thumbnail: agmImg,
+    // Dark dashboard capture: skip the brightness damping meant for light UIs.
+    darkThumbnail: true,
     featured: true,
   },
   {

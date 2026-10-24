@@ -77,7 +77,9 @@ function CategoryCard({ cat, index, reduced }) {
   return (
     <motion.article
       {...rise(reduced, index)}
-      className={`v2-card h-full${cat.span === 'wide' ? ' sm:col-span-2' : ''}`}
+      // Four categories in a two-column grid tile as a clean two-by-two, so
+      // the card sizes stay uniform here and `span` is left to v1's masonry.
+      className="v2-card h-full"
     >
       <div className="flex h-full flex-col gap-5 p-6 sm:p-7">
         <div className="flex items-center gap-3">

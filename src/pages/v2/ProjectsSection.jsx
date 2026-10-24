@@ -20,6 +20,7 @@ const PROJECTS = projects
     demoLabel: p.demoLabel,
     code: p.codeLink,
     img: p.thumbnail,
+    darkImg: p.darkThumbnail === true,
     featured: p.featured,
   }));
 
@@ -92,7 +93,7 @@ const CodeIcon = () => (
    wall of raw screenshots reads as a deliberate set rather than an album. The
    scrim keeps the lower edge dark enough for the card seam to stay visible
    under bright captures. */
-function Thumbnail({ src, title, reduced, className = '' }) {
+function Thumbnail({ src, title, reduced, dark = false, className = '' }) {
   return (
     <div className={`relative overflow-hidden ${className}`} style={{ background: 'var(--v2-surface-2)' }}>
       <img
@@ -104,10 +105,15 @@ function Thumbnail({ src, title, reduced, className = '' }) {
         // strength they punch holes in a dark page and each card competes with
         // the next; damped at rest and restored on hover, the wall settles and
         // the card you point at comes forward.
-        className={`absolute inset-0 h-full w-full object-cover object-center brightness-[0.72] saturate-[0.88] ${
+        // Damping exists to stop bright, light-UI screenshots punching holes in
+        // a dark page. A screenshot that is already dark needs the opposite:
+        // crushing it further leaves an unreadable black rectangle.
+        className={`absolute inset-0 h-full w-full object-cover object-center ${
+          dark ? 'brightness-[1.06] saturate-100' : 'brightness-[0.72] saturate-[0.88]'
+        } ${
           reduced
             ? ''
-            : 'transition-[transform,filter] duration-[600ms] group-hover:scale-[1.04] group-focus-within:scale-[1.04] group-hover:brightness-100 group-hover:saturate-100 group-focus-within:brightness-100 group-focus-within:saturate-100'
+            : 'transition-[transform,filter] duration-[600ms] group-hover:scale-[1.04] group-focus-within:scale-[1.04] group-hover:brightness-110 group-hover:saturate-100 group-focus-within:brightness-110 group-focus-within:saturate-100'
         }`}
         style={{ transformOrigin: 'center', transitionTimingFunction: 'var(--v2-ease)' }}
       />
@@ -117,8 +123,9 @@ function Thumbnail({ src, title, reduced, className = '' }) {
           reduced ? '' : 'transition-opacity duration-[600ms] group-hover:opacity-70 group-focus-within:opacity-70'
         }`}
         style={{
-          background:
-            'linear-gradient(180deg, rgba(6,6,10,0.28) 0%, rgba(6,6,10,0.18) 40%, rgba(6,6,10,0.58) 74%, rgba(6,6,10,0.94) 100%)',
+          background: dark
+            ? 'linear-gradient(180deg, rgba(6,6,10,0) 0%, rgba(6,6,10,0) 52%, rgba(6,6,10,0.42) 80%, rgba(6,6,10,0.88) 100%)'
+            : 'linear-gradient(180deg, rgba(6,6,10,0.28) 0%, rgba(6,6,10,0.18) 40%, rgba(6,6,10,0.58) 74%, rgba(6,6,10,0.94) 100%)',
           transitionTimingFunction: 'var(--v2-ease)',
         }}
       />
@@ -217,6 +224,7 @@ function LeadCard({ project, reduced }) {
         src={project.img}
         title={project.title}
         reduced={reduced}
+        dark={project.darkImg}
         className="aspect-[16/10] rounded-tl-[var(--v2-r-lg)] rounded-tr-[var(--v2-r-lg)] lg:aspect-auto lg:rounded-tr-none lg:rounded-bl-[var(--v2-r-lg)]"
       />
 
@@ -259,6 +267,7 @@ function ProjectCard({ project, reduced, index }) {
           src={project.img}
           title={project.title}
           reduced={reduced}
+          dark={project.darkImg}
           className="aspect-[16/10] rounded-t-[var(--v2-r-lg)]"
         />
       )}
