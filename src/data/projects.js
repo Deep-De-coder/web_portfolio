@@ -63,13 +63,23 @@ export const projects = [
     demoLink: 'https://pypi.org/project/agm-memory-mcp',
     demoLabel: 'PyPI',
     codeLink: '',
-    summary: 'MCP memory server for AI agents, published on PyPI.',
-    shortSummary: 'MCP memory server for AI agents, published on PyPI.',
-    techStack: ['MCP'],
-    techHighlights: ['MCP'],
+    summary:
+      'Agent Guard Memory is an MCP memory server for AI agents, published on PyPI. Every memory is stored with a content hash so storage integrity can be verified rather than assumed, each agent carries a trust score, and violations are tracked as they happen. A graph view shows how memories and agents relate, rules govern what gets accepted, and a quorum check reports how many agents fully agree. The immunology panel runs periodic DCA scans over agent behaviour, weighing danger signals such as reasoning break, write surge, source collapse, trust cliff cluster and retrieval anomaly against safe ones such as consistent reasoning, low write velocity, source diversity and corroboration rate, then returns a verdict on the current state. An attacks console exercises that detection against adversarial agents covering forgery, poisoning, phantom proxies, echo and sleeper behaviour.',
+    shortSummary:
+      'An MCP memory server for AI agents, published on PyPI. Every memory carries a content hash for integrity, every agent carries a trust score, and violations are tracked as they happen. Periodic DCA scans weigh danger signals against safe ones and return a verdict on current agent behaviour.',
+    highlights: [
+      'Every memory stored with a content hash, so storage integrity is verified rather than assumed',
+      'Per-agent trust scoring with violation tracking and a quorum check across agents',
+      'Periodic DCA scans weigh danger signals (reasoning break, write surge, source collapse) against safe ones (corroboration rate, source diversity) and return a verdict',
+      'An attacks console exercises detection against forgery, poisoning, phantom-proxy, echo and sleeper agents',
+    ],
+    techStack: ['MCP', 'Python'],
+    techHighlights: ['MCP', 'Python'],
     thumbnail: agmImg,
     // Dark dashboard capture: skip the brightness damping meant for light UIs.
     darkThumbnail: true,
+    thumbnailAlt:
+      'The Agent Guard Memory dashboard: memory, agent and violation counts above an immunology control panel listing danger and safe signals with a SAFE verdict.',
     featured: true,
   },
   {
