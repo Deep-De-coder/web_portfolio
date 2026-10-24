@@ -9,6 +9,7 @@
 import dresserImg from '../assets/projects/dresser.png';
 import wardreamImg from '../assets/projects/wardream.png';
 import agmImg from '../assets/projects/agentguardmemory.png';
+import parsImg from '../assets/projects/parsfrontier.webp';
 import lowlightdiffusionImg from '../assets/projects/lowlightdiffusion.png';
 import healthcareImg from '../assets/projects/healthcare.png';
 import roadextract from '../assets/projects/roadextract.png';
@@ -72,13 +73,26 @@ export const projects = [
     featured: true,
   },
   {
-    title: 'PARS Simulator',
+    title: 'PARS Frontier',
     demoLink: '',
     codeLink: 'https://github.com/deep-de-coder/pars-simulator',
-    summary: 'Cross-entropy method search, +28% over baseline.',
-    shortSummary: 'Cross-entropy method search, +28% over baseline.',
-    techStack: ['Cross-entropy method'],
-    techHighlights: ['Cross-entropy method'],
+    summary:
+      "With an AI coding assistant, I designed and built PARS Frontier, a browser-based 3D survival-colony simulator (JavaScript, three.js). Survivors start anywhere from a tsunami-struck coast to Mars with a deliberately flawed handbook. The engine knows the hidden truth; the colony's rule-based planner works mainly from its own beliefs, correcting them from experience. The Colony mind panel shows each day's needs, options and assignments. Without being told, most colonies in sandy places learned that foraging on sand yields about half as much as on grass. I kept a change only if paired games (the same random world with and without it) showed no harm. Across 240 fresh paired games in all scenarios, my first four rounds of fixes raised year-end self-sufficiency from 69% to 82% of colonies, mostly on Mars.",
+    shortSummary:
+      "A browser-based 3D survival-colony simulator where survivors start anywhere from a tsunami-struck coast to Mars with a deliberately flawed handbook. The engine knows the hidden truth; the colony's planner works mainly from its own beliefs and corrects them from experience.",
+    highlights: [
+      'Year-end self-sufficiency rose from 69% to 82% of colonies across 240 fresh paired games, mostly on Mars',
+      'A change was kept only if paired games, the same random world with and without it, showed no harm',
+      'Without being told, most colonies in sandy places learned that foraging on sand yields about half what grass does',
+    ],
+    techStack: ['JavaScript', 'three.js'],
+    techHighlights: ['JavaScript', 'three.js'],
+    thumbnail: parsImg,
+    // Mid-dark capture (mean luminance 82/255): the damping meant for bright
+    // light-UI screenshots would crush it, same as the AGM dashboard.
+    darkThumbnail: true,
+    thumbnailAlt:
+      "PARS Frontier in a browser on day 201 of the After the Wave scenario: a low-poly 3D colony with a river, crop fields, water wheels and log cabins, next to the Colony mind panel listing needs, stores, today's thinking and who does what.",
     featured: true,
   },
   {

@@ -21,6 +21,7 @@ const PROJECTS = projects
     code: p.codeLink,
     img: p.thumbnail,
     darkImg: p.darkThumbnail === true,
+    imgAlt: p.thumbnailAlt,
     featured: p.featured,
   }));
 
@@ -93,12 +94,13 @@ const CodeIcon = () => (
    wall of raw screenshots reads as a deliberate set rather than an album. The
    scrim keeps the lower edge dark enough for the card seam to stay visible
    under bright captures. */
-function Thumbnail({ src, title, reduced, dark = false, className = '' }) {
+function Thumbnail({ src, title, alt, reduced, dark = false, className = '' }) {
   return (
     <div className={`relative overflow-hidden ${className}`} style={{ background: 'var(--v2-surface-2)' }}>
       <img
         src={src}
-        alt={`${title}, interface screenshot`}
+        // A hand-written alt beats the generated one when the author supplied it.
+        alt={alt || `${title}, interface screenshot`}
         loading="lazy"
         decoding="async"
         // Most captures are bright, light-UI screenshots. Held at full
@@ -223,6 +225,7 @@ function LeadCard({ project, reduced }) {
       <Thumbnail
         src={project.img}
         title={project.title}
+        alt={project.imgAlt}
         reduced={reduced}
         dark={project.darkImg}
         className="aspect-[16/10] rounded-tl-[var(--v2-r-lg)] rounded-tr-[var(--v2-r-lg)] lg:aspect-auto lg:rounded-tr-none lg:rounded-bl-[var(--v2-r-lg)]"
@@ -266,6 +269,7 @@ function ProjectCard({ project, reduced, index }) {
         <Thumbnail
           src={project.img}
           title={project.title}
+          alt={project.imgAlt}
           reduced={reduced}
           dark={project.darkImg}
           className="aspect-[16/10] rounded-t-[var(--v2-r-lg)]"

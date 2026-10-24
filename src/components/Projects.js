@@ -168,7 +168,7 @@ const Projects = () => {
                         {proj.thumbnail && (
                           <img
                             src={proj.thumbnail}
-                            alt={`${proj.title} Thumbnail`}
+                            alt={proj.thumbnailAlt || `${proj.title} Thumbnail`}
                             className="project-thumbnail"
                           />
                         )}
