@@ -10,8 +10,11 @@ const EXPERIENCES = experiences.map(e => ({
   title: e.title,
   company: e.company,
   period: e.period,
-  description: e.shortDescription,
-  tech: e.techHighlights || e.techStack,
+  location: e.location,
+  summary: e.summary,
+  highlights: e.highlights || [],
+  link: e.link,
+  tech: e.techHighlights || e.techStack || [],
   color: e.color,
 }));
 
@@ -120,13 +123,32 @@ function Role({ exp, index, reduced }) {
           {/* ml-auto keeps the period right-aligned even once it wraps to its
               own line on narrow cards. */}
           <span className="v2-meta ml-auto shrink-0" style={{ fontSize: '0.8125rem', whiteSpace: 'nowrap' }}>
-            {exp.period}
+            {exp.location ? `${exp.period} · ${exp.location}` : exp.period}
           </span>
         </div>
 
         <p className="v2-body" style={{ margin: '1.125rem 0 0', maxWidth: '64ch', lineHeight: 1.7 }}>
-          {exp.description}
+          {exp.summary}
         </p>
+
+        {exp.highlights.length > 0 && (
+          <ul
+            className="v2-bullets"
+            style={{ margin: '1rem 0 0', padding: 0, maxWidth: '68ch' }}
+          >
+            {exp.highlights.map(h => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+        )}
+
+        {exp.link && (
+          <p style={{ margin: '0.875rem 0 0' }}>
+            <a className="v2-inline-link" href={exp.link.href} target="_blank" rel="noopener noreferrer">
+              {exp.link.label}
+            </a>
+          </p>
+        )}
 
         <ul className="flex list-none flex-wrap items-center gap-2" style={{ margin: '1.375rem 0 0', padding: 0 }}>
           {exp.tech.map(t => (
@@ -148,7 +170,7 @@ export default function ExperienceSection() {
       <div className="v2-container">
         <motion.header {...rise(reduced)} className="mb-12 sm:mb-14">
           <p className="v2-eyebrow" style={{ margin: 0 }}>
-            <span className="v2-eyebrow__index">03</span>
+            <span className="v2-eyebrow__index">04</span>
             <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
             Career
           </p>

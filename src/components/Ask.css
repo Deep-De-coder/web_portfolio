@@ -325,7 +325,7 @@
 
 /* ✅ Typing animation for the Ask header only (scoped so other sections'
    h1 headings do not get the blinking cursor). Only the cursor/animation
-   props live here — .ask-header keeps its own wrapping behavior. */
+   props live here, .ask-header keeps its own wrapping behavior. */
 .ask-container h1 {
     border-right: 2px solid white;
     animation: blink-header 0.9s step-end infinite;

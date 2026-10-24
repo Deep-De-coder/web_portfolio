@@ -186,3 +186,53 @@
         display: block;
     }
 }
+
+/* Lettermark stand-in for companies with no logo asset. Matches the circular
+   footprint of .company-logo so the card header keeps its alignment. */
+.App .company-logo--mark {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(99, 102, 241, 0.18);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    color: #c7d2fe;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+/* Result-first bullets inside an experience card. */
+.App .exp-highlights {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 7px;
+}
+
+.App .exp-highlights li {
+    position: relative;
+    padding-left: 15px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: #cfcfd6;
+}
+
+.App .exp-highlights li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.68em;
+    width: 7px;
+    height: 1px;
+    background: #818cf8;
+}
+
+.App .exp-link {
+    margin: 10px 0 0;
+    font-size: 13px;
+}
+
+.App .exp-link a {
+    color: #818cf8;
+}

@@ -35,7 +35,7 @@ const Sidebar = () => {
       setCopiedLink(type);
       setTimeout(() => setCopiedLink(null), 2000);
     } catch (err) {
-      // Clipboard unavailable (permissions/insecure context) — ignore silently
+      // Clipboard unavailable (permissions/insecure context), ignore silently
     }
   };
 

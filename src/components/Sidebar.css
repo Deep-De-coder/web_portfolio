@@ -1,5 +1,5 @@
 /* ✅ SIDEBAR FOR DESKTOP
-   (single source of truth — App.css no longer redefines .sidebar) */
+   (single source of truth, App.css no longer redefines .sidebar) */
 .sidebar {
   position: fixed;
   top: 0;
@@ -77,7 +77,7 @@
   border-color: #4caf50 !important;
 }
 
-/* ✅ Individual Icon Styling — icon fills the circular border */
+/* ✅ Individual Icon Styling, icon fills the circular border */
 .social-icons a {
   position: relative;
   color: #ffffff !important;
@@ -155,7 +155,7 @@
 @media (max-width: 768px) {
 
   /* Collapsed container; the fixed .nav-buttons and .name-bar inside it
-     render the visible mobile navbar (single source of truth — App.css no
+     render the visible mobile navbar (single source of truth, App.css no
      longer redefines mobile .sidebar) */
   .sidebar {
     width: 0;

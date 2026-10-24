@@ -7,6 +7,7 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../utils/webllmClient';
+import { ASSISTANT_SYSTEM_PROMPT } from '../data/assistantKnowledge';
 
 const Ask = () => {
     const [inputValue, setInputValue] = useState('');
@@ -17,7 +18,7 @@ const Ask = () => {
     const [modelProgress, setModelProgress] = useState(0);
     const [isStreaming, setIsStreaming] = useState(false);
     const [isInitializing, setIsInitializing] = useState(false);
-    const fullText = `Curious about my skills or experience? Ask, and I'll explain!`;
+    const fullText = `AI Engineer. Ask about my work, projects or research.`;
 
     const messageEndRef = useRef(null);
     const streamingAbortRef = useRef(false);
@@ -163,10 +164,7 @@ const Ask = () => {
                 }
             }
 
-            // System prompt about the portfolio
-            const systemPrompt = `You are a helpful AI assistant for Deep Shahane's portfolio. 
-Answer questions about Deep's experience, projects, skills, and education based on the portfolio information.
-Be concise, professional, and accurate.`;
+            const systemPrompt = ASSISTANT_SYSTEM_PROMPT;
 
             // Remove loading message and add empty response
             setMessages((prev) => {

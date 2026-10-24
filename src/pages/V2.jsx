@@ -5,6 +5,7 @@ import ChipCanvas from './v2/ChipCanvas';
 import NavBar from './v2/NavBar';
 import HeroSection from './v2/HeroSection';
 import ChipAssemblySection from './v2/ChipAssemblySection';
+import AboutSection from './v2/AboutSection';
 import AskSection from './v2/AskSection';
 import ProjectsSection from './v2/ProjectsSection';
 import ExperienceSection from './v2/ExperienceSection';
@@ -77,6 +78,7 @@ export default function V2() {
         <NavBar />
         <HeroSection />
         <ChipAssemblySection />
+        <AboutSection />
         <AskSection />
         <ProjectsSection />
         <ExperienceSection />
@@ -104,7 +106,7 @@ export default function V2() {
                   Deep Shahane
                 </p>
                 <p className="v2-meta" style={{ margin: 0 }}>
-                  AI Researcher · MS Computer Science, University at Buffalo
+                  AI Engineer · Founding Engineer @ NILA · MS CS @ University at Buffalo
                 </p>
               </div>
 
@@ -135,7 +137,7 @@ export default function V2() {
         </footer>
       </div>
 
-      {/* Film grain — sits above everything, purely optical. */}
+      {/* Film grain, sits above everything, purely optical. */}
       <div className="v2-grain" aria-hidden="true" />
     </div>
   );

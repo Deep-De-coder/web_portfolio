@@ -6,6 +6,10 @@ import { Meteors } from './ui/meteors';
 import './Projects.css';
 import { projects } from '../data/projects';
 
+// `hidden` retires a card from the page while keeping its record and image in
+// the data file, so bringing one back is a one-word change.
+const VISIBLE_PROJECTS = projects.filter(p => !p.hidden);
+
 gsap.registerPlugin(ScrollTrigger);
 
 const MOBILE_QUERY = '(max-width: 767px)'; // matches the previous innerWidth < 768 check
@@ -94,7 +98,7 @@ const Projects = () => {
       const cards = cardsRef.current.filter(Boolean);
       if (cards.length > 0) {
         gsap.set(cards, { opacity: 0, y: 50 });
-        // ScrollTrigger.batch returns an array of triggers — spread so each
+        // ScrollTrigger.batch returns an array of triggers, spread so each
         // one is killed individually on cleanup
         triggers.push(
           ...ScrollTrigger.batch(cards, {
@@ -109,7 +113,7 @@ const Projects = () => {
     } catch (_) {}
 
     return () => {
-      // Kill only this component's tween/triggers — a global
+      // Kill only this component's tween/triggers, a global
       // ScrollTrigger.getAll() kill would destroy other components' triggers
       triggers.forEach(t => t && t.kill && t.kill());
     };
@@ -129,10 +133,10 @@ const Projects = () => {
       </h1>
 
       <div className="projects-grid">
-        {projects.map((proj, index) => {
+        {VISIBLE_PROJECTS.map((proj, index) => {
           const isExpanded = expandedIndex === index;
           const maxLength = 100;
-          const displayedSummary = isExpanded || isMobile
+          const displayedSummary = isExpanded || isMobile || proj.summary.length <= maxLength
             ? proj.summary
             : `${proj.summary.substring(0, maxLength)}...`;
 
@@ -161,11 +165,13 @@ const Projects = () => {
                   >
                     <CardItem translateZ={30} className="w-full">
                       <div className="project-header">
-                        <img
-                          src={proj.thumbnail}
-                          alt={`${proj.title} Thumbnail`}
-                          className="project-thumbnail"
-                        />
+                        {proj.thumbnail && (
+                          <img
+                            src={proj.thumbnail}
+                            alt={`${proj.title} Thumbnail`}
+                            className="project-thumbnail"
+                          />
+                        )}
                         <div className="project-info">
                           <h3 className="project-name">{proj.title}</h3>
                           <div className="project-links">
@@ -177,7 +183,7 @@ const Projects = () => {
                                 className="project-link"
                                 onClick={e => e.stopPropagation()}
                               >
-                                [DEMO]
+                                [{(proj.demoLabel || 'Demo').toUpperCase()}]
                               </a>
                             )}
                             {proj.codeLink && (
@@ -192,7 +198,7 @@ const Projects = () => {
                               </a>
                             )}
                           </div>
-                          <p className="project-duration">{proj.period}</p>
+                          {proj.period && <p className="project-duration">{proj.period}</p>}
                         </div>
                         {isMobile && (
                           <span className="toggle-icon">
@@ -204,6 +210,13 @@ const Projects = () => {
 
                     <CardItem translateZ={15} className="w-full">
                       <p className="project-summary">{displayedSummary}</p>
+                      {(proj.highlights || []).length > 0 && (
+                        <ul className="project-highlights">
+                          {proj.highlights.map(h => (
+                            <li key={h}>{h}</li>
+                          ))}
+                        </ul>
+                      )}
                     </CardItem>
 
                     <CardItem translateZ={10} className="w-fit">
@@ -220,7 +233,7 @@ const Projects = () => {
 
                     <CardItem translateZ={20} className="w-full">
                       <div className="tech-stack">
-                        {proj.techStack.map((tech, idx) => (
+                        {(proj.techStack || []).map((tech, idx) => (
                           <span key={idx} className="tech-badge">{tech}</span>
                         ))}
                       </div>

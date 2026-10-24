@@ -128,7 +128,7 @@ function DegreeCard({ edu, index, reduced }) {
           </div>
         </div>
 
-        {/* Record — hairline-separated from the identity column on desktop */}
+        {/* Record, hairline-separated from the identity column on desktop */}
         <div
           className="flex min-w-0 flex-col gap-7 border-t pt-7 md:border-l md:border-t-0 md:pl-10 md:pt-0"
           style={{ borderColor: HAIRLINE }}
@@ -157,7 +157,7 @@ export default function EducationSection() {
       <div className="v2-container">
         <motion.header {...rise(reduced)} className="mb-12 sm:mb-14">
           <p className="v2-eyebrow" style={{ margin: 0 }}>
-            <span className="v2-eyebrow__index">04</span>
+            <span className="v2-eyebrow__index">05</span>
             <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
             Background
           </p>

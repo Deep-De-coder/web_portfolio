@@ -46,7 +46,7 @@ function rise(reduced, i = 0) {
 }
 
 /* The whole citation is one link, so its hover/focus states have to be CSS on
-   the anchor rather than per-element handlers. Tokens only — no new colours,
+   the anchor rather than per-element handlers. Tokens only, no new colours,
    radii or curves. */
 const PUB_CSS = `
 .v2-pub {
@@ -112,7 +112,7 @@ function Citation({ pub, index, reduced }) {
         href={pub.link}
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${pub.title} — ${pub.venue}, ${pub.year} (opens in a new tab)`}
+        aria-label={`${pub.title}, ${pub.venue}, ${pub.year} (opens in a new tab)`}
       >
         <div className="grid items-start gap-x-6 gap-y-4 py-7 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] sm:py-8">
           {/* Year rail */}
@@ -176,7 +176,7 @@ export default function PublicationsSection() {
       <div className="v2-container">
         <motion.header {...rise(reduced)} className="mb-10 sm:mb-12">
           <p className="v2-eyebrow" style={{ margin: 0 }}>
-            <span className="v2-eyebrow__index">06</span>
+            <span className="v2-eyebrow__index">07</span>
             <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
             Research
           </p>

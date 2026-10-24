@@ -7,6 +7,7 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../../utils/webllmClient';
+import { ASSISTANT_SYSTEM_PROMPT } from '../../data/assistantKnowledge';
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -19,7 +20,7 @@ const QUICK = [
 ];
 
 // Credibility strip. Cyan (--v2-live) is reserved for the single fact that
-// carries the "this is running right here, right now" signal — spending it on
+// carries the "this is running right here, right now" signal, spending it on
 // more than one chip would drain the meaning out of the colour.
 const TRUST = [
   { label: 'WebGPU', live: false },
@@ -37,7 +38,7 @@ function engineStatus({ isInitializing, isStreaming, mode }) {
   return { label: 'Ready', tone: 'neutral' };
 }
 
-/* Chip/die glyph — the section is about silicon, so the mark is silicon. */
+/* Chip/die glyph, the section is about silicon, so the mark is silicon. */
 function ChipMark({ size = 20 }) {
   return (
     <svg
@@ -59,7 +60,7 @@ function ChipMark({ size = 20 }) {
   );
 }
 
-/* Three dots with staggered opacity — the "a reply is coming" beat that sits
+/* Three dots with staggered opacity, the "a reply is coming" beat that sits
    between hitting send and the first token landing. */
 function TypingDots() {
   return (
@@ -129,7 +130,7 @@ export default function AskSection() {
     };
   }, []);
 
-  // Scroll only when a message is added/removed — not on every streamed token,
+  // Scroll only when a message is added/removed, not on every streamed token,
   // and never on initial mount.
   useEffect(() => {
     if (messages.length === 0) return;
@@ -183,7 +184,7 @@ export default function AskSection() {
     let acc = '';
     try {
       await streamChat({
-        systemPrompt: `You are an AI assistant embedded in Deep Shahane's portfolio. Deep is an AI researcher with expertise in computer vision, LLMs, and robotics. Answer questions about his education (VIT Bachelor's + UB Master's), experience (SAIR Lab, Bragr, Captain Cool, VIT), projects, and skills concisely and professionally.`,
+        systemPrompt: ASSISTANT_SYSTEM_PROMPT,
         history,
         userPrompt: userQ,
         onToken: (tok) => {
@@ -333,7 +334,7 @@ export default function AskSection() {
           {/* ---------- Section header ---------- */}
           <motion.header {...rise()}>
             <div className="v2-eyebrow">
-              <span className="v2-eyebrow__index">01</span>
+              <span className="v2-eyebrow__index">02</span>
               <span className="v2-eyebrow__line" aria-hidden="true" />
               <span>The Showstopper</span>
             </div>
@@ -345,7 +346,7 @@ export default function AskSection() {
 
             <p className="v2-lede">
               This assistant is a language model running on your own GPU through WebGPU. It
-              downloads once, then answers with no API call and no server round trip — nothing
+              downloads once, then answers with no API call and no server round trip, nothing
               you type here ever leaves the tab.
             </p>
 
@@ -387,7 +388,7 @@ export default function AskSection() {
                     <ChipMark size={22} />
                   </span>
                   <div className="ask-empty__copy">
-                    <p className="ask-empty__title">Nothing loaded yet — ask the first question.</p>
+                    <p className="ask-empty__title">Nothing loaded yet, ask the first question.</p>
                     <p className="ask-empty__sub">
                       The model downloads on your first message, then runs entirely offline.
                     </p>
@@ -433,7 +434,7 @@ export default function AskSection() {
                             <circle cx="12" cy="12" r="9" />
                             <path d="M12 7.5v5M12 16.2h.01" />
                           </svg>
-                          <span>{msg.text} — try again.</span>
+                          <span>{msg.text}, try again.</span>
                         </div>
                       ) : (
                         <>
@@ -472,7 +473,7 @@ export default function AskSection() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Status rail — download progress, or the stop control while streaming */}
+            {/* Status rail, download progress, or the stop control while streaming */}
             {isInitializing ? (
               <div className="ask-rail">
                 <div className="ask-progress__head">
@@ -495,7 +496,7 @@ export default function AskSection() {
                   />
                 </div>
                 <p className="ask-progress__note">
-                  This happens once — then it runs offline, straight off your GPU.
+                  This happens once, then it runs offline, straight off your GPU.
                 </p>
               </div>
             ) : isStreaming ? (
@@ -562,7 +563,7 @@ export default function AskSection() {
           </motion.div>
 
           <p className="v2-meta ask-foot">
-            No WebGPU in your browser? It falls back to a hosted model automatically — same
+            No WebGPU in your browser? It falls back to a hosted model automatically, same
             answers, one network hop.
           </p>
         </div>
@@ -574,7 +575,7 @@ export default function AskSection() {
 }
 
 /* ==========================================================================
-   Panel styling. Everything here is derived from the v2 tokens in theme.css —
+   Panel styling. Everything here is derived from the v2 tokens in theme.css , 
    the only literals are alpha variants of --v2-accent (#6366f1) / --v2-live
    (#22d3ee), which is the same convention theme.css uses for .v2-tag--live.
    ========================================================================== */
@@ -928,7 +929,7 @@ const PANEL_CSS = `
   margin-top: 0.25rem;
 }
 
-/* Cancelled before the first token arrived — say so rather than leaving a
+/* Cancelled before the first token arrived, say so rather than leaving a
    bubble that reads as a rendering bug. */
 .ask-bubble__muted {
   font-size: 0.875rem;

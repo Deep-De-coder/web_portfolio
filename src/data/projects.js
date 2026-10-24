@@ -1,4 +1,4 @@
-// Canonical project data — single source of truth shared by
+// Canonical project data, single source of truth shared by
 // v1 (src/components/Projects.js) and v2 (src/pages/v2/ProjectsSection.jsx).
 //
 // Field conventions:
@@ -21,36 +21,85 @@ import coineeImg from '../assets/projects/coinee.png';
 
 export const projects = [
   {
-    title: 'Dresser Smart Wardrobe App',
-    period: 'Jun 2025 – Aug 2025',
+    title: 'Dresser',
+    period: 'Jun 2025 to Aug 2025',
     demoLink: 'https://dresser-pi.vercel.app/',
     codeLink: '',
-    summary:
-      'Built a production-ready wardrobe app on Next.js 14 (App Router, TypeScript, Tailwind) with Node serverless API routes on Vercel, delivering AI outfit suggestions and real-time photo analysis. Integrated Azure Vision and a private Ollama LLM (qwen2:1.5b) via a Fly.io HTTPS proxy with API-key auth; added timeouts/retries and server-only secrets for a secure, reliable pipeline. Built a mobile-first UI with drag-and-drop uploads, guardrail category detection, and fallback for low-bandwidth devices.',
-    shortSummary:
-      'Production-ready wardrobe app with AI outfit suggestions and real-time photo analysis. Next.js 14, Azure Vision, and a private Ollama LLM via Fly.io HTTPS proxy with API-key auth.',
+    summary: 'AI outfit recommender with retrieval and evals.',
+    shortSummary: 'AI outfit recommender with retrieval and evals.',
+    highlights: [
+      'CLIP top-3 accuracy 73% to 96%, MRR 0.690 to 0.905',
+      'Caught a tagger regression (74% to 55%) and rebuilt it to 89%',
+      'Weather rule violations 7.2% to 0%, backed by 551 tests',
+    ],
     techStack: ['Next.js', 'TypeScript', 'Node.js', 'Azure Vision', 'Ollama', 'Tailwind', 'Vercel'],
     techHighlights: ['Next.js', 'TypeScript', 'Azure Vision', 'Ollama', 'Vercel'],
     thumbnail: dresserImg,
     featured: true,
   },
   {
+    title: 'WarDream',
+    demoLink: '',
+    codeLink: '',
+    summary: 'Behaviour-cloning game agent.',
+    shortSummary: 'Behaviour-cloning game agent.',
+    highlights: [
+      '67.2% win rate vs 57.2% baseline',
+      'Caught 3 reward-hacking exploits during training',
+    ],
+    techStack: ['Behaviour cloning'],
+    techHighlights: ['Behaviour cloning'],
+    featured: true,
+  },
+  {
+    title: 'Agent Guard Memory',
+    demoLink: 'https://pypi.org/project/agm-memory-mcp',
+    demoLabel: 'PyPI',
+    codeLink: '',
+    summary: 'MCP memory server for AI agents, published on PyPI.',
+    shortSummary: 'MCP memory server for AI agents, published on PyPI.',
+    techStack: ['MCP'],
+    techHighlights: ['MCP'],
+    featured: true,
+  },
+  {
+    title: 'PARS Simulator',
+    demoLink: '',
+    codeLink: 'https://github.com/deep-de-coder/pars-simulator',
+    summary: 'Cross-entropy method search, +28% over baseline.',
+    shortSummary: 'Cross-entropy method search, +28% over baseline.',
+    techStack: ['Cross-entropy method'],
+    techHighlights: ['Cross-entropy method'],
+    featured: true,
+  },
+  {
+    title: '2DGS SLAM (research)',
+    demoLink: 'https://cse.buffalo.edu/tech-reports/2025-09.pdf',
+    demoLabel: 'Tech report',
+    codeLink: '',
+    summary: 'Real-time 3D reconstruction, 16x faster than a 3DGS baseline (39 vs 2.4 FPS).',
+    shortSummary: 'Real-time 3D reconstruction, 16x faster than a 3DGS baseline (39 vs 2.4 FPS).',
+    techStack: ['C++', 'CUDA', 'Gaussian Splatting', 'SLAM'],
+    techHighlights: ['C++', 'CUDA', 'Gaussian Splatting', 'SLAM'],
+    featured: true,
+  },
+  {
     title: 'Lowlight Diffusion Restoration',
-    period: 'Dec 2025 – Present',
+    period: 'Dec 2025 to Present',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/lowlight_diffusion_restoration',
     summary:
-      'It is a camera-style pipeline that restores dark, noisy photos into clean, brighter images while preserving sharp details. It builds on a diffusion img2img backbone fine-tuned with LoRA on LOL/SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. The project also includes benchmarking, performance-focused inference optimizations, and profiling tools so it is engineered as a measurable system—not just a demo.',
+      'It is a camera-style pipeline that restores dark, noisy photos into clean, brighter images while preserving sharp details. It builds on a diffusion img2img backbone fine-tuned with LoRA on LOL/SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. The project also includes benchmarking, performance-focused inference optimizations, and profiling tools so it is engineered as a measurable system, not just a demo.',
     shortSummary:
       'Camera-style pipeline restoring dark/noisy photos using diffusion img2img fine-tuned with LoRA on LOL/SID. Includes benchmarking, inference optimizations, and profiling tools.',
     techStack: ['PyTorch', 'Diffusers', 'LoRA (PEFT)', 'Stable Diffusion 2.1', 'Accelerate', 'CUDA', 'PyTorch Profiler', 'NVIDIA Nsight', 'OpenCV'],
     techHighlights: ['PyTorch', 'Diffusers', 'LoRA (PEFT)', 'Stable Diffusion 2.1', 'CUDA'],
     thumbnail: lowlightdiffusionImg,
-    featured: true,
+    featured: false,
   },
   {
     title: 'Efficient Multimodal LLM Agent',
-    period: 'Feb 2025 – May 2025',
+    period: 'Feb 2025 to May 2025',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/efficient-multimodal-healthcare-llm-agent',
     summary:
@@ -60,11 +109,11 @@ export const projects = [
     techStack: ['Python', 'vLLM', 'FlashAttention', 'RAG', 'PyTorch', 'FAISS', 'LLaMA-2', 'CLIP'],
     techHighlights: ['vLLM', 'FlashAttention', 'RAG', 'FAISS', 'LLaMA-2', 'CLIP'],
     thumbnail: healthcareImg,
-    featured: true,
+    featured: false,
   },
   {
     title: 'Road Extraction From Satellite Images',
-    period: 'Sep 2023 – Nov 2023',
+    period: 'Sep 2023 to Nov 2023',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/road_extraction_using_satellite_images',
     summary:
@@ -78,7 +127,7 @@ export const projects = [
   },
   {
     title: 'Transformers Deep Learning',
-    period: 'Feb 2024 – Apr 2024',
+    period: 'Feb 2024 to Apr 2024',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/Transformers_deeplearning',
     summary:
@@ -92,7 +141,7 @@ export const projects = [
   },
   {
     title: 'Novel Chatbot (RAG)',
-    period: 'Oct 2023 – Nov 2023',
+    period: 'Oct 2023 to Nov 2023',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/novel_chatbot_RAG',
     summary:
@@ -106,7 +155,7 @@ export const projects = [
   },
   {
     title: 'GDP Prediction System',
-    period: 'Feb 2024 – Apr 2024',
+    period: 'Feb 2024 to Apr 2024',
     demoLink: 'https://gdp-prediction-app.onrender.com/',
     codeLink: 'https://github.com/Deep-De-coder/gdp_prediction',
     summary:
@@ -120,7 +169,7 @@ export const projects = [
   },
   {
     title: 'Auto Envision',
-    period: 'Sep 2022 – Apr 2023',
+    period: 'Sep 2022 to Apr 2023',
     demoLink: 'https://doi.org/10.1007/978-981-99-3982-4_41',
     codeLink: 'https://github.com/Deep-De-coder/Auto-Envision',
     summary:
@@ -133,8 +182,9 @@ export const projects = [
     featured: false,
   },
   {
-    title: 'Music Fiesta — Recommendation System',
-    period: 'Sep 2021 – Apr 2022',
+    title: 'Music Fiesta, Recommendation System',
+    hidden: true,
+    period: 'Sep 2021 to Apr 2022',
     demoLink: 'https://ieeexplore.ieee.org/document/9936009',
     codeLink: 'https://github.com/Deep-De-coder/Music-Recommendation',
     summary:
@@ -148,7 +198,8 @@ export const projects = [
   },
   {
     title: 'Car Price EDA',
-    period: 'Sep 2022 – Nov 2022',
+    hidden: true,
+    period: 'Sep 2022 to Nov 2022',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/EDA-on-car-price-prediction',
     summary:
@@ -162,7 +213,8 @@ export const projects = [
   },
   {
     title: 'Flying Cubes (AR)',
-    period: 'Oct 2022 – Jan 2023',
+    hidden: true,
+    period: 'Oct 2022 to Jan 2023',
     demoLink: '',
     codeLink: 'https://github.com/Deep-De-coder/FLying_Cubes',
     summary:
@@ -176,11 +228,12 @@ export const projects = [
   },
   {
     title: 'Coinee',
-    period: 'Oct 2024 – Jan 2025',
+    hidden: true,
+    period: 'Oct 2024 to Jan 2025',
     demoLink: 'https://play.google.com/store/apps/details?id=com.deepshahane.coines&hl=en_US',
     codeLink: '',
     summary:
-      'Coinee is a privacy-safe Android app to browse 300+ coins from 15+ countries with crisp visuals and concise facts. Optimized for offline use with fast on-device search, category filters, and smooth Material UI—no sign-in, no tracking. Built as a lightweight, read-only viewer to showcase numismatic collections and inspire casual learning.',
+      'Coinee is a privacy-safe Android app to browse 300+ coins from 15+ countries with crisp visuals and concise facts. Optimized for offline use with fast on-device search, category filters, and smooth Material UI, no sign-in, no tracking. Built as a lightweight, read-only viewer to showcase numismatic collections and inspire casual learning.',
     shortSummary:
       'Privacy-safe Android app browsing 300+ coins from 15+ countries. Optimized for offline use with fast on-device search and Material UI. On Google Play.',
     techStack: ['Android', 'Kotlin', 'Java', 'Android SDK', 'Material Components'],

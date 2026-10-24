@@ -48,7 +48,7 @@ function rise(reduced, i = 0) {
 /* Per-item hover has to be real CSS: framer-motion on ~40 chips would rerender
    the section on every pointer move, and a Tailwind `hover:` utility loses the
    specificity tie with the design system's `.v2-card:hover .v2-tag` rule.
-   Tokens only — no new colours, radii or curves. */
+   Tokens only, no new colours, radii or curves. */
 const SKILL_CSS = `
 .v2-skill {
   transition:
@@ -126,7 +126,7 @@ export default function SkillsSection() {
       <div className="v2-container">
         <motion.header {...rise(reduced)} className="mb-12 sm:mb-14">
           <p className="v2-eyebrow" style={{ margin: 0 }}>
-            <span className="v2-eyebrow__index">05</span>
+            <span className="v2-eyebrow__index">06</span>
             <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
             Toolkit
           </p>
@@ -137,7 +137,7 @@ export default function SkillsSection() {
         </motion.header>
 
         {/* Two columns, with the data's `wide` categories taking the full
-            measure. That alternation is the rhythm — every row stays filled,
+            measure. That alternation is the rhythm, every row stays filled,
             so the grid never ends on a hole. */}
         <div className="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 sm:gap-5">
           {CATEGORIES.map((cat, i) => (

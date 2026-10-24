@@ -1,4 +1,4 @@
-// Canonical education data — single source of truth shared by
+// Canonical education data, single source of truth shared by
 // v1 (src/components/Education.js) and v2 (src/pages/v2/EducationSection.jsx).
 //
 // Ordered chronologically (bachelor's first) to match the v1 timeline, which
@@ -17,7 +17,7 @@ export const education = [
     short: 'VIT',
     degree: 'Bachelor of Engineering in Computer Engineering',
     degreeShort: 'BE Computer Engineering',
-    period: 'Aug 2019 – Jun 2023',
+    period: 'Aug 2019 to Jun 2023',
     gpa: '3.8 / 4.0',
     courses: ['Machine Learning', 'Big Data Analytics', 'Artificial Intelligence', 'Algorithms & Data Structures'],
     year: '2019',
@@ -32,7 +32,7 @@ export const education = [
     short: 'UB',
     degree: 'Master of Science in Computer Science',
     degreeShort: 'MS Computer Science',
-    period: 'Aug 2023 – Jun 2025',
+    period: 'Aug 2023 to Jun 2025',
     gpa: '3.5 / 4.0',
     courses: ['Information Retrieval', 'Computer Vision', 'Deep Learning', 'Pattern Recognition'],
     year: '2023',

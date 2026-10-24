@@ -6,7 +6,7 @@
   overflow: hidden;
 }
 
-/* Meteors background — fills the section, no pointer events */
+/* Meteors background, fills the section, no pointer events */
 .meteors-bg {
   position: absolute;
   inset: 0;
@@ -41,12 +41,12 @@
   border-radius: 2px;
 }
 
-/* Each char is a span — GSAP animates these */
+/* Each char is a span, GSAP animates these */
 .projects-heading .char {
   display: inline-block;
 }
 
-/* GSAP wrapper — GSAP sets opacity:0 immediately on mount */
+/* GSAP wrapper, GSAP sets opacity:0 immediately on mount */
 .card-gsap-wrapper {
   width: 100%;
 }
@@ -240,4 +240,31 @@
     flex-shrink: 0;
     margin-left: auto;
   }
+}
+
+/* Result-first bullets inside a project card, mirroring .exp-highlights. */
+.App #projects .project-highlights {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.App #projects .project-highlights li {
+  position: relative;
+  padding-left: 15px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #cfcfd6;
+}
+
+.App #projects .project-highlights li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.68em;
+  width: 7px;
+  height: 1px;
+  background: #818cf8;
 }

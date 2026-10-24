@@ -114,7 +114,7 @@ export default function SceneBackground() {
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    // Neural connection lines — static topology computed once.
+    // Neural connection lines, static topology computed once.
     // Spatial hash grid (cell = neighbor threshold) replaces the O(n^2)
     // all-pairs scan: only the 27 surrounding cells can hold a neighbor.
     const linePositions = [];
@@ -229,7 +229,7 @@ export default function SceneBackground() {
         style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}
       />
       {/* Vignette. Pulls the corners down so the eye is held in the centre of
-          the frame — the field no longer runs flat to the edges of the screen. */}
+          the frame, the field no longer runs flat to the edges of the screen. */}
       <div
         aria-hidden="true"
         style={{

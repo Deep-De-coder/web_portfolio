@@ -87,7 +87,7 @@ function buildLayout(W, H) {
       const midx = (x0 + x1) / 2;
       blocks.push({ x: x0, y: yTop, w: x1 - x0, h: yBot - yTop, label: blk.label, reveal: row.reveal });
 
-      // Perimeter — top and bottom edges split at midx so vertical traces can connect.
+      // Perimeter, top and bottom edges split at midx so vertical traces can connect.
       edge(x0, yTop, midx, yTop, row.reveal);
       edge(midx, yTop, x1, yTop, row.reveal);
       edge(x0, yBot, midx, yBot, row.reveal);
@@ -155,7 +155,7 @@ export default function ChipCanvas() {
     let layout = null;
     let particles = [];
     let particlesReady = false;
-    // Cached in size() — reading document.body.scrollHeight inside the rAF
+    // Cached in size(), reading document.body.scrollHeight inside the rAF
     // loop forces a layout every frame.
     let docScrollMax = 0;
     const startTime = Date.now();
@@ -331,7 +331,7 @@ export default function ChipCanvas() {
           ctx.stroke();
         }
 
-        // Particle trails — no shadow, every 2nd point (cheap).
+        // Particle trails, no shadow, every 2nd point (cheap).
         for (const p of particles) {
           ctx.fillStyle = p.color;
           for (let i = 1; i < p.trail.length; i += 2) {
@@ -343,7 +343,7 @@ export default function ChipCanvas() {
             ctx.fill();
           }
         }
-        // Glowing particle heads — shadowBlur set once for the whole pass.
+        // Glowing particle heads, shadowBlur set once for the whole pass.
         ctx.shadowBlur = 8;
         ctx.globalAlpha = 0.9;
         for (const p of particles) {

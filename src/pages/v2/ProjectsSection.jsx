@@ -6,16 +6,22 @@ import './theme.css';
 
 // Adapter: map the shared canonical records onto the compact shape this
 // section renders (condensed summary/tech, shorter field names).
-const PROJECTS = projects.map(p => ({
-  title: p.title,
-  period: p.period,
-  summary: p.shortSummary,
-  tech: p.techHighlights,
-  demo: p.demoLink,
-  code: p.codeLink,
-  img: p.thumbnail,
-  featured: p.featured,
-}));
+const PROJECTS = projects
+  // `hidden` keeps a record (and its image) in the data file while taking it
+  // off the page, so nothing is lost and restoring one is a one-word change.
+  .filter(p => !p.hidden)
+  .map(p => ({
+    title: p.title,
+    period: p.period,
+    summary: p.shortSummary,
+    highlights: p.highlights || [],
+    tech: p.techHighlights || [],
+    demo: p.demoLink,
+    demoLabel: p.demoLabel,
+    code: p.codeLink,
+    img: p.thumbnail,
+    featured: p.featured,
+  }));
 
 const EASE = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, margin: '-80px' };
@@ -91,7 +97,7 @@ function Thumbnail({ src, title, reduced, className = '' }) {
     <div className={`relative overflow-hidden ${className}`} style={{ background: 'var(--v2-surface-2)' }}>
       <img
         src={src}
-        alt={`${title} — interface screenshot`}
+        alt={`${title}, interface screenshot`}
         loading="lazy"
         decoding="async"
         // Most captures are bright, light-UI screenshots. Held at full
@@ -161,12 +167,14 @@ const LINK_GHOST =
   'hover:border-[var(--v2-line-strong)] hover:bg-[var(--v2-surface-2)] hover:text-[var(--v2-text)]';
 
 /* The first link is stretched over the whole card through its ::after, so the
-   entire surface is clickable from exactly one anchor — no nested interactive
+   entire surface is clickable from exactly one anchor, no nested interactive
    elements, and the card is reachable by keyboard through that same link. A
    second link is lifted above the overlay so it stays independently clickable. */
 function LinkRow({ project }) {
   const links = [];
-  if (project.demo) links.push({ href: project.demo, label: 'Demo', Icon: ArrowIcon });
+  // Not every primary link is a live demo: a package page or a PDF gets
+  // named for what it is rather than mislabelled.
+  if (project.demo) links.push({ href: project.demo, label: project.demoLabel || 'Demo', Icon: ArrowIcon });
   if (project.code) links.push({ href: project.code, label: 'Code', Icon: CodeIcon });
   if (!links.length) return null;
 
@@ -178,7 +186,7 @@ function LinkRow({ project }) {
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={`${label} — ${project.title} (opens in a new tab)`}
+          aria-label={`${label}, ${project.title} (opens in a new tab)`}
           className={[
             LINK_BASE,
             i === 0 ? LINK_PRIMARY : LINK_GHOST,
@@ -217,10 +225,20 @@ function LeadCard({ project, reduced }) {
           <h3 className="v2-h3" style={{ fontSize: 'clamp(1.25rem, 2.2vw, 1.625rem)', lineHeight: 1.2 }}>
             {project.title}
           </h3>
-          <p className="v2-meta" style={{ margin: '0.625rem 0 0' }}>{project.period}</p>
+          {project.period && (
+            <p className="v2-meta" style={{ margin: '0.625rem 0 0' }}>{project.period}</p>
+          )}
         </div>
 
-        <p className="v2-body line-clamp-4">{project.summary}</p>
+        <p className="v2-body">{project.summary}</p>
+
+        {project.highlights.length > 0 && (
+          <ul className="v2-bullets" style={{ margin: 0, padding: 0 }}>
+            {project.highlights.map(h => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+        )}
 
         <TagRow tech={project.tech} limit={4} />
         <LinkRow project={project} />
@@ -229,25 +247,39 @@ function LeadCard({ project, reduced }) {
   );
 }
 
-/* Every other card shares one anatomy — fixed-ratio thumbnail, then a body that
+/* Every other card shares one anatomy, fixed-ratio thumbnail, then a body that
    pins tags and links to the bottom so rows align whatever the copy does. */
 function ProjectCard({ project, reduced, index }) {
   return (
     <motion.article {...rise(reduced, index)} className="v2-card v2-card--interactive group flex flex-col">
-      <Thumbnail
-        src={project.img}
-        title={project.title}
-        reduced={reduced}
-        className="aspect-[16/10] rounded-t-[var(--v2-r-lg)]"
-      />
+      {/* Work with no screenshot keeps the same card, minus the image well.
+          Inventing a visual for it would be worse than leaving it out. */}
+      {project.img && (
+        <Thumbnail
+          src={project.img}
+          title={project.title}
+          reduced={reduced}
+          className="aspect-[16/10] rounded-t-[var(--v2-r-lg)]"
+        />
+      )}
 
       <div className="flex flex-1 flex-col gap-3.5 p-5 sm:p-6">
         <div>
           <h3 className="v2-h3">{project.title}</h3>
-          <p className="v2-meta" style={{ margin: '0.5rem 0 0' }}>{project.period}</p>
+          {project.period && (
+            <p className="v2-meta" style={{ margin: '0.5rem 0 0' }}>{project.period}</p>
+          )}
         </div>
 
-        <p className="v2-body line-clamp-3" style={{ fontSize: '0.875rem' }}>{project.summary}</p>
+        <p className="v2-body" style={{ fontSize: '0.875rem' }}>{project.summary}</p>
+
+        {project.highlights.length > 0 && (
+          <ul className="v2-bullets" style={{ margin: 0, padding: 0, fontSize: '0.875rem' }}>
+            {project.highlights.map(h => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+        )}
 
         <div className="mt-auto flex flex-col gap-3.5 pt-1">
           <TagRow tech={project.tech} limit={3} />
@@ -265,13 +297,15 @@ const REST = PROJECTS.filter(p => !p.featured);
 
 export default function ProjectsSection() {
   const reduced = useReducedMotion();
+  // Earlier work starts collapsed so the featured set owns the section.
+  const [showEarlier, setShowEarlier] = useState(false);
 
   return (
     <section id="projects" className="v2-section" style={{ background: 'transparent' }}>
       <div className="v2-container">
         <motion.header {...rise(reduced)} className="mb-12 sm:mb-14">
           <p className="v2-eyebrow" style={{ margin: 0 }}>
-            <span className="v2-eyebrow__index">02</span>
+            <span className="v2-eyebrow__index">03</span>
             <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
             Work
           </p>
@@ -294,23 +328,42 @@ export default function ProjectsSection() {
           )}
         </div>
 
-        {/* Everything else, on a uniform grid. */}
+        {/* Earlier work, behind a disclosure so it stays available without
+            competing with the featured set. */}
         {REST.length > 0 && (
           <>
             <motion.div {...rise(reduced)} className="mt-16 mb-8 sm:mt-20">
               <hr className="v2-rule" />
-              <p className="v2-eyebrow" style={{ margin: '2rem 0 0' }}>
-                <span className="v2-eyebrow__index">{String(REST.length).padStart(2, '0')}</span>
-                <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
-                More projects
-              </p>
+              <button
+                type="button"
+                className="v2-disclosure"
+                aria-expanded={showEarlier}
+                aria-controls="earlier-work"
+                onClick={() => setShowEarlier(v => !v)}
+              >
+                <span className="v2-eyebrow" style={{ margin: 0 }}>
+                  Earlier work
+                  <span className="v2-eyebrow__line shrink-0" aria-hidden="true" />
+                  {/* A count, not a section number: the numbered eyebrows
+                      elsewhere index sections, and reusing that slot here read
+                      as though this were section 07. */}
+                  <span className="v2-eyebrow__index">{REST.length} projects</span>
+                </span>
+                <span className="v2-disclosure__chevron" data-open={showEarlier} aria-hidden="true">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m6 9 6 6 6-6" />
+                  </svg>
+                </span>
+              </button>
             </motion.div>
 
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {REST.map((p, i) => (
-                // Stagger resets per row so no card waits on the row above it.
-                <ProjectCard key={p.title} project={p} reduced={reduced} index={i % 3} />
-              ))}
+            <div id="earlier-work" hidden={!showEarlier}>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {REST.map((p, i) => (
+                  // Stagger resets per row so no card waits on the row above it.
+                  <ProjectCard key={p.title} project={p} reduced={reduced} index={i % 3} />
+                ))}
+              </div>
             </div>
           </>
         )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const LINKS = [
+  { label: 'About', href: '#about', id: 'about' },
   { label: 'Ask', href: '#ask', id: 'ask' },
   { label: 'Projects', href: '#projects', id: 'projects' },
   { label: 'Experience', href: '#experience', id: 'experience' },
@@ -38,7 +39,7 @@ export default function NavBar() {
           .filter((e) => e.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         // Clear when nothing owns the centre band (hero, chip sequence,
-        // footer) — otherwise the last match stays lit on unrelated screens.
+        // footer), otherwise the last match stays lit on unrelated screens.
         setActiveId(visible.length ? visible[0].target.id : null);
       },
       { rootMargin: '-45% 0px -45% 0px', threshold: 0 }

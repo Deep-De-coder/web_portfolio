@@ -8,7 +8,7 @@
 .v2 {
   /* --- ground & surfaces -------------------------------------------------
      Four discrete elevation steps. Surfaces are translucent so the scene
-     behind them stays faintly visible — depth without losing legibility. */
+     behind them stays faintly visible, depth without losing legibility. */
   --v2-bg: #06060a;
   --v2-bg-raised: #08080e;
   --v2-surface-1: rgba(255, 255, 255, 0.024);
@@ -111,7 +111,7 @@
   padding-inline: var(--v2-gutter);
 }
 
-/* Hairline that fades out at both ends — a hard 1px line across a dark
+/* Hairline that fades out at both ends, a hard 1px line across a dark
    page reads as a seam; this reads as a horizon. */
 .v2-rule {
   height: 1px;
@@ -155,7 +155,7 @@
   opacity: 0.55;
 }
 
-/* Display type gets progressively tighter tracking as it gets larger —
+/* Display type gets progressively tighter tracking as it gets larger , 
    optical compensation, the way a type foundry would set it. */
 .v2-display {
   font-family: 'Space Grotesk', system-ui, sans-serif;
@@ -186,7 +186,7 @@
   margin: 0;
 }
 
-/* Intro paragraph under a section title. Capped at ~62ch — past that the
+/* Intro paragraph under a section title. Capped at ~62ch, past that the
    eye loses the line return. */
 .v2-lede {
   font-family: 'DM Sans', system-ui, sans-serif;
@@ -211,6 +211,93 @@
   letter-spacing: 0.01em;
   color: var(--v2-text-3);
   font-variant-numeric: tabular-nums;
+}
+
+/* Result-first bullets. The marker is a small accent rule rather than a disc:
+   at this text size a disc reads as noise, a rule reads as structure. */
+.v2-bullets {
+  list-style: none;
+  display: grid;
+  gap: 0.5625rem;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--v2-text-2);
+}
+
+.v2-bullets > li {
+  position: relative;
+  padding-left: 1.125rem;
+}
+
+.v2-bullets > li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 7px;
+  height: 1px;
+  background: var(--v2-accent-bright);
+  opacity: 0.75;
+}
+
+.v2-inline-link {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.8125rem;
+  color: var(--v2-accent-bright);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(129, 140, 248, 0.35);
+  transition: border-color var(--v2-t-fast) var(--v2-ease), color var(--v2-t-fast) var(--v2-ease);
+}
+
+.v2-inline-link:hover {
+  color: var(--v2-text);
+  border-bottom-color: var(--v2-text);
+}
+
+/* Disclosure header for the Earlier work group. Full-bleed hit area so the
+   whole row is clickable, not just the chevron. */
+.v2-disclosure {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  margin: 2rem 0 0;
+  padding: 0.5rem 0;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.v2-disclosure:hover .v2-eyebrow {
+  color: var(--v2-text-2);
+}
+
+.v2-disclosure__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  border: 1px solid var(--v2-line-weak);
+  background: var(--v2-surface-1);
+  color: var(--v2-text-3);
+  transition: transform var(--v2-t) var(--v2-ease), color var(--v2-t) var(--v2-ease),
+    border-color var(--v2-t) var(--v2-ease);
+}
+
+.v2-disclosure__chevron[data-open='true'] {
+  transform: rotate(180deg);
+}
+
+.v2-disclosure:hover .v2-disclosure__chevron {
+  color: var(--v2-text);
+  border-color: var(--v2-line-strong);
 }
 
 /* Reserved for a handful of key phrases. Used more than twice per viewport
@@ -388,7 +475,7 @@
   background: var(--v2-surface-1);
 }
 
-/* Scroll-spy state. The dot is 3px and centred under the label — enough to
+/* Scroll-spy state. The dot is 3px and centred under the label, enough to
    locate yourself without adding a second visual weight to the bar. */
 .v2-nav-link[data-active='true'] {
   color: var(--v2-text);

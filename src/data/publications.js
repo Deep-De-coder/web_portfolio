@@ -1,4 +1,4 @@
-// Canonical publications data — single source of truth shared by
+// Canonical publications data, single source of truth shared by
 // v1 (src/components/Publications.js) and v2 (src/pages/v2/PublicationsSection.jsx).
 //
 // Ordered as the v1 list renders; v2 sorts by `year` descending (newest first).

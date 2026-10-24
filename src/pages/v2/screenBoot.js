@@ -2,10 +2,10 @@
  * Draws the laptop boot sequence onto a 2D canvas (used as a Three.js
  * CanvasTexture for the MacBook screen). `stage` 0..1 drives the boot:
  *
- *   0.00–0.30  black → DS logo fades in
- *   0.30–0.62  progress bar fills, "initializing WebGPU"
- *   0.62–0.78  "WEBGPU READY · NPU 38 TOPS"
- *   0.78–1.00  Ask chat UI mock (user + assistant bubble, blinking cursor)
+ *   0.00-0.30  black → DS logo fades in
+ *   0.30-0.62  progress bar fills, "initializing WebGPU"
+ *   0.62-0.78  "WEBGPU READY · NPU 38 TOPS"
+ *   0.78-1.00  Ask chat UI mock (user + assistant bubble, blinking cursor)
  *
  * `t` is wall-clock seconds for the blinking cursor.
  * ------------------------------------------------------------------ */
@@ -19,7 +19,7 @@ const CYAN = '#22d3ee';
 const INK = '#e8f6fb';
 
 export function drawScreen(ctx, W, H, stage, t) {
-  // Background — deep space with a faint vertical gradient + vignette.
+  // Background, deep space with a faint vertical gradient + vignette.
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, '#070a12');
   g.addColorStop(1, '#03040a');
@@ -117,7 +117,7 @@ export function drawScreen(ctx, W, H, stage, t) {
     ctx.font = `500 ${Math.round(H * 0.038)}px "DM Sans", system-ui, sans-serif`;
     ctx.fillText('What can you build?', ubx + W * 0.03, uby + H * 0.075);
 
-    // Assistant bubble (left) — types in
+    // Assistant bubble (left), types in
     const aby = H * 0.46;
     const abw = W * 0.62;
     ctx.fillStyle = 'rgba(255,255,255,0.06)';
@@ -126,7 +126,7 @@ export function drawScreen(ctx, W, H, stage, t) {
     ctx.fillStyle = 'rgba(232,246,251,0.92)';
     ctx.font = `500 ${Math.round(H * 0.038)}px "DM Sans", system-ui, sans-serif`;
     const full =
-      'Production ML systems, in-browser AI, and fast, beautiful interfaces — running on-device, no data leaves your machine.';
+      'Production ML systems, in-browser AI, and fast, beautiful interfaces, running on-device, no data leaves your machine.';
     const typed = full.slice(0, Math.floor(full.length * smooth(0.82, 1.0, stage)));
     const lines = wrap(ctx, typed, abw - W * 0.06);
     lines.forEach((ln, i) => ctx.fillText(ln, pad + W * 0.03, aby + H * 0.06 + i * H * 0.055));

@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 
-const ROLES = [
-  'AI Researcher at SAIR Lab, UB',
-  'Building AI that runs in your browser',
-  'Computer Vision · LLMs · WebGPU',
-  '16× speedup in drone 3D reconstruction',
+const ROLES = ['Agents, pipelines, and systems that ship.'];
+
+const SUB_LINE = 'Founding Engineer @ NILA · MS CS @ University at Buffalo';
+
+const LINKS = [
+  { label: 'Resume', href: 'https://drive.google.com/file/d/1huA6oTDVo2jL9u24RWxN6DAm_YVkURG2/view?usp=sharing', external: true },
+  { label: 'GitHub', href: 'https://github.com/Deep-De-coder', external: true },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/deepshahane/', external: true },
+  { label: 'Email', href: 'mailto:esotericdeep@gmail.com', external: false },
 ];
 
 const EASE = [0.16, 1, 0.3, 1];
@@ -27,7 +31,7 @@ export default function HeroSection() {
   }, []);
 
   useEffect(() => {
-    if (reduceMotion) return; // static tagline, no typewriter
+    if (reduceMotion || ROLES.length < 2) return; // nothing to cycle through
     const current = ROLES[roleIdx];
     let t;
     if (!deleting && displayed.length < current.length) {
@@ -51,7 +55,7 @@ export default function HeroSection() {
       className="relative flex items-center justify-center overflow-hidden"
       style={{ minHeight: '100svh', background: 'transparent' }}
     >
-      {/* Soft key light behind the wordmark — gives the type something to sit
+      {/* Soft key light behind the wordmark, gives the type something to sit
           in front of so it reads as lit rather than pasted on. */}
       <div
         aria-hidden="true"
@@ -98,7 +102,7 @@ export default function HeroSection() {
               color: 'var(--v2-accent-bright)',
             }}
           >
-            MS Computer Science · University at Buffalo
+            AI Engineer
           </span>
           <span
             aria-hidden="true"
@@ -106,7 +110,7 @@ export default function HeroSection() {
           />
         </motion.div>
 
-        {/* Wordmark — each word rises out of its own mask. A clipped reveal
+        {/* Wordmark, each word rises out of its own mask. A clipped reveal
             reads more considered than a blur-in, and it keeps the baseline
             perfectly stable while it animates. */}
         <h1
@@ -146,8 +150,8 @@ export default function HeroSection() {
           }}
         >
           <span>
-            {reduceMotion ? ROLES[0] : displayed}
-            {!reduceMotion && (
+            {reduceMotion || ROLES.length < 2 ? ROLES[0] : displayed}
+            {!reduceMotion && ROLES.length > 1 && (
               <span
                 aria-hidden="true"
                 style={{
@@ -164,6 +168,21 @@ export default function HeroSection() {
           </span>
         </motion.div>
 
+        {/* Sub line */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.95, duration: 0.5 }}
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: 'clamp(0.875rem, 1.5vw, 0.9375rem)',
+            color: 'var(--v2-text-3)',
+            margin: '0 0 clamp(1.75rem, 4vh, 2.5rem)',
+          }}
+        >
+          {SUB_LINE}
+        </motion.p>
+
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 14 }}
@@ -178,19 +197,16 @@ export default function HeroSection() {
             marginBottom: 'clamp(1.75rem, 4vh, 2.5rem)',
           }}
         >
-          <a href="#ask" className="v2-btn v2-btn--primary">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 2a10 10 0 1 0 10 10" />
-              <path d="M12 6v6l4 2" />
-            </svg>
-            Try the in-browser AI
-          </a>
-          <a href="#projects" className="v2-btn v2-btn--ghost">
-            View projects
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h13M12 5.5 18.5 12 12 18.5" />
-            </svg>
-          </a>
+          {LINKS.map(({ label, href, external }, i) => (
+            <a
+              key={label}
+              href={href}
+              className={`v2-btn ${i === 0 ? 'v2-btn--primary' : 'v2-btn--ghost'}`}
+              {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            >
+              {label}
+            </a>
+          ))}
         </motion.div>
 
         {/* Proof chips */}

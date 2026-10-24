@@ -135,7 +135,7 @@ export default function ChipAssemblySection() {
     const rimLight = new THREE.DirectionalLight(0xcfd9ff, 0.5);
     rimLight.position.set(-4, 5, -8);
     scene.add(rimLight);
-    // The only colored light — the SoC "power on", off until its beat.
+    // The only colored light, the SoC "power on", off until its beat.
     const accentLight = new THREE.PointLight(0x38e0ff, 0, 12, 2);
     scene.add(accentLight);
 
@@ -157,7 +157,7 @@ export default function ChipAssemblySection() {
     const loader = new GLTFLoader();
     loader.load(boardUrl, (gltf) => {
       if (!alive) {
-        // Arrived after cleanup — free the GPU resources instead of adding it.
+        // Arrived after cleanup, free the GPU resources instead of adding it.
         disposeObject(gltf.scene);
         return;
       }
