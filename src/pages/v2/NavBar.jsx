@@ -11,7 +11,7 @@ const LINKS = [
 ];
 
 const RESUME_URL =
-  'https://drive.google.com/file/d/1huA6oTDVo2jL9u24RWxN6DAm_YVkURG2/view?usp=sharing';
+  'https://drive.google.com/file/d/1q9-9VMk70cHw87K7mhuZKY6eKp7_j10X/view?usp=sharing';
 
 export default function NavBar() {
   const [scrolled, setScrolled] = useState(false);

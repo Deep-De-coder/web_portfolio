@@ -12,9 +12,8 @@ const PROJECTS = projects
   .filter(p => !p.hidden)
   .map(p => ({
     title: p.title,
-    period: p.period,
-    summary: p.shortSummary,
-    highlights: p.highlights || [],
+    tagline: p.tagline,
+    summary: p.summary,
     tech: p.techHighlights || [],
     demo: p.demoLink,
     demoLabel: p.demoLabel,
@@ -236,20 +235,10 @@ function LeadCard({ project, reduced }) {
           <h3 className="v2-h3" style={{ fontSize: 'clamp(1.25rem, 2.2vw, 1.625rem)', lineHeight: 1.2 }}>
             {project.title}
           </h3>
-          {project.period && (
-            <p className="v2-meta" style={{ margin: '0.625rem 0 0' }}>{project.period}</p>
-          )}
+          <p className="v2-project-tagline">{project.tagline}</p>
         </div>
 
         <p className="v2-body">{project.summary}</p>
-
-        {project.highlights.length > 0 && (
-          <ul className="v2-bullets" style={{ margin: 0, padding: 0 }}>
-            {project.highlights.map(h => (
-              <li key={h}>{h}</li>
-            ))}
-          </ul>
-        )}
 
         <TagRow tech={project.tech} limit={4} />
         <LinkRow project={project} />
@@ -279,20 +268,10 @@ function ProjectCard({ project, reduced, index }) {
       <div className="flex flex-1 flex-col gap-3.5 p-5 sm:p-6">
         <div>
           <h3 className="v2-h3">{project.title}</h3>
-          {project.period && (
-            <p className="v2-meta" style={{ margin: '0.5rem 0 0' }}>{project.period}</p>
-          )}
+          <p className="v2-project-tagline">{project.tagline}</p>
         </div>
 
         <p className="v2-body" style={{ fontSize: '0.875rem' }}>{project.summary}</p>
-
-        {project.highlights.length > 0 && (
-          <ul className="v2-bullets" style={{ margin: 0, padding: 0, fontSize: '0.875rem' }}>
-            {project.highlights.map(h => (
-              <li key={h}>{h}</li>
-            ))}
-          </ul>
-        )}
 
         <div className="mt-auto flex flex-col gap-3.5 pt-1">
           <TagRow tech={project.tech} limit={3} />

@@ -6,7 +6,7 @@ const ROLES = ['Agents, pipelines, and systems that ship.'];
 const SUB_LINE = 'Founding Engineer @ NILA · MS CS @ University at Buffalo';
 
 const LINKS = [
-  { label: 'Resume', href: 'https://drive.google.com/file/d/1huA6oTDVo2jL9u24RWxN6DAm_YVkURG2/view?usp=sharing', external: true },
+  { label: 'Resume', href: 'https://drive.google.com/file/d/1q9-9VMk70cHw87K7mhuZKY6eKp7_j10X/view?usp=sharing', external: true },
   { label: 'GitHub', href: 'https://github.com/Deep-De-coder', external: true },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/deepshahane/', external: true },
   { label: 'Email', href: 'mailto:esotericdeep@gmail.com', external: false },

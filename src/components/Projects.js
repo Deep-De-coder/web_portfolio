@@ -135,10 +135,12 @@ const Projects = () => {
       <div className="projects-grid">
         {VISIBLE_PROJECTS.map((proj, index) => {
           const isExpanded = expandedIndex === index;
-          const maxLength = 100;
+          // The tagline always shows; only the paragraph under it collapses.
+          const maxLength = 150;
           const displayedSummary = isExpanded || isMobile || proj.summary.length <= maxLength
             ? proj.summary
             : `${proj.summary.substring(0, maxLength)}...`;
+          const needsToggle = !isMobile && proj.summary.length > maxLength;
 
           return (
             <div
@@ -198,7 +200,6 @@ const Projects = () => {
                               </a>
                             )}
                           </div>
-                          {proj.period && <p className="project-duration">{proj.period}</p>}
                         </div>
                         {isMobile && (
                           <span className="toggle-icon">
@@ -209,27 +210,23 @@ const Projects = () => {
                     </CardItem>
 
                     <CardItem translateZ={15} className="w-full">
+                      <p className="project-tagline">{proj.tagline}</p>
                       <p className="project-summary">{displayedSummary}</p>
-                      {(proj.highlights || []).length > 0 && (
-                        <ul className="project-highlights">
-                          {proj.highlights.map(h => (
-                            <li key={h}>{h}</li>
-                          ))}
-                        </ul>
-                      )}
                     </CardItem>
 
-                    <CardItem translateZ={10} className="w-fit">
-                      <button
-                        className="view-more-btn"
-                        onClick={e => {
-                          e.stopPropagation();
-                          toggleExpand(index);
-                        }}
-                      >
-                        {isExpanded ? 'View Less' : 'View More'}
-                      </button>
-                    </CardItem>
+                    {needsToggle && (
+                      <CardItem translateZ={10} className="w-fit">
+                        <button
+                          className="view-more-btn"
+                          onClick={e => {
+                            e.stopPropagation();
+                            toggleExpand(index);
+                          }}
+                        >
+                          {isExpanded ? 'View Less' : 'View More'}
+                        </button>
+                      </CardItem>
+                    )}
 
                     <CardItem translateZ={20} className="w-full">
                       <div className="tech-stack">

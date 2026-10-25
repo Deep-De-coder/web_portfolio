@@ -300,6 +300,18 @@
   border-color: var(--v2-line-strong);
 }
 
+/* The one-line statement of what a project is. Brighter than the paragraph
+   under it so the eye lands here first and can skip the rest. */
+.v2-project-tagline {
+  margin: 0.625rem 0 0;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: -0.005em;
+  color: var(--v2-text);
+}
+
 /* Reserved for a handful of key phrases. Used more than twice per viewport
    it stops reading as emphasis. */
 .v2-gradient-text {
