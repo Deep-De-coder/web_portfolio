@@ -43,7 +43,7 @@ html, body {
   flex-grow: 1;
   height: 100vh;
   overflow-y: auto;
-  padding: 40px 20px 40px 130px;
+  padding: 40px 20px 40px 154px;
   box-sizing: border-box;
   background-color: rgba(50, 50, 50, 0.7);
   backdrop-filter: blur(3px);
@@ -59,7 +59,7 @@ html, body {
 
 @media (max-height: 680px) and (min-width: 769px) {
   .main-content {
-    padding-left: 106px; /* rail narrows to 64px when labels are dropped */
+    padding-left: 126px; /* rail narrows to 84px when labels are dropped */
   }
 }
 

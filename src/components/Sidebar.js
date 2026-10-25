@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import "./Sidebar.css";
-import { FaGithub, FaLinkedin } from "react-icons/fa";
+import { FaGithub, FaLinkedin, FaCopy, FaCheck } from "react-icons/fa";
 import {
   FiMessageSquare,
   FiBookOpen,
@@ -19,6 +19,11 @@ const MOBILE_QUERY = "(max-width: 767px)"; // matches the previous innerWidth < 
 
 // Outline icons keep the rail legible at 88px wide, where a text-only label
 // would have to shrink past readable.
+const SOCIALS = [
+  { key: "github", label: "GitHub", href: GITHUB_URL, Icon: FaGithub },
+  { key: "linkedin", label: "LinkedIn", href: LINKEDIN_URL, Icon: FaLinkedin },
+];
+
 const SECTIONS = [
   { id: "ask", label: "Ask", Icon: FiMessageSquare },
   { id: "education", label: "Education", Icon: FiBookOpen },
@@ -31,6 +36,12 @@ const SECTIONS = [
 const Sidebar = () => {
   const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches);
   const [activeId, setActiveId] = useState(null);
+  // { key, ok } so a failed copy can say so instead of looking like a dead button.
+  const [copyState, setCopyState] = useState(null);
+  const copyResetRef = useRef(null);
+
+  // Clear the pending "Copied" reset so it cannot fire after unmount.
+  useEffect(() => () => clearTimeout(copyResetRef.current), []);
 
   // Detect screen size changes (media query "change" fires only at the breakpoint)
   useEffect(() => {
@@ -62,6 +73,42 @@ const Sidebar = () => {
     targets.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
   }, [isMobile]);
+
+  // The async clipboard API needs a secure context and permission, and is
+  // refused outright in some embedded views. Fall back to the legacy path
+  // before giving up, and report failure rather than doing nothing.
+  const writeClipboard = async (text) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    } catch (err) {
+      // fall through to the legacy path
+    }
+    try {
+      const field = document.createElement("textarea");
+      field.value = text;
+      field.setAttribute("readonly", "");
+      field.style.position = "fixed";
+      field.style.top = "-1000px";
+      field.style.opacity = "0";
+      document.body.appendChild(field);
+      field.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(field);
+      return ok;
+    } catch (err) {
+      return false;
+    }
+  };
+
+  const handleCopyLink = async (key, url) => {
+    const ok = await writeClipboard(url);
+    setCopyState({ key, ok });
+    clearTimeout(copyResetRef.current);
+    copyResetRef.current = setTimeout(() => setCopyState(null), 2000);
+  };
 
   // Smooth scrolling to sections
   const handleScrollTo = (sectionId) => {
@@ -102,6 +149,48 @@ const Sidebar = () => {
 
   return (
     <nav className="rail" aria-label="Sections">
+      <div className="rail__social" role="group" aria-label="Profiles">
+        {SOCIALS.map(({ key, label, href, Icon }) => (
+          <div className="rail__social-item" key={key}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rail__social-link"
+              aria-label={label}
+              title={label}
+            >
+              <Icon />
+            </a>
+            <button
+              type="button"
+              className="rail__copy"
+              data-copied={copyState?.key === key && copyState.ok}
+              data-failed={copyState?.key === key && !copyState.ok}
+              onClick={() => handleCopyLink(key, href)}
+              aria-label={
+                copyState?.key === key
+                  ? copyState.ok
+                    ? `${label} link copied`
+                    : `Could not copy ${label} link`
+                  : `Copy ${label} link`
+              }
+              title={
+                copyState?.key === key
+                  ? copyState.ok
+                    ? "Copied"
+                    : "Copy failed, open the link instead"
+                  : `Copy ${label} link`
+              }
+            >
+              {copyState?.key === key && copyState.ok ? <FaCheck /> : <FaCopy />}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <hr className="rail__divider" />
+
       <button
         type="button"
         className="rail__mark"
@@ -135,15 +224,6 @@ const Sidebar = () => {
         <FiLayers className="rail__icon" aria-hidden="true" />
         <span className="rail__label">V2</span>
       </Link>
-
-      <div className="rail__social">
-        <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer" aria-label="GitHub">
-          <FaGithub />
-        </a>
-        <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-          <FaLinkedin />
-        </a>
-      </div>
     </nav>
   );
 };

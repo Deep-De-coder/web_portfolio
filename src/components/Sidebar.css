@@ -292,8 +292,8 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  width: 88px;
-  padding: 14px 8px;
+  width: 112px;
+  padding: 14px 10px;
   box-sizing: border-box;
 
   /* Hugs its content and only scrolls if the viewport is genuinely short. */
@@ -409,39 +409,98 @@
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
 }
 
+/* Profiles sit at the top of the rail: two columns, each the platform link
+   with its own copy button underneath. Icon-only at this width, so both
+   carry an aria-label and a title. */
 .App .rail__social {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding-top: 2px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  width: 100%;
+  padding: 2px 0 0;
 }
 
-.App .rail__social a {
+.App .rail__social-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.App .rail__social-link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 34px;
+  height: 34px;
   padding: 0;
-  color: #8b919c;
-  background: none;
-  transition: color 0.18s ease, transform 0.18s ease;
+  border-radius: 11px;
+  color: #c6ccd6;
+  background: rgba(255, 255, 255, 0.05);
+  transition: color 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
 }
 
-.App .rail__social a:hover {
+.App .rail__social-link:hover {
   color: #ffffff;
-  background: none;
+  background: rgba(255, 255, 255, 0.11);
   transform: translateY(-1px);
 }
 
-.App .rail__social svg {
+.App .rail__social-link svg {
   width: 17px;
   height: 17px;
+}
+
+.App .rail__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 21px;
+  padding: 0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 7px;
+  background: transparent !important;
+  color: #878d98;
+  cursor: pointer;
+  transition: color 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
+}
+
+.App .rail__copy svg {
+  width: 10px;
+  height: 10px;
+}
+
+.App .rail__copy:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Confirmation reuses the teal the active section uses, so "something
+   happened" reads the same way everywhere in the bar. */
+.App .rail__copy[data-copied='true'] {
+  color: #7fe3f0;
+  border-color: rgba(0, 188, 212, 0.4) !important;
+  background: rgba(0, 188, 212, 0.16) !important;
+}
+
+.App .rail__copy[data-failed='true'] {
+  color: #f0b36b;
+  border-color: rgba(240, 179, 107, 0.4) !important;
+  background: rgba(240, 179, 107, 0.14) !important;
+}
+
+.App .rail__copy:focus-visible,
+.App .rail__social-link:focus-visible {
+  outline: 2px solid #00bcd4;
+  outline-offset: 2px;
 }
 
 /* Short viewports: drop the labels before the bar starts scrolling. */
 @media (max-height: 680px) {
   .App .rail {
-    width: 64px;
+    width: 84px;
   }
 
   .App .rail__label {
@@ -456,7 +515,8 @@
 @media (prefers-reduced-motion: reduce) {
   .App .rail__mark,
   .App .rail__item,
-  .App .rail__social a {
+  .App .rail__social-link,
+  .App .rail__copy {
     transition: none;
   }
 }
