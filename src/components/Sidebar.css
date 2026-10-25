@@ -272,3 +272,191 @@
   }
 
 }
+
+/* ==========================================================================
+   Floating rail (desktop)
+   Replaces the full-height 240px panel. The bar is detached from every edge
+   so the page reads as a surface underneath it rather than beside it.
+   Scoped under .App because this stylesheet loads on every route and the
+   rebuild at /v2 has its own navigation.
+   ========================================================================== */
+
+.App .rail {
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 88px;
+  padding: 14px 8px;
+  box-sizing: border-box;
+
+  /* Hugs its content and only scrolls if the viewport is genuinely short. */
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: rgba(24, 26, 32, 0.82);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  /* Tight contact shadow plus a wide ambient one, so it floats rather than
+     looking like a flat rectangle pasted on the background. */
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 18px 40px -16px rgba(0, 0, 0, 0.8);
+}
+
+.App .rail::-webkit-scrollbar {
+  width: 0;
+}
+
+/* Monogram doubles as back-to-top. */
+.App .rail__mark {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  margin: 2px 0 4px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 188, 212, 0.3) !important;
+  background: rgba(0, 188, 212, 0.12) !important;
+  color: #7fe3f0;
+  font-family: 'Arial', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.App .rail__mark:hover {
+  background: rgba(0, 188, 212, 0.22) !important;
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.App .rail__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* Icon over label, the way the reference stacks them: at this width a
+   side-by-side label would have to shrink past readable. */
+.App .rail__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  padding: 9px 2px 8px !important;
+  border: 0 !important;
+  border-radius: 14px;
+  background: transparent !important;
+  color: #9aa0ab;
+  font-family: 'Arial', sans-serif;
+  font-size: 10px;
+  line-height: 1.1;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.App .rail__item:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #ffffff;
+}
+
+/* Current section. The filled pill is the one strong colour in the bar, so
+   position is readable at a glance without reading any label. */
+.App .rail__item[data-active='true'] {
+  background: rgba(0, 188, 212, 0.14) !important;
+  color: #7fe3f0;
+}
+
+.App .rail__item:focus-visible {
+  outline: 2px solid #00bcd4;
+  outline-offset: 2px;
+}
+
+.App .rail__icon {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.App .rail__label {
+  display: block;
+  max-width: 100%;
+  letter-spacing: 0.01em;
+}
+
+.App .rail__divider {
+  width: 44px;
+  height: 1px;
+  margin: 2px 0;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+}
+
+.App .rail__social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding-top: 2px;
+}
+
+.App .rail__social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  color: #8b919c;
+  background: none;
+  transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.App .rail__social a:hover {
+  color: #ffffff;
+  background: none;
+  transform: translateY(-1px);
+}
+
+.App .rail__social svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Short viewports: drop the labels before the bar starts scrolling. */
+@media (max-height: 680px) {
+  .App .rail {
+    width: 64px;
+  }
+
+  .App .rail__label {
+    display: none;
+  }
+
+  .App .rail__item {
+    padding: 10px 2px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .App .rail__mark,
+  .App .rail__item,
+  .App .rail__social a {
+    transition: none;
+  }
+}
