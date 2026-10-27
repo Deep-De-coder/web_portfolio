@@ -17,7 +17,7 @@ import './v2/theme.css';
 const FOOTER_LINKS = [
   { label: 'Email', href: 'mailto:esotericdeep@gmail.com', external: false },
   { label: 'GitHub', href: 'https://github.com/Deep-De-coder', external: true },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/deepshahane/', external: true },
+  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/deep-shahane/', external: true },
 ];
 
 export default function V2() {
