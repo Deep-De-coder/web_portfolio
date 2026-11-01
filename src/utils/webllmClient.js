@@ -7,7 +7,7 @@ import { createWebLLMWorker } from "./createWebLLMWorker";
 // Options: "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC" (smallest, ~700MB)
 //          "Phi-3-mini-4k-instruct-q4f16_1-MLC" (~2.3GB)
 //          "Llama-3.2-1B-Instruct-q4f16_1-MLC" (~700MB)
-const DEFAULT_MODEL_ID = "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC";
+const DEFAULT_MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
 
 let engine = null;
 let worker = null;
@@ -134,7 +134,14 @@ export async function streamChat({ systemPrompt, history, userPrompt, onToken })
     const stream = await engine.chat.completions.create({
       messages,
       stream: true,
-      temperature: 0.7,
+      // This answers factual questions about one person from a fixed brief,
+      // so creativity is not wanted. 0.7 with no cap and no penalty was
+      // enough for the model to invent a bibliography and then loop on it.
+      temperature: 0.2,
+      top_p: 0.9,
+      max_tokens: 420,
+      frequency_penalty: 0.6,
+      presence_penalty: 0.3,
     });
 
     for await (const chunk of stream) {
