@@ -89,11 +89,8 @@ export default function HeroSection() {
               Agents, pipelines, and systems that ship.
             </motion.p>
 
-            {/* Two beats rather than one clause: the claim, then the proof,
-                which is also an instruction to keep reading. */}
-            <motion.p {...rise(0.28)} className="v2-lede" style={{ maxWidth: '44ch' }}>
-              <span style={{ color: 'var(--v2-text)' }}>I ship systems that hold up.</span>{' '}
-              The evidence is on this page, including the results I withdrew.
+            <motion.p {...rise(0.28)} className="v2-lede" style={{ maxWidth: '46ch' }}>
+              I build AI that holds up in production, and I keep the evidence that it does.
             </motion.p>
 
             <motion.p {...rise(0.32)} className="v2-meta" style={{ margin: '0.75rem 0 0' }}>

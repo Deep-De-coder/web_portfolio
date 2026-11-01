@@ -9,7 +9,7 @@
 // - `thumbnail` is the shared image import; `featured` drives the v2 layout.
 // - `hidden` retires an entry from both routes while keeping its record here.
 
-import dresserImg from '../assets/projects/dresser.png';
+import dresserImg from '../assets/projects/dresser.webp';
 import wardreamImg from '../assets/projects/wardream.png';
 import agmImg from '../assets/projects/agentguardmemory.png';
 import parsImg from '../assets/projects/parsfrontier.webp';
@@ -28,7 +28,9 @@ import coineeImg from '../assets/projects/coinee.png';
 export const projects = [
   {
     title: 'Dresser',
-    demoLink: 'https://dresser-pi.vercel.app/',
+    // The site root redirects to a sign-in wall. /explore is the public
+    // no-account demo, which is what a visitor should actually land on.
+    demoLink: 'https://dresser-pi.vercel.app/explore',
     codeLink: '',
     tagline: 'An AI outfit recommender built around retrieval and evals.',
     summary:
@@ -36,6 +38,8 @@ export const projects = [
     techStack: ['Next.js', 'TypeScript', 'Node.js', 'Azure Vision', 'Ollama', 'Tailwind', 'Vercel'],
     techHighlights: ['Next.js', 'TypeScript', 'Azure Vision', 'Ollama', 'Vercel'],
     thumbnail: dresserImg,
+    thumbnailAlt:
+      "The Dresser Explore page: a sample wardrobe grid beside a prompt that styles an outfit and shows it on a figure you can turn.",
     featured: true,
   },
   {

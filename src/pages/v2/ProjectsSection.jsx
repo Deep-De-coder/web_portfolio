@@ -202,7 +202,7 @@ function LeadCard({ project, reduced }) {
   return (
     <motion.article
       {...rise(reduced)}
-      className="v2-card v2-card--interactive group grid lg:grid-cols-[minmax(0,1.06fr)_minmax(0,1fr)]"
+      className="v2-card v2-card--interactive group grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]"
     >
       <Thumbnail
         src={project.img}
@@ -212,9 +212,9 @@ function LeadCard({ project, reduced }) {
         className="aspect-[16/10] rounded-tl-[var(--v2-r-lg)] rounded-tr-[var(--v2-r-lg)] lg:aspect-auto lg:rounded-tr-none lg:rounded-bl-[var(--v2-r-lg)]"
       />
 
-      <div className="flex flex-col justify-center gap-[1.125rem] p-6 sm:p-8 lg:min-h-[330px]">
+      <div className="flex flex-col justify-center gap-3.5 p-5 sm:p-6 lg:min-h-[228px]">
         <div>
-          <h3 className="v2-h3" style={{ fontSize: 'clamp(1.25rem, 2.2vw, 1.625rem)', lineHeight: 1.2 }}>
+          <h3 className="v2-h3" style={{ fontSize: 'clamp(1.125rem, 1.7vw, 1.3125rem)', lineHeight: 1.22 }}>
             {project.title}
           </h3>
           <p className="v2-project-tagline">{project.tagline}</p>
