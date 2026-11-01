@@ -1,5 +1,6 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
+import { copyToClipboard } from '../../utils/copyToClipboard';
 
 // Lazy so the type paints before the 3D layer is parsed; the reserved box
 // keeps the layout from shifting when it arrives.
@@ -8,17 +9,94 @@ const Avatar = lazy(() => import('./Avatar'));
 const AVATAR_SIZE = 150;
 const EASE = [0.16, 1, 0.3, 1];
 
-const LINKS = [
+const RESUME = {
+  label: 'Resume',
+  href: 'https://drive.google.com/file/d/1q9-9VMk70cHw87K7mhuZKY6eKp7_j10X/view?usp=sharing',
+};
+
+// Each of these is one control with two jobs: the label opens it, the icon
+// beside it copies the address. Kept as a single bordered unit so it never
+// reads as two unrelated buttons.
+const PROFILES = [
   {
-    label: 'Resume',
-    href: 'https://drive.google.com/file/d/1q9-9VMk70cHw87K7mhuZKY6eKp7_j10X/view?usp=sharing',
+    key: 'github',
+    label: 'GitHub',
+    href: 'https://github.com/Deep-De-coder',
+    copy: 'https://github.com/Deep-De-coder',
     external: true,
-    primary: true,
   },
-  { label: 'GitHub', href: 'https://github.com/Deep-De-coder', external: true },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/deep-shahane/', external: true },
-  { label: 'Email', href: 'mailto:esotericdeep@gmail.com', external: false },
+  {
+    key: 'linkedin',
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/deep-shahane/',
+    copy: 'https://www.linkedin.com/in/deep-shahane/',
+    external: true,
+  },
+  {
+    key: 'email',
+    label: 'Email',
+    href: 'mailto:esotericdeep@gmail.com',
+    // The address, not the mailto: scheme, is what anyone pasting wants,
+    // so the control says so rather than calling it a link.
+    copy: 'esotericdeep@gmail.com',
+    copyNoun: 'email address',
+    external: false,
+  },
 ];
+
+function CopyIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="9" y="9" width="11" height="11" rx="2" />
+      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
+function ProfileControl({ profile }) {
+  const [state, setState] = useState(null); // 'ok' | 'fail' | null
+  const timer = useRef(null);
+
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  const onCopy = async () => {
+    const ok = await copyToClipboard(profile.copy);
+    setState(ok ? 'ok' : 'fail');
+    clearTimeout(timer.current);
+    timer.current = setTimeout(() => setState(null), 1800);
+  };
+
+  const noun = profile.copyNoun || `${profile.label} link`;
+  const status =
+    state === 'ok'
+      ? 'Copied'
+      : state === 'fail'
+        ? 'Copy failed, select the text instead'
+        : `Copy ${noun}`;
+
+  return (
+    <span className="v2-split" data-state={state || 'idle'}>
+      <a
+        href={profile.href}
+        className="v2-split__link"
+        {...(profile.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+      >
+        {profile.label}
+      </a>
+      <button type="button" className="v2-split__copy" onClick={onCopy} aria-label={status} title={status}>
+        {state === 'ok' ? <CheckIcon /> : <CopyIcon />}
+      </button>
+    </span>
+  );
+}
 
 export default function HeroSection() {
   const [reduced, setReduced] = useState(
@@ -106,15 +184,16 @@ export default function HeroSection() {
               {...rise(0.4)}
               style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.625rem' }}
             >
-              {LINKS.map(({ label, href, external, primary }) => (
-                <a
-                  key={label}
-                  href={href}
-                  className={`v2-btn ${primary ? 'v2-btn--primary' : 'v2-btn--ghost'}`}
-                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                >
-                  {label}
-                </a>
+              <a
+                href={RESUME.href}
+                className="v2-btn v2-btn--primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {RESUME.label}
+              </a>
+              {PROFILES.map(p => (
+                <ProfileControl key={p.key} profile={p} />
               ))}
             </motion.div>
 

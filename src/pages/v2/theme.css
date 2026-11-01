@@ -338,6 +338,65 @@
 
 .v2-btn:active { transform: translateY(1px); }
 
+/* A link and its copy action as one bordered unit, divided by a hairline.
+   Two separate buttons would read as two destinations; this reads as one
+   thing you can either open or take with you. */
+.v2-split {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid var(--v2-line-strong);
+  border-radius: var(--v2-r-sm);
+  overflow: hidden;
+  transition: border-color var(--v2-t) var(--v2-ease);
+}
+
+.v2-split:hover { border-color: var(--v2-accent); }
+
+.v2-split__link {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--v2-body);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  padding: 0.8125rem 0.9375rem;
+  color: var(--v2-text);
+  text-decoration: none;
+  transition: color var(--v2-t-fast) var(--v2-ease);
+}
+
+.v2-split__link:hover { color: var(--v2-accent); }
+
+.v2-split__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.625rem;
+  border: 0;
+  border-left: 1px solid var(--v2-line);
+  background: transparent;
+  color: var(--v2-text-3);
+  cursor: pointer;
+  transition: color var(--v2-t-fast) var(--v2-ease), background-color var(--v2-t-fast) var(--v2-ease);
+}
+
+.v2-split__copy:hover {
+  color: var(--v2-accent);
+  background: var(--v2-accent-soft);
+}
+
+/* Confirmation borrows the accent; a failure is called out rather than
+   left looking like a dead control. */
+.v2-split[data-state='ok'] { border-color: var(--v2-accent); }
+.v2-split[data-state='ok'] .v2-split__copy {
+  color: var(--v2-accent);
+  background: var(--v2-accent-soft);
+}
+.v2-split[data-state='fail'] .v2-split__copy {
+  color: var(--v2-live);
+  background: var(--v2-live-soft);
+}
+
 /* Bulleted evidence. The marker is a short rule in the accent, which reads
    as a ledger entry rather than a list item. */
 .v2-bullets {
