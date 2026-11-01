@@ -89,8 +89,11 @@ export default function HeroSection() {
               Agents, pipelines, and systems that ship.
             </motion.p>
 
-            <motion.p {...rise(0.28)} className="v2-lede" style={{ maxWidth: '46ch' }}>
-              I build AI that holds up in production, and I keep the evidence that it does.
+            {/* Two beats. The first carries full-strength ink so the
+                claim and the qualification read as a pair, not a run-on. */}
+            <motion.p {...rise(0.28)} className="v2-lede" style={{ maxWidth: '44ch' }}>
+              <span style={{ color: 'var(--v2-text)' }}>Shipping AI is the easy half.</span>{' '}
+              Proving it holds up is the rest.
             </motion.p>
 
             <motion.p {...rise(0.32)} className="v2-meta" style={{ margin: '0.75rem 0 0' }}>
