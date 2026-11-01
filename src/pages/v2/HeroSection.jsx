@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
+
+// Lazy so the hero text paints before the 3D layer is parsed; the reserved
+// box below keeps the layout from shifting when it arrives.
+const Avatar = lazy(() => import('./Avatar'));
+
+const AVATAR_SIZE = 196;
 
 const ROLES = ['Agents, pipelines, and systems that ship.'];
 
@@ -76,6 +82,23 @@ export default function HeroSection() {
         className="relative text-center w-full"
         style={{ zIndex: 3, maxWidth: '68rem', margin: '0 auto', padding: '0 var(--v2-gutter)' }}
       >
+        {/* Companion */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.1, ease: EASE }}
+          style={{
+            height: AVATAR_SIZE,
+            marginBottom: 'clamp(0.25rem, 1.5vh, 0.75rem)',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Suspense fallback={<div style={{ width: AVATAR_SIZE, height: AVATAR_SIZE }} />}>
+            <Avatar size={AVATAR_SIZE} />
+          </Suspense>
+        </motion.div>
+
         {/* Eyebrow */}
         <motion.div
           initial={{ opacity: 0, y: 8 }}
