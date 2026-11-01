@@ -1,79 +1,26 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import V2 from './pages/V2';
 
-// Split per route: /v2 pulls in three.js and its own design system, none of
-// which the classic route needs.
-const V2 = lazy(() => import('./pages/V2'));
-import Sidebar from './components/Sidebar'; // Sidebar component
-import Education from './components/Education';
-import Experience from './components/Experience';
-import Publications from './components/Publications';
-import Projects from './components/Projects';
-import Skillset from './components/Skillset';
-import Ask from './components/Ask';
-import './App.css';
-import './ShootingStars.css';
+// The classic dark portfolio is now the secondary route, so it is the one
+// that loads on demand. It brings its own stylesheets and the shooting-star
+// background with it, none of which the main route needs.
+const Classic = lazy(() => import('./pages/Classic'));
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<V2 />} />
         <Route
           path="/v2"
           element={
-            <Suspense fallback={<div style={{ minHeight: '100vh', background: '#06060a' }} />}>
-              <V2 />
+            <Suspense fallback={<div style={{ minHeight: '100vh', background: '#090a0f' }} />}>
+              <Classic />
             </Suspense>
           }
         />
-        <Route path="/" element={
-      <div className="App">
-        {/* Shooting Stars Background */}
-        <div className="night">
-          {Array.from({ length: 60 }).map((_, index) => (
-            <div
-              key={index}
-              className="shooting_star"
-              style={{
-                '--top': Math.random(),
-                '--left': Math.random(),
-                '--delay': Math.random() * 5,
-              }}
-            ></div>
-          ))}
-        </div>
-
-        {/* Sidebar */}
-        <Sidebar />
-        <div className="main-content">
-          {/* Ask keeps its wrapper id: the Ask component has no id of its own,
-              and both App.css (#ask) and Sidebar scrolling rely on it.
-              The other sections' components carry their own ids, so the
-              wrappers stay id-less to avoid duplicate DOM ids. */}
-          <div id="ask">
-            <Ask />
-          </div>
-          <div>
-            <Education />
-          </div>
-          <div>
-            <Experience />
-          </div>
-          <div>
-            <Publications />
-          </div>
-          <div>
-            <Projects />
-          </div>
-          <div>
-            <Skillset />
-          </div>
-        </div>
-      </div>
-        } />
       </Routes>
     </Router>
   );
 }
-
-export default App;

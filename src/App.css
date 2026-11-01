@@ -1,11 +1,14 @@
 /* Global Reset for Body and HTML */
+/* The dark ground, full height and overflow:hidden that this layout needs
+   are applied by the Classic page itself, not globally. They used to live
+   here, which meant the default route loaded dark and had to undo them. */
 html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  height: 100%;
-  overflow: hidden; /* Prevent unnecessary scrollbars */
-  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+}
+
+.App {
   font-family: 'Arial', sans-serif;
   color: white;
 }

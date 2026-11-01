@@ -120,7 +120,7 @@ export default function NavBar() {
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexShrink: 0 }}>
-          <a href="/" className="v2-nav-link v2-nav-classic" style={{ color: 'var(--v2-text-4)' }}>
+          <a href="/v2" className="v2-nav-link v2-nav-classic" style={{ color: 'var(--v2-text-4)' }}>
             Classic
           </a>
           <a
@@ -170,7 +170,7 @@ export default function NavBar() {
                   {label}
                 </a>
               ))}
-              <a href="/" className="v2-nav-link" style={{ display: 'block', padding: '0.625rem 0', color: 'var(--v2-text-4)' }}>
+              <a href="/v2" className="v2-nav-link" style={{ display: 'block', padding: '0.625rem 0', color: 'var(--v2-text-4)' }}>
                 Classic portfolio
               </a>
             </div>

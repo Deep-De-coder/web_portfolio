@@ -127,8 +127,8 @@ const Sidebar = () => {
               {label}
             </button>
           ))}
-          <Link to="/v2" style={{ textDecoration: "none" }}>
-            <button>V2</button>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <button>New</button>
           </Link>
         </div>
 
@@ -220,9 +220,9 @@ const Sidebar = () => {
 
       <hr className="rail__divider" />
 
-      <Link to="/v2" className="rail__item rail__item--link">
+      <Link to="/" className="rail__item rail__item--link">
         <FiLayers className="rail__icon" aria-hidden="true" />
-        <span className="rail__label">V2</span>
+        <span className="rail__label">New</span>
       </Link>
     </nav>
   );
