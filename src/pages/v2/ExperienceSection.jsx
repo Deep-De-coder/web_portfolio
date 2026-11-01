@@ -21,15 +21,6 @@ const EXPERIENCES = experiences.map(e => ({
 const EASE = [0.16, 1, 0.3, 1];
 const VIEWPORT = { once: true, margin: '-80px' };
 
-// The saturated per-role accents read well as 8px timeline nodes but several
-// of them (indigo especially) fall just under 4.5:1 as text on the dark
-// ground. Mixing toward white keeps each role identifiable while clearing AA.
-function tint(hex, amount = 0.42) {
-  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
-  if (!m) return hex;
-  const mix = (c) => Math.round(parseInt(c, 16) + (255 - parseInt(c, 16)) * amount);
-  return `rgb(${mix(m[1])}, ${mix(m[2])}, ${mix(m[3])})`;
-}
 
 function useReducedMotion() {
   const [reduced, setReduced] = useState(
@@ -98,7 +89,7 @@ const RAIL =
 function Role({ exp, index, reduced }) {
   return (
     <motion.li {...rise(reduced, index)} className="relative pl-9 md:pl-14">
-      <Node color={exp.color} />
+      <Node color="var(--v2-accent)" />
 
       <article className="v2-card" style={{ padding: 'clamp(1.5rem, 3.5vw, 1.875rem)' }}>
         <div className="flex flex-wrap items-baseline justify-between gap-x-5 gap-y-1">
@@ -113,7 +104,7 @@ function Role({ exp, index, reduced }) {
                 fontSize: '0.875rem',
                 fontWeight: 500,
                 letterSpacing: '0.005em',
-                color: tint(exp.color),
+                color: 'var(--v2-accent)',
               }}
             >
               {exp.company}

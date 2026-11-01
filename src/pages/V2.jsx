@@ -1,7 +1,4 @@
 import React, { useEffect } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import SceneBackground from './v2/SceneBackground';
-import ChipCanvas from './v2/ChipCanvas';
 import NavBar from './v2/NavBar';
 import HeroSection from './v2/HeroSection';
 import AboutSection from './v2/AboutSection';
@@ -20,123 +17,99 @@ const FOOTER_LINKS = [
 ];
 
 export default function V2() {
-  // App.css sets overflow:hidden + height:100% on html/body for the old layout.
-  // Override those for the V2 scroll-driven page and restore on unmount.
+  // App.css belongs to the classic route: it pins html/body to a dark
+  // gradient with overflow hidden. Both have to be lifted here and restored
+  // on the way out, or the paper page sits on a dark ground and cannot
+  // scroll.
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
 
-    const prevHtmlOverflow = html.style.overflow;
-    const prevHtmlHeight = html.style.height;
-    const prevBodyOverflow = body.style.overflow;
-    const prevBodyHeight = body.style.height;
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      htmlHeight: html.style.height,
+      htmlBackground: html.style.background,
+      bodyOverflow: body.style.overflow,
+      bodyHeight: body.style.height,
+      bodyBackground: body.style.background,
+    };
 
-    // NOTE: 'visible', not 'auto'. When BOTH html and body are overflow:auto,
-    // Chromium creates two scroll containers and `position: sticky` silently
-    // stops pinning. 'visible' still scrolls fine and keeps that trap shut for
-    // anything sticky added later.
+    // 'visible', not 'auto': with both html and body set to auto, Chromium
+    // makes two scroll containers and position: sticky stops pinning.
     html.style.overflow = 'visible';
     html.style.height = 'auto';
     body.style.overflow = 'visible';
     body.style.height = 'auto';
+    // Covers overscroll and any gap below a short page.
+    html.style.background = '#f2efec';
+    body.style.background = '#f2efec';
 
     return () => {
-      html.style.overflow = prevHtmlOverflow;
-      html.style.height = prevHtmlHeight;
-      body.style.overflow = prevBodyOverflow;
-      body.style.height = prevBodyHeight;
+      html.style.overflow = prev.htmlOverflow;
+      html.style.height = prev.htmlHeight;
+      html.style.background = prev.htmlBackground;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.height = prev.bodyHeight;
+      body.style.background = prev.bodyBackground;
     };
   }, []);
 
-  // The constellation belongs to the hero. Once the reader is into the content
-  // it becomes noise behind body copy, so a veil fades it back over the first
-  // viewport of scroll. Driven off raw scrollY (not progress) so it stays
-  // correct regardless of how tall the page grows.
-  const { scrollY } = useScroll();
-  const veilOpacity = useTransform(scrollY, [320, 1100], [0, 0.92]);
-
   return (
-    <div className="v2" style={{ position: 'relative' }}>
-      <SceneBackground />
-      <ChipCanvas />
+    <div className="v2" style={{ position: 'relative', minHeight: '100vh' }}>
+      <NavBar />
+      <HeroSection />
+      <AboutSection />
+      <AskSection />
+      <ProjectsSection />
+      <ExperienceSection />
+      <EducationSection />
+      <SkillsSection />
+      <PublicationsSection />
 
-      {/* Recedes the live scene behind the content sections. */}
-      <motion.div
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          inset: 0,
-          zIndex: 5,
-          pointerEvents: 'none',
-          opacity: veilOpacity,
-          background:
-            'radial-gradient(120% 80% at 50% 0%, rgba(6,6,10,0.55) 0%, rgba(6,6,10,0.92) 55%, #06060a 100%)',
-        }}
-      />
-
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        <NavBar />
-        <HeroSection />
-        <AboutSection />
-        <AskSection />
-        <ProjectsSection />
-        <ExperienceSection />
-        <EducationSection />
-        <SkillsSection />
-        <PublicationsSection />
-
-        <footer style={{ position: 'relative', paddingBlock: 'clamp(3rem, 7vh, 5rem)' }}>
-          <div className="v2-container">
-            <hr className="v2-rule" style={{ marginBottom: 'clamp(2rem, 5vh, 3.5rem)' }} />
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'flex-end',
-                justifyContent: 'space-between',
-                gap: '1.75rem',
-              }}
-            >
-              <div>
-                <p
-                  className="v2-h3"
-                  style={{ fontSize: '1.125rem', marginBottom: '0.4375rem' }}
-                >
-                  Deep Shahane
-                </p>
-                <p className="v2-meta" style={{ margin: 0 }}>
-                  AI Engineer · Founding Engineer @ NILA · MS CS @ University at Buffalo
-                </p>
-              </div>
-
-              <nav
-                aria-label="Footer"
-                style={{ display: 'flex', flexWrap: 'wrap', gap: '1.75rem' }}
-              >
-                {FOOTER_LINKS.map(({ label, href, external }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                    className="v2-footer-link"
-                  >
-                    {label}
-                  </a>
-                ))}
-              </nav>
+      <footer style={{ position: 'relative', paddingBlock: 'clamp(3rem, 7vh, 4.5rem)' }}>
+        <div className="v2-container">
+          <hr className="v2-rule" style={{ marginBottom: 'clamp(1.75rem, 4vh, 2.5rem)' }} />
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'flex-end',
+              justifyContent: 'space-between',
+              gap: '1.75rem',
+            }}
+          >
+            <div>
+              <p className="v2-h3" style={{ fontSize: '1.25rem', marginBottom: '0.375rem' }}>
+                Deep Shahane
+              </p>
+              <p className="v2-meta" style={{ margin: 0 }}>
+                AI Engineer · Founding Engineer @ NILA · MS CS @ University at Buffalo
+              </p>
             </div>
 
-            <p
-              className="v2-meta"
-              style={{ marginTop: 'clamp(2rem, 5vh, 3rem)', color: 'var(--v2-text-4)' }}
-            >
-              Built with React, Three.js and WebLLM. The assistant on this page runs on your own GPU.
-            </p>
+            <nav aria-label="Footer" style={{ display: 'flex', flexWrap: 'wrap', gap: '1.75rem' }}>
+              {FOOTER_LINKS.map(({ label, href, external }) => (
+                <a
+                  key={label}
+                  href={href}
+                  {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="v2-footer-link"
+                >
+                  {label}
+                </a>
+              ))}
+            </nav>
           </div>
-        </footer>
-      </div>
 
-      {/* Film grain, sits above everything, purely optical. */}
+          <p
+            className="v2-meta"
+            style={{ marginTop: 'clamp(1.75rem, 4vh, 2.5rem)', color: 'var(--v2-text-4)' }}
+          >
+            Built with React, three.js and WebLLM. The assistant on this page runs on your own GPU.
+          </p>
+        </div>
+      </footer>
+
       <div className="v2-grain" aria-hidden="true" />
     </div>
   );

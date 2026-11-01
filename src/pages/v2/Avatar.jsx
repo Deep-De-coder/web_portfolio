@@ -13,8 +13,12 @@ import * as THREE from 'three';
  * canvas, which is what makes it feel aware of you instead of like a widget.
  */
 
-const ACCENT = '#22d3ee';
-const ACCENT_DIM = '#6366f1';
+// Tuned for a paper ground: a dark warm shell reads as an object on light
+// stock, lit eyes in a soft rose rather than a neon, and a burgundy orbit
+// that ties it to the page accent. Teal is deliberately absent here, since
+// the page reserves that colour for a withdrawn result.
+const EYE = '#f2bcc8';
+const ORBIT = '#6e1f35';
 
 /** Window-wide pointer in -1..1, so the avatar reacts anywhere on the page. */
 function usePointer() {
@@ -86,7 +90,7 @@ function Companion({ pointer, reduced }) {
   return (
     <group ref={head}>
       <RoundedBox args={[1.25, 1.05, 1.0]} radius={0.3} smoothness={5} castShadow>
-        <meshStandardMaterial color="#1a1e28" roughness={0.36} metalness={0.38} />
+        <meshStandardMaterial color="#2a1f24" roughness={0.42} metalness={0.22} />
       </RoundedBox>
 
       {/* Eyes sit proud of the face so the emissive reads as light, not paint. */}
@@ -94,9 +98,9 @@ function Companion({ pointer, reduced }) {
         <mesh key={x} ref={i === 0 ? leftEye : rightEye} position={[x, 0.07, 0.52]}>
           <capsuleGeometry args={[0.085, 0.07, 4, 12]} />
           <meshStandardMaterial
-            color={ACCENT}
-            emissive={ACCENT}
-            emissiveIntensity={2.4}
+            color={EYE}
+            emissive={EYE}
+            emissiveIntensity={1.35}
             toneMapped={false}
           />
         </mesh>
@@ -106,12 +110,12 @@ function Companion({ pointer, reduced }) {
       <mesh ref={ring} position={[0, -0.04, 0]} rotation={[Math.PI / 2 - 0.4, 0, 0.12]}>
         <torusGeometry args={[1.08, 0.013, 8, 72]} />
         <meshStandardMaterial
-          color={ACCENT_DIM}
-          emissive={ACCENT_DIM}
-          emissiveIntensity={1.4}
+          color={ORBIT}
+          emissive={ORBIT}
+          emissiveIntensity={0.5}
           toneMapped={false}
           transparent
-          opacity={0.55}
+          opacity={0.8}
         />
       </mesh>
     </group>
@@ -120,17 +124,17 @@ function Companion({ pointer, reduced }) {
 
 function Rig({ reduced }) {
   const pointer = usePointer();
-  const key = useMemo(() => new THREE.Color(ACCENT), []);
-  const rim = useMemo(() => new THREE.Color(ACCENT_DIM), []);
+  const key = useMemo(() => new THREE.Color(EYE), []);
+  const rim = useMemo(() => new THREE.Color(ORBIT), []);
 
   return (
     <>
-      <ambientLight intensity={0.45} />
-      <directionalLight position={[2.5, 3, 4]} intensity={2.1} />
+      <ambientLight intensity={1.15} />
+      <directionalLight position={[2.5, 3, 4]} intensity={1.7} />
       {/* Cyan fill from below-front picks out the lower edge of the face. */}
-      <pointLight position={[-1.6, -1.2, 2.4]} intensity={6} color={key} distance={9} />
+      <pointLight position={[-1.6, -1.2, 2.4]} intensity={3} color={key} distance={9} />
       {/* Rim from behind-left: without it the shell disappears into the page. */}
-      <directionalLight position={[-3.2, 2.2, -2.6]} intensity={3.4} color={rim} />
+      <directionalLight position={[-3.2, 2.2, -2.6]} intensity={2.2} color={rim} />
       <Companion pointer={pointer} reduced={reduced} />
     </>
   );
