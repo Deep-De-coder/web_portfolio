@@ -40,7 +40,6 @@ const Education = () => {
               <h2>{edu.institution}</h2>
               <p className="degree">{edu.degree}</p>
               <p className="education-period">{edu.period}</p>
-              {edu.gpa !== "N/A" && <p><strong>GPA:</strong> {edu.gpa}</p>}
               <p><strong>Relevant Courses:</strong> {edu.courses.join(', ')}</p>
             </div>
           </div>

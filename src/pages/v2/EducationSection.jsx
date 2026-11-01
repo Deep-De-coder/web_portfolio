@@ -11,7 +11,6 @@ const EDU = [...education].reverse().map(e => ({
   short: e.short,
   degree: e.degreeShort,
   period: e.period,
-  gpa: e.gpa,
   courses: e.courses,
   color: e.color,
   accent: e.accent,
@@ -68,32 +67,6 @@ function rise(reduced, i = 0) {
   };
 }
 
-/* GPA reads as a figure, not as prose: the score is set large in tabular
-   numerals and the scale trails it at meta size. */
-function Gpa({ value }) {
-  const [score, scale] = String(value).split('/').map(s => s.trim());
-
-  return (
-    <div className="flex flex-col gap-2">
-      <span style={MICRO}>Grade point average</span>
-      <p className="flex items-baseline gap-1.5" style={{ margin: 0 }}>
-        <span
-          className="font-grotesk font-semibold"
-          style={{
-            fontSize: '1.75rem',
-            lineHeight: 1,
-            letterSpacing: '-0.02em',
-            color: 'var(--v2-text)',
-            fontVariantNumeric: 'tabular-nums',
-          }}
-        >
-          {score}
-        </span>
-        {scale && <span className="v2-meta">/ {scale}</span>}
-      </p>
-    </div>
-  );
-}
 
 function DegreeCard({ edu, index, reduced }) {
   return (
@@ -130,11 +103,9 @@ function DegreeCard({ edu, index, reduced }) {
 
         {/* Record, hairline-separated from the identity column on desktop */}
         <div
-          className="flex min-w-0 flex-col gap-7 border-t pt-7 md:border-l md:border-t-0 md:pl-10 md:pt-0"
+          className="flex min-w-0 flex-col border-t pt-7 md:border-l md:border-t-0 md:pl-10 md:pt-0"
           style={{ borderColor: HAIRLINE }}
         >
-          <Gpa value={edu.gpa} />
-
           <div className="flex flex-col gap-3">
             <span style={MICRO}>Relevant coursework</span>
             <ul className="flex list-none flex-wrap gap-2" style={{ margin: 0, padding: 0 }}>

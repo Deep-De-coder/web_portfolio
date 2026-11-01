@@ -8,6 +8,8 @@
 // - `institution` / `degree` are the full formal names (rendered by v1).
 // - `institutionShort` (optional) / `degreeShort` are the condensed versions
 //   rendered by v2.
+// - `gpa` is retained as a record but is deliberately not rendered on
+//   either route.
 // - `year` / `endYear` / `position` drive the v1 timeline; `short`, `color`,
 //   `accent`, `border` drive the v2 cards.
 

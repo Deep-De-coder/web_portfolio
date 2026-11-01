@@ -83,7 +83,7 @@ export default function V2() {
                 Deep Shahane
               </p>
               <p className="v2-meta" style={{ margin: 0 }}>
-                AI Engineer · Founding Engineer @ NILA · MS CS @ University at Buffalo
+                Production AI Engineer · Founding Engineer @ NILA · MS CS @ University at Buffalo
               </p>
             </div>
 
