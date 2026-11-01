@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import V2 from './pages/V2';
+
+// Split per route: /v2 pulls in three.js and its own design system, none of
+// which the classic route needs.
+const V2 = lazy(() => import('./pages/V2'));
 import Sidebar from './components/Sidebar'; // Sidebar component
 import Education from './components/Education';
 import Experience from './components/Experience';
@@ -15,7 +18,14 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/v2" element={<V2 />} />
+        <Route
+          path="/v2"
+          element={
+            <Suspense fallback={<div style={{ minHeight: '100vh', background: '#06060a' }} />}>
+              <V2 />
+            </Suspense>
+          }
+        />
         <Route path="/" element={
       <div className="App">
         {/* Shooting Stars Background */}

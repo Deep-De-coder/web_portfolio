@@ -203,7 +203,7 @@ const Ask = () => {
 
     // Handle backend fallback
     const handleBackendChat = async (userPrompt) => {
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
+        const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
 
         const controller = new AbortController();
         // 75s: the backend is a free Render instance that spins down when

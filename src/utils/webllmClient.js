@@ -1,5 +1,6 @@
 // WebLLM Client Wrapper - Singleton for local LLM inference
-import { CreateWebWorkerMLCEngine } from "@mlc-ai/web-llm";
+// The host library is ~5MB. Imported dynamically inside init() so it stays
+// out of the entry chunk and only downloads once a visitor opens the chat.
 import { createWebLLMWorker } from "./createWebLLMWorker";
 
 // Model ID - using a small instruction-tuned model
@@ -52,7 +53,8 @@ export async function init(onProgress) {
       worker = createWebLLMWorker();
 
       // Create engine with progress callback
-      engine = await CreateWebWorkerMLCEngine(
+      const { CreateWebWorkerMLCEngine } = await import("@mlc-ai/web-llm");
+    engine = await CreateWebWorkerMLCEngine(
         worker,
         DEFAULT_MODEL_ID,
         {

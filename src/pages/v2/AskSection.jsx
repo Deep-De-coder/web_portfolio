@@ -143,7 +143,7 @@ export default function AskSection() {
   // that a genuinely unreachable backend still releases the UI.
   const SERVER_TIMEOUT_MS = 75000;
   const SERVER_CHAT_URL =
-    process.env.REACT_APP_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
+    import.meta.env.VITE_BACKEND_URL || 'https://portfolio-backend-wt45.onrender.com/chat';
 
   const ensureWebLLM = async () => {
     if (webLLMReady.current) return;
