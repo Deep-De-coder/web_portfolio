@@ -7,16 +7,19 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../../utils/webllmClient';
-import { ASSISTANT_SYSTEM_PROMPT } from '../../data/assistantKnowledge';
+import { buildSystemPrompt, asThirdPerson } from '../../data/assistantKnowledge';
 
 const EASE = [0.16, 1, 0.3, 1];
 
+// Phrased in the third person on purpose. A visitor reading a portfolio asks
+// about Deep, and the model behind this chat answers a "your publications"
+// question as though it were being asked about itself.
 const QUICK = [
-  { label: 'Education', q: 'Tell me about your education background' },
-  { label: 'Experience', q: 'Tell me about your work experience' },
-  { label: 'Projects', q: 'What are your most impressive projects?' },
-  { label: 'Skills', q: 'What are your main technical skills?' },
-  { label: 'Publications', q: 'Tell me about your research publications' },
+  { label: 'Education', q: "What is Deep's education background?" },
+  { label: 'Experience', q: "Tell me about Deep's work experience." },
+  { label: 'Projects', q: "What are Deep's most impressive projects?" },
+  { label: 'Skills', q: "What are Deep's main technical skills?" },
+  { label: 'Publications', q: 'What has Deep published?' },
 ];
 
 // Credibility strip. Cyan (--v2-live) is reserved for the single fact that
@@ -109,7 +112,7 @@ export default function AskSection() {
   // against their captured value and bail, so a cancelled/superseded stream
   // can never write into a newer bubble (or into an unmounted component).
   const genRef = useRef(0);
-  const bottomRef = useRef(null);
+  const transcriptRef = useRef(null);
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -130,14 +133,54 @@ export default function AskSection() {
     };
   }, []);
 
-  // Scroll only when a message is added/removed, not on every streamed token,
-  // and never on initial mount.
+  // Keep the transcript following its newest message, and keep the page out
+  // of it.
+  //
+  // This used to call scrollIntoView() on a sentinel at the end of the
+  // transcript, which scrolls every scrollable ancestor, the document
+  // included: picking a suggestion chip dragged the visitor 200-odd pixels
+  // down the page. Setting scrollTop can only ever move this one element.
+  //
+  // It also used to fire on messages.length, which is too early. A bubble is
+  // measured before its entrance animation settles and before its markdown
+  // renders, and a streamed answer then grows for another several seconds, so
+  // the transcript pinned itself to a height the content had already passed.
+  // Watching the subtree catches a new bubble and every token after it.
   useEffect(() => {
-    if (messages.length === 0) return;
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages.length]);
+    const el = transcriptRef.current;
+    if (!el) return undefined;
 
-  const INIT_TIMEOUT_MS = 120000;
+    // Following stops the moment the reader scrolls up to re-read something,
+    // and resumes when they come back to the bottom.
+    let follow = true;
+    const onScroll = () => {
+      follow = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+    };
+    const pin = () => {
+      if (follow) el.scrollTop = el.scrollHeight;
+    };
+
+    const observer = new MutationObserver(pin);
+    observer.observe(el, { childList: true, subtree: true, characterData: true });
+    el.addEventListener('scroll', onScroll, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      el.removeEventListener('scroll', onScroll);
+    };
+  }, []);
+
+  // A watchdog on silence, not a deadline on the whole download.
+  //
+  // The model is over a gigabyte and the previous code gave the entire
+  // download two minutes. It cannot finish in two minutes, so
+  // a perfectly healthy download was cancelled around a third of the way in
+  // and the visitor was dropped to the hosted fallback, which is the one thing
+  // this section exists to avoid. WebLLM reports progress continuously, so
+  // what actually signals a dead init is the reporting stopping. The timer is
+  // re-armed on every progress event and only fires if nothing arrives for a
+  // full minute.
+  const INIT_STALL_MS = 60000;
   // Generous on purpose: the fallback runs on a free Render instance that
   // spins down when idle, and a cold start alone can take ~45s. Short enough
   // that a genuinely unreachable backend still releases the UI.
@@ -149,17 +192,22 @@ export default function AskSection() {
     if (webLLMReady.current) return;
     setIsInitializing(true);
     setProgress(0);
-    let timeoutId;
+    let stallId;
     try {
-      await Promise.race([
-        initWebLLM((p) => setProgress(p)),
-        new Promise((_, reject) => {
-          timeoutId = setTimeout(
-            () => reject(new Error('WebLLM initialization timed out')),
-            INIT_TIMEOUT_MS
+      await new Promise((resolve, reject) => {
+        const arm = () => {
+          clearTimeout(stallId);
+          stallId = setTimeout(
+            () => reject(new Error('WebLLM initialization stalled')),
+            INIT_STALL_MS
           );
-        }),
-      ]);
+        };
+        arm();
+        initWebLLM((p) => {
+          setProgress(p);
+          arm();
+        }).then(resolve, reject);
+      });
       webLLMReady.current = true;
       setMode('local');
     } catch (err) {
@@ -167,7 +215,7 @@ export default function AskSection() {
       setMode('server');
       throw err;
     } finally {
-      clearTimeout(timeoutId);
+      clearTimeout(stallId);
       setIsInitializing(false);
     }
   };
@@ -175,18 +223,23 @@ export default function AskSection() {
   const runLocalChat = async (userQ) => {
     const gen = ++genRef.current;
     setIsStreaming(true);
-    const history = [];
-    for (const m of messages) {
-      if (m.role === 'user') history.push({ role: 'user', content: m.text });
-      else if (m.role === 'ai') history.push({ role: 'assistant', content: m.text });
-    }
     setMessages(p => [...p.filter(m => m.role !== 'loading'), { role: 'ai', text: '' }]);
     let acc = '';
+    const asked = asThirdPerson(userQ);
     try {
-      await streamChat({
-        systemPrompt: ASSISTANT_SYSTEM_PROMPT,
-        history,
-        userPrompt: userQ,
+      // streamChat returns the answer with any dangling fragment removed, so
+      // the final bubble is its return value rather than the raw token run.
+      const settled = await streamChat({
+        // Only the blocks this question is about, which is the difference
+        // between the model quoting the brief and the model rewriting it.
+        systemPrompt: buildSystemPrompt(asked),
+        // No history. Each question is answered against the blocks it needs,
+        // so an earlier turn's answer was drawn from a brief this one does
+        // not have: asked for Deep's skills straight after his publications,
+        // the model answered with the publications. Independent questions
+        // cost the odd follow-up and buy correct answers.
+        history: [],
+        userPrompt: asked,
         onToken: (tok) => {
           if (genRef.current !== gen) return;
           acc += tok;
@@ -198,6 +251,14 @@ export default function AskSection() {
           });
         },
       });
+      if (genRef.current === gen && settled !== acc) {
+        setMessages(p => {
+          const next = [...p];
+          const last = next[next.length - 1];
+          if (last?.role === 'ai') next[next.length - 1] = { role: 'ai', text: settled };
+          return next;
+        });
+      }
     } finally {
       if (genRef.current === gen) setIsStreaming(false);
     }
@@ -213,7 +274,7 @@ export default function AskSection() {
       res = await fetch(SERVER_CHAT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: userQ }),
+        body: JSON.stringify({ prompt: asThirdPerson(userQ) }),
         signal: controller.signal,
       });
     } catch (err) {
@@ -376,6 +437,7 @@ export default function AskSection() {
 
             {/* Transcript */}
             <div
+              ref={transcriptRef}
               className={hasMessages ? 'ask-transcript' : 'ask-transcript ask-transcript--empty'}
               role="log"
               aria-live="polite"
@@ -469,8 +531,6 @@ export default function AskSection() {
                   );
                 })}
               </AnimatePresence>
-
-              <div ref={bottomRef} />
             </div>
 
             {/* Status rail, download progress, or the stop control while streaming */}

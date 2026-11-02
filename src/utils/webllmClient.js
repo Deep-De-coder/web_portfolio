@@ -3,11 +3,17 @@
 // out of the entry chunk and only downloads once a visitor opens the chat.
 import { createWebLLMWorker } from "./createWebLLMWorker";
 
-// Model ID - using a small instruction-tuned model
-// Options: "TinyLlama-1.1B-Chat-v0.4-q4f16_1-MLC" (smallest, ~700MB)
-//          "Phi-3-mini-4k-instruct-q4f16_1-MLC" (~2.3GB)
-//          "Llama-3.2-1B-Instruct-q4f16_1-MLC" (~700MB)
-const DEFAULT_MODEL_ID = "Llama-3.2-1B-Instruct-q4f16_1-MLC";
+// The model has one job: answer questions about one person from a short
+// brief, without adding anything. That is a grounding task, and grounding is
+// where the very small models fall down. Asked where Deep studied,
+// Llama-3.2-1B invented an education history outright, naming universities he
+// never attended. Qwen2.5-1.5B holds to the brief.
+//
+// Sizes, since a visitor pays for this once before the chat answers:
+//   Qwen2.5-1.5B-Instruct-q4f16_1-MLC   ~1.1GB   current
+//   Llama-3.2-1B-Instruct-q4f16_1-MLC   ~0.7GB   too loose with the facts
+//   Llama-3.2-3B-Instruct-q4f16_1-MLC   ~2.2GB   better still, twice the wait
+const DEFAULT_MODEL_ID = "Qwen2.5-1.5B-Instruct-q4f16_1-MLC";
 
 let engine = null;
 let worker = null;
@@ -101,6 +107,26 @@ export async function init(onProgress) {
 }
 
 /**
+ * Drop a trailing fragment, so an answer that ran out of tokens still ends on
+ * a complete sentence or a complete bullet. Keeps the fragment if cutting
+ * would throw away most of the answer: half a thought beats almost nothing.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function trimToLastSentence(text) {
+  const trimmed = text.trimEnd();
+  const stop = Math.max(
+    trimmed.lastIndexOf("."),
+    trimmed.lastIndexOf("!"),
+    trimmed.lastIndexOf("?")
+  );
+  if (stop === trimmed.length - 1) return trimmed;
+  const cut = Math.max(stop + 1, trimmed.lastIndexOf("\n"));
+  return cut > trimmed.length * 0.4 ? trimmed.slice(0, cut).trimEnd() : trimmed;
+}
+
+/**
  * Stream chat completion
  * @param {Object} params
  * @param {string} params.systemPrompt - System prompt
@@ -129,23 +155,42 @@ export async function streamChat({ systemPrompt, history, userPrompt, onToken })
   messages.push({ role: "user", content: userPrompt });
 
   let fullText = "";
+  let finishReason = null;
 
   try {
     const stream = await engine.chat.completions.create({
       messages,
       stream: true,
-      // This answers factual questions about one person from a fixed brief,
-      // so creativity is not wanted. 0.7 with no cap and no penalty was
-      // enough for the model to invent a bibliography and then loop on it.
-      temperature: 0.2,
-      top_p: 0.9,
-      max_tokens: 420,
-      frequency_penalty: 0.6,
-      presence_penalty: 0.3,
+      // Greedy decoding. The job is to restate a brief, not to write, so
+      // there is nothing for sampling to contribute and every sampled token
+      // is a chance to drift: at 0.2 the model moved a start date from Dec
+      // 2021 to May 2021.
+      temperature: 0,
+      top_p: 1,
+      // The model holds to the brief for the first few sentences and starts
+      // embroidering after that: given 640 tokens on Deep's work history it
+      // opened with four accurate sentences, then invented a date range, a
+      // figure and a comparison that were never in front of it. 260 is enough
+      // for a complete answer to every question the chat is actually asked,
+      // and short enough to end before the drift. Running out mid-sentence
+      // reads as a crash, so trimToLastSentence below clears the fragment.
+      max_tokens: 260,
+      // No repetition penalties. They were added to stop an earlier model
+      // looping on an invented bibliography, but they punish exactly what is
+      // wanted here: a faithful answer repeats "Niti Pharma", "AI Engineer"
+      // and the numbers from the brief, and a penalty pushes the model to
+      // reach for different words instead, which is where the facts bend.
+      // Greedy decoding handles the looping on its own.
+      frequency_penalty: 0,
+      presence_penalty: 0,
     });
 
     for await (const chunk of stream) {
-      const delta = chunk.choices[0]?.delta?.content || "";
+      const choice = chunk.choices[0];
+      if (choice?.finish_reason) {
+        finishReason = choice.finish_reason;
+      }
+      const delta = choice?.delta?.content || "";
       if (delta) {
         fullText += delta;
         if (onToken) {
@@ -154,7 +199,10 @@ export async function streamChat({ systemPrompt, history, userPrompt, onToken })
       }
     }
 
-    return fullText;
+    // Hitting the cap leaves a dangling clause. The caller replaces the
+    // streamed text with whatever comes back here, so the visitor is left
+    // with whole sentences.
+    return finishReason === "length" ? trimToLastSentence(fullText) : fullText;
   } catch (error) {
     throw new Error(`Streaming error: ${error.message}`);
   }

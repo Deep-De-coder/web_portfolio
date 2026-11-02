@@ -7,7 +7,7 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../utils/webllmClient';
-import { ASSISTANT_SYSTEM_PROMPT } from '../data/assistantKnowledge';
+import { buildSystemPrompt, asThirdPerson } from '../data/assistantKnowledge';
 
 const Ask = () => {
     const [inputValue, setInputValue] = useState('');
@@ -104,11 +104,14 @@ const Ask = () => {
             setIsInitializing(true);
             setModelProgress(0);
             
-            // Add timeout to prevent getting stuck (2 minutes)
-            let raceTimeoutId = null;
-            const timeoutPromise = new Promise((_, reject) => {
-                raceTimeoutId = setTimeout(() => reject(new Error('Model loading timeout after 2 minutes')), 120000); // 2 minutes
-            });
+            // A watchdog on silence, not a deadline on the whole download.
+            // The model is over a gigabyte, and capping the entire download
+            // at two minutes cancelled healthy downloads about a third of
+            // the way in. WebLLM reports progress continuously, so the real
+            // signal of a dead init is the reporting stopping: the timer is
+            // re-armed on every progress event and fires only after a full
+            // minute of silence.
+            let stallId = null;
 
             // Update progress periodically as fallback
             const progressInterval = setInterval(() => {
@@ -118,19 +121,24 @@ const Ask = () => {
                     return prev;
                 });
             }, 2000);
-            
+
             try {
-                await Promise.race([
+                await new Promise((resolve, reject) => {
+                    const arm = () => {
+                        clearTimeout(stallId);
+                        stallId = setTimeout(() => reject(new Error('Model loading stalled')), 60000);
+                    };
+                    arm();
                     initWebLLM((progress) => {
                         setModelProgress(progress);
-                    }),
-                    timeoutPromise
-                ]);
+                        arm();
+                    }).then(resolve, reject);
+                });
                 clearInterval(progressInterval);
-                clearTimeout(raceTimeoutId);
+                clearTimeout(stallId);
             } catch (err) {
                 clearInterval(progressInterval);
-                clearTimeout(raceTimeoutId);
+                clearTimeout(stallId);
                 throw err;
             }
 
@@ -154,17 +162,10 @@ const Ask = () => {
         setIsStreaming(true);
 
         try {
-            // Build chat history from messages
-            const history = [];
-            for (let i = 0; i < messages.length; i++) {
-                if (messages[i].type === 'query') {
-                    history.push({ role: 'user', content: messages[i].text });
-                } else if (messages[i].type === 'response') {
-                    history.push({ role: 'assistant', content: messages[i].text });
-                }
-            }
-
-            const systemPrompt = ASSISTANT_SYSTEM_PROMPT;
+            const asked = asThirdPerson(userPrompt);
+            // Only the blocks this question is about, which is the difference
+            // between the model quoting the brief and the model rewriting it.
+            const systemPrompt = buildSystemPrompt(asked);
 
             // Remove loading message and add empty response
             setMessages((prev) => {
@@ -174,10 +175,17 @@ const Ask = () => {
 
             let accumulatedText = '';
 
-            await streamChat({
+            // streamChat returns the answer with any dangling fragment
+            // removed, so the final bubble is its return value rather than
+            // the raw token run.
+            const settled = await streamChat({
                 systemPrompt,
-                history,
-                userPrompt,
+                // No history. Each question is answered against the blocks it
+                // needs, so an earlier turn's answer came from a brief this
+                // one does not have: asked for Deep's skills straight after
+                // his publications, the model answered with the publications.
+                history: [],
+                userPrompt: asked,
                 onToken: (token) => {
                     if (streamingAbortRef.current) return;
                     accumulatedText += token;
@@ -191,6 +199,17 @@ const Ask = () => {
                     });
                 },
             });
+
+            if (!streamingAbortRef.current && settled !== accumulatedText) {
+                setMessages((prev) => {
+                    const updated = [...prev];
+                    const lastIdx = updated.length - 1;
+                    if (updated[lastIdx]?.type === 'response') {
+                        updated[lastIdx] = { type: 'response', text: settled };
+                    }
+                    return updated;
+                });
+            }
 
             setIsStreaming(false);
         } catch (error) {
@@ -217,7 +236,7 @@ const Ask = () => {
             response = await fetch(backendUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: userPrompt }),
+                body: JSON.stringify({ prompt: asThirdPerson(userPrompt) }),
                 signal: controller.signal
             });
 
@@ -360,12 +379,12 @@ const Ask = () => {
     // Handle quick action button clicks
     const handleQuickAction = (action) => {
         const queries = {
-            'education': 'Tell me about your education',
-            'experience': 'Tell me about your work experience',
-            'leadership': 'Tell me about your leadership qualities',
-            'projects': 'Tell me about your projects',
-            'skills': 'Tell me about your skills',
-            'publications': 'Tell me about your publications'
+            'education': "Tell me about Deep's education",
+            'experience': "Tell me about Deep's work experience",
+            'leadership': "Tell me about Deep's leadership qualities",
+            'projects': "Tell me about Deep's projects",
+            'skills': "Tell me about Deep's skills",
+            'publications': "Tell me about Deep's publications"
         };
         
         const query = queries[action];
