@@ -191,3 +191,79 @@ export function asThirdPerson(question) {
   // sentence starting lower case. Put the capital back.
   return named.charAt(0).toUpperCase() + named.slice(1);
 }
+
+/* ==========================================================================
+   Reading the answer back
+   ========================================================================== */
+
+// The names worth picking out of a sentence: where Deep did the work, and
+// what he built. Sorted longest first so "NILA Solutions Inc." wins over
+// "NILA Solutions".
+const NAMES = [
+  'NILA Solutions Inc.',
+  'NILA Solutions',
+  'Niti Pharma',
+  'Bragr',
+  'SAIR Lab',
+  'University at Buffalo',
+  'Vidyalankar Institute of Technology',
+  'Mumbai University',
+  'Agent Guard Memory',
+  'PARS Simulator',
+  '2DGS SLAM',
+  'WarDream',
+  'Dresser',
+  'Springer LNNS',
+  'IEEE Xplore',
+  'PyPI',
+].sort((a, b) => b.length - a.length);
+
+// Anything measured. Order matters: a pattern that can be a prefix of
+// another goes second, so "May 2026" is matched before the bare year and
+// "2.4 FPS" before anything that would take the number alone.
+const FIGURES = [
+  /\$\d[\d,]*(?:\.\d+)?/,
+  /[+-]?\d+(?:\.\d+)?\s?%/,
+  /\b\d+(?:\.\d+)?\s?x\b/,
+  /\b\d+(?:\.\d+)?\s?(?:FPS|fps)\b/,
+  /\b\d[\d,]*(?:\.\d+)?\s(?:seconds?|milliseconds?|hours?|minutes?)\b/,
+  /\b\d[\d,]*\s(?:tests?|tables?|documents?|SKUs|failures?)\b/,
+  /\b\d+\+\s?years?\b/,
+  /\b\d{1,3}(?:,\d{3})+\b/,
+  /\b0\.\d+\b/,
+  /\b(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s\d{4}\b/,
+  /\b(?:19|20)\d{2}\b/,
+];
+
+const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+const NAME_RE = new RegExp(`(${NAMES.map(escapeRe).join('|')})`, 'g');
+const FIGURE_RE = new RegExp(`(${FIGURES.map((r) => r.source).join('|')})`, 'g');
+
+/**
+ * Mark up the facts in a finished answer so it can be read at a glance.
+ *
+ * The model writes flat prose, and the whole point of this portfolio is the
+ * evidence, so the figures and the places the work happened are the parts
+ * worth seeing first. Doing it here rather than asking the model for
+ * markdown keeps a one-and-a-half billion parameter model out of a job it
+ * would do inconsistently, and it marks the hosted fallback's answers too.
+ *
+ * Names become bold, figures become code spans, and the terminal gives each
+ * its own colour. Anything the model emphasised itself is left alone.
+ *
+ * @param {string} text
+ * @returns {string} the same text with markdown emphasis added
+ */
+export function highlightFacts(text) {
+  if (!text) return text;
+  return text
+    // Split on what is already marked up: odd indices are those spans, and
+    // they pass through untouched so nothing is ever wrapped twice.
+    .split(/(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]*\]\([^)]*\))/g)
+    .map((part, i) => {
+      if (i % 2) return part;
+      return part.replace(FIGURE_RE, '`$1`').replace(NAME_RE, '**$1**');
+    })
+    .join('');
+}

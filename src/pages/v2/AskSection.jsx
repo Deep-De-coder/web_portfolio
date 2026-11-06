@@ -7,7 +7,7 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../../utils/webllmClient';
-import { buildSystemPrompt, asThirdPerson } from '../../data/assistantKnowledge';
+import { buildSystemPrompt, asThirdPerson, highlightFacts } from '../../data/assistantKnowledge';
 
 const EASE = [0.16, 1, 0.3, 1];
 
@@ -39,59 +39,6 @@ function engineStatus({ isInitializing, isStreaming, mode }) {
   if (mode === 'local') return { label: 'On your GPU', tone: 'live' };
   if (mode === 'server') return { label: 'Hosted fallback', tone: 'neutral' };
   return { label: 'Ready', tone: 'neutral' };
-}
-
-/* Chip/die glyph, the section is about silicon, so the mark is silicon. */
-function ChipMark({ size = 20 }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect x="4.5" y="4.5" width="15" height="15" rx="4.5" />
-      <rect x="9" y="9" width="6" height="6" rx="1.5" />
-      <path d="M9 1.8v2.7M15 1.8v2.7M9 19.5v2.7M15 19.5v2.7M1.8 9h2.7M1.8 15h2.7M19.5 9h2.7M19.5 15h2.7" />
-    </svg>
-  );
-}
-
-/* Three dots with staggered opacity, the "a reply is coming" beat that sits
-   between hitting send and the first token landing. */
-function TypingDots() {
-  return (
-    <>
-      <span className="ask-sr-only">Generating a reply</span>
-      <span className="ask-typing__dot" aria-hidden="true" />
-      <span className="ask-typing__dot" aria-hidden="true" />
-      <span className="ask-typing__dot" aria-hidden="true" />
-    </>
-  );
-}
-
-function SuggestionChips({ disabled, onPick, className }) {
-  return (
-    <div className={className}>
-      {QUICK.map(({ label, q }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={() => !disabled && onPick(q)}
-          disabled={disabled}
-          className="ask-suggest"
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
 }
 
 export default function AskSection() {
@@ -353,46 +300,51 @@ export default function AskSection() {
     transition: { duration: reduceMotion ? 0.3 : 0.6, ease: EASE, delay: reduceMotion ? 0 : delay },
   });
 
-  const bubbleIn = {
-    initial: reduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 },
-    animate: reduceMotion ? { opacity: 1 } : { opacity: 1, y: 0 },
-    transition: { duration: reduceMotion ? 0.16 : 0.28, ease: EASE },
+  // Output arrives the way a shell prints it: it appears, it does not slide
+  // in from somewhere. A short fade is enough to mark that a line is new.
+  const lineIn = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: reduceMotion ? 0.12 : 0.22, ease: EASE },
   };
 
+  // Figures arrive as code spans and names as bold, both added by
+  // highlightFacts rather than by the model. Inside the terminal neither
+  // gets a chip or a background, only its own colour, the way a shell
+  // distinguishes output.
   const markdownComponents = {
     a: ({ node, children, ...p }) => (
       <a {...p} target="_blank" rel="noopener noreferrer">
         {children}
       </a>
     ),
-    ul: ({ node, ...p }) => <ul {...p} />,
-    ol: ({ node, ...p }) => <ol {...p} />,
-    p: ({ node, ...p }) => <p {...p} />,
-    pre: ({ node, ...p }) => <pre {...p} className="ask-pre" />,
+    pre: ({ node, ...p }) => <pre {...p} className="term__pre" />,
     // react-markdown v9 removed the `inline` prop; detect
     // block code via a language- className or a newline.
     code: ({ node, className, children, ...p }) => {
-      const isBlock =
-        /language-/.test(className || '') || /\n/.test(String(children));
+      const isBlock = /language-/.test(className || '') || /\n/.test(String(children));
       return isBlock ? (
-        <code {...p} className="ask-code-block">
+        <code {...p} className="term__code-block">
           {children}
         </code>
       ) : (
-        <code {...p} className="ask-code-inline">
+        <code {...p} className="term__figure">
           {children}
         </code>
       );
     },
   };
 
+  // A drawn progress bar rather than a styled div: on a terminal, the blocks
+  // are the honest way to show it, and they line up with the mono grid.
+  const BAR_CELLS = 28;
+  const filledCells = Math.max(0, Math.min(BAR_CELLS, Math.round((progress / 100) * BAR_CELLS)));
+
   return (
     <section id="ask" className="v2-section ask-root">
-      <div className="ask-glow" aria-hidden="true" />
-
       <div className="v2-container">
         <div className="ask-shell">
-          {/* ---------- Section header ---------- */}
+          {/* ---------- Section header, on paper ---------- */}
           <motion.header {...rise()}>
             <div className="v2-eyebrow">
               <span className="v2-eyebrow__index">02</span>
@@ -413,7 +365,10 @@ export default function AskSection() {
 
             <ul className="ask-trust">
               {TRUST.map(({ label, live }) => (
-                <li key={label} className={live ? 'v2-tag v2-tag--live ask-trust__item' : 'v2-tag ask-trust__item'}>
+                <li
+                  key={label}
+                  className={live ? 'v2-tag v2-tag--live ask-trust__item' : 'v2-tag ask-trust__item'}
+                >
                   {live && <span className="ask-trust__dot" aria-hidden="true" />}
                   {label}
                 </li>
@@ -421,111 +376,107 @@ export default function AskSection() {
             </ul>
           </motion.header>
 
-          {/* ---------- Chat panel ---------- */}
-          <motion.div {...rise(0.08)} className="v2-card ask-panel">
-            {/* Header strip */}
-            <div className="ask-panel__head">
-              <div className="ask-panel__id">
-                <span className="ask-panel__dot" data-tone={status.tone} aria-hidden="true" />
-                <span className="ask-panel__name">Deep&rsquo;s AI Assistant</span>
-                <span className="ask-panel__sub">runs in this tab</span>
-              </div>
-              <span className="ask-state" data-tone={status.tone}>
+          {/* ---------- The terminal ---------- */}
+          <motion.div {...rise(0.08)} className="term" data-reduced={reduceMotion || undefined}>
+            <div className="term__chrome">
+              <span className="term__lights" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="term__path">
+                deep@portfolio
+                <span className="term__punct">:</span>~/ask
+              </span>
+              <span className="term__status" data-tone={status.tone}>
+                <span className="term__status-dot" aria-hidden="true" />
                 {status.label}
               </span>
             </div>
 
-            {/* Transcript */}
             <div
               ref={transcriptRef}
-              className={hasMessages ? 'ask-transcript' : 'ask-transcript ask-transcript--empty'}
+              className="term__screen"
               role="log"
               aria-live="polite"
               aria-relevant="additions"
               aria-label="Conversation with the in-browser assistant"
             >
               {!hasMessages && (
-                <div className="ask-empty">
-                  <span className="ask-empty__mark">
-                    <ChipMark size={22} />
-                  </span>
-                  <div className="ask-empty__copy">
-                    <p className="ask-empty__title">Nothing loaded yet, ask the first question.</p>
-                    <p className="ask-empty__sub">
-                      The model downloads on your first message, then runs entirely offline.
-                    </p>
-                  </div>
-                  <SuggestionChips
-                    disabled={busy}
-                    onPick={send}
-                    className="ask-empty__chips"
-                  />
+                <div className="term__boot">
+                  <p>
+                    <span className="term__name">deep-assistant</span>{' '}
+                    <span className="term__figure">1.0</span>{' '}
+                    <span className="term__faint">·</span>{' '}
+                    <span className="term__dim">language model, on your GPU, via WebGPU</span>
+                  </p>
+                  <p className="term__dim">
+                    The model downloads once on your first question, then answers offline.
+                  </p>
+                  <p className="term__dim">
+                    Nothing you type here is sent anywhere.
+                  </p>
+                  <p className="term__boot-hint">
+                    <span className="term__faint">Ask below, or run:</span>{' '}
+                    {QUICK.map(({ label }, i) => (
+                      <React.Fragment key={label}>
+                        {i > 0 && <span className="term__faint"> · </span>}
+                        <span className="term__cmdname">{label.toLowerCase()}</span>
+                      </React.Fragment>
+                    ))}
+                  </p>
                 </div>
               )}
 
               <AnimatePresence initial={false}>
                 {messages.map((msg, i) => {
-                  // An 'ai' bubble is pushed empty and filled token by token, so
-                  // until the first token lands it shows the same pending beat as
-                  // the explicit 'loading' placeholder.
+                  // An 'ai' line is pushed empty and filled token by token, so
+                  // until the first token lands it shows the same pending beat
+                  // as the explicit 'loading' placeholder.
                   const isLast = i === messages.length - 1;
                   const pending = msg.role === 'loading' || (msg.role === 'ai' && !msg.text);
 
+                  if (msg.role === 'user') {
+                    return (
+                      <motion.p key={i} {...lineIn} className="term__cmd">
+                        <span className="term__sigil" aria-hidden="true">
+                          ❯
+                        </span>
+                        <span>{msg.text}</span>
+                      </motion.p>
+                    );
+                  }
+
+                  if (msg.role === 'error') {
+                    return (
+                      <motion.p key={i} {...lineIn} className="term__error">
+                        <span className="term__error-tag">error</span>
+                        <span>{msg.text}, try again.</span>
+                      </motion.p>
+                    );
+                  }
+
                   return (
-                    <motion.div
-                      key={i}
-                      {...bubbleIn}
-                      className={`ask-msg ${msg.role === 'user' ? 'ask-msg--user' : 'ask-msg--ai'}`}
-                    >
-                      {msg.role === 'user' ? (
-                        <div className="ask-bubble ask-bubble--user">{msg.text}</div>
-                      ) : msg.role === 'error' ? (
-                        <div className="ask-bubble ask-bubble--error">
-                          <svg
-                            width="15"
-                            height="15"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            aria-hidden="true"
-                            focusable="false"
-                            className="ask-bubble__icon"
-                          >
-                            <circle cx="12" cy="12" r="9" />
-                            <path d="M12 7.5v5M12 16.2h.01" />
-                          </svg>
-                          <span>{msg.text}, try again.</span>
-                        </div>
+                    <motion.div key={i} {...lineIn} className="term__out">
+                      {pending ? (
+                        isStreaming || msg.role === 'loading' ? (
+                          <p className="term__working">
+                            <span className="term__spinner" aria-hidden="true" />
+                            <span className="term__dim">thinking</span>
+                            <span className="ask-sr-only">Generating a reply</span>
+                          </p>
+                        ) : (
+                          <p className="term__faint">^C stopped.</p>
+                        )
                       ) : (
-                        <>
-                          <span className="ask-avatar" aria-hidden="true">
-                            <ChipMark size={15} />
-                          </span>
-                          <div
-                            className={
-                              pending && (isStreaming || msg.role === 'loading')
-                                ? 'ask-bubble ask-bubble--ai ask-typing'
-                                : 'ask-bubble ask-bubble--ai'
-                            }
-                            data-streaming={isStreaming && isLast && !pending ? 'true' : undefined}
-                          >
-                            {pending ? (
-                              isStreaming || msg.role === 'loading' ? (
-                                <TypingDots />
-                              ) : (
-                                <span className="ask-bubble__muted">Stopped.</span>
-                              )
-                            ) : (
-                              <div className="ask-md">
-                                <ReactMarkdown components={markdownComponents}>
-                                  {msg.text}
-                                </ReactMarkdown>
-                              </div>
-                            )}
-                          </div>
-                        </>
+                        <div
+                          className="term__md"
+                          data-streaming={isStreaming && isLast ? 'true' : undefined}
+                        >
+                          <ReactMarkdown components={markdownComponents}>
+                            {highlightFacts(msg.text)}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </motion.div>
                   );
@@ -533,53 +484,60 @@ export default function AskSection() {
               </AnimatePresence>
             </div>
 
-            {/* Status rail, download progress, or the stop control while streaming */}
+            {/* Download progress, or the stop control while streaming */}
             {isInitializing ? (
-              <div className="ask-rail">
-                <div className="ask-progress__head">
-                  <span className="ask-progress__label">Downloading the model</span>
-                  <span className="ask-progress__pct">{progress}%</span>
-                </div>
+              <div className="term__rail">
                 <div
-                  className="ask-progress__track"
+                  className="term__progress"
                   role="progressbar"
                   aria-label="Model download progress"
                   aria-valuenow={progress}
                   aria-valuemin={0}
                   aria-valuemax={100}
                 >
-                  {/* Revealed with clip-path rather than width so the gradient stays
-                      mapped to the full track and nothing triggers layout. */}
-                  <span
-                    className="ask-progress__fill"
-                    style={{ clipPath: `inset(0 ${100 - progress}% 0 0)` }}
-                  />
+                  <span className="term__dim">pulling model</span>
+                  <span className="term__bar" aria-hidden="true">
+                    <span className="term__bar-fill">{'█'.repeat(filledCells)}</span>
+                    <span className="term__bar-rest">{'░'.repeat(BAR_CELLS - filledCells)}</span>
+                  </span>
+                  <span className="term__figure">{String(progress).padStart(3, ' ')}%</span>
                 </div>
-                <p className="ask-progress__note">
-                  This happens once, then it runs offline, straight off your GPU.
+                <p className="term__faint term__progress-note">
+                  Once only. After this it runs offline, straight off your GPU.
                 </p>
               </div>
             ) : isStreaming ? (
-              <div className="ask-rail ask-rail--center">
-                <button type="button" onClick={cancel} className="ask-stop" aria-label="Stop generating">
-                  <svg width="9" height="9" viewBox="0 0 10 10" aria-hidden="true" focusable="false">
-                    <rect width="10" height="10" rx="2.5" fill="currentColor" />
-                  </svg>
-                  Stop generating
+              <div className="term__rail term__rail--center">
+                <button type="button" onClick={cancel} className="term__stop">
+                  <span className="term__key">^C</span> stop generating
                 </button>
               </div>
             ) : null}
 
             {/* Composer */}
-            <div className="ask-composer">
-              {hasMessages && (
-                <SuggestionChips disabled={busy} onPick={send} className="ask-composer__chips" />
-              )}
+            <div className="term__composer">
+              <div className="term__commands">
+                <span className="term__faint term__commands-label">run</span>
+                {QUICK.map(({ label, q }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => !busy && send(q)}
+                    disabled={busy}
+                    className="term__command"
+                  >
+                    {label.toLowerCase()}
+                  </button>
+                ))}
+              </div>
 
               <label htmlFor="ask-input" className="ask-sr-only">
                 Ask a question about Deep&rsquo;s work
               </label>
-              <div className="ask-field">
+              <div className="term__prompt">
+                <span className="term__sigil" aria-hidden="true">
+                  ❯
+                </span>
                 <input
                   id="ask-input"
                   type="text"
@@ -592,31 +550,19 @@ export default function AskSection() {
                     }
                   }}
                   disabled={busy}
-                  placeholder="Ask about Deep's work…"
+                  placeholder="ask about Deep's work"
                   autoComplete="off"
-                  className="ask-field__input"
+                  spellCheck="false"
+                  className="term__input"
                 />
                 <button
                   type="button"
                   onClick={() => send()}
                   disabled={busy || !input.trim()}
                   aria-label="Send message"
-                  className="v2-btn v2-btn--primary ask-send"
+                  className="term__send"
                 >
-                  <svg
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    focusable="false"
-                  >
-                    <path d="M12 19V5M5 12l7-7 7 7" />
-                  </svg>
+                  <span aria-hidden="true">return ⏎</span>
                 </button>
               </div>
             </div>
@@ -629,32 +575,30 @@ export default function AskSection() {
         </div>
       </div>
 
-      <style>{PANEL_CSS}</style>
+      <style>{TERMINAL_CSS}</style>
     </section>
   );
 }
 
 /* ==========================================================================
-   Panel styling. Everything here is derived from the v2 tokens in theme.css , 
-   the only literals are alpha variants of --v2-accent (#6366f1) / --v2-live
-   (#22d3ee), which is the same convention theme.css uses for .v2-tag--live.
+   The terminal.
+
+   One dark object on a paper page, in the same warm near-black as the body
+   ink so it reads as part of the document rather than a widget dropped onto
+   it. Everything inside is set in the page's mono face on a fixed grid, and
+   colour carries meaning rather than decoration: rose for what the visitor
+   typed and for the places the work happened, amber for every measured
+   figure, teal for the one fact that matters live, that this is running on
+   their own hardware.
    ========================================================================== */
-const PANEL_CSS = `
+const TERMINAL_CSS = `
 .ask-root {
   position: relative;
-  font-family: 'DM Sans', system-ui, sans-serif;
-}
-
-.ask-glow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(ellipse 58% 46% at 50% 58%, rgba(99, 102, 241, 0.10), transparent 70%);
 }
 
 .ask-shell {
   position: relative;
-  max-width: 900px;
+  max-width: 880px;
   margin-inline: auto;
 }
 
@@ -676,7 +620,7 @@ const PANEL_CSS = `
   padding-block: 0.06em;
 }
 
-/* --- trust strip ---------------------------------------------------------- */
+/* --- trust strip, on paper ------------------------------------------------ */
 
 .ask-trust {
   display: flex;
@@ -687,506 +631,389 @@ const PANEL_CSS = `
   margin: 1.75rem 0 0;
 }
 
-.ask-trust__item {
-  gap: 0.4375rem;
-}
+.ask-trust__item { gap: 0.4375rem; }
 
 .ask-trust__dot {
   width: 5px;
   height: 5px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 6px currentColor;
   flex: none;
-  animation: ask-pulse 2.4s ease-in-out infinite;
+  animation: term-pulse 2.4s ease-in-out infinite;
 }
 
-/* --- panel ---------------------------------------------------------------- */
+.ask-foot {
+  margin: 1.125rem 0 0;
+  max-width: 62ch;
+  line-height: 1.6;
+}
 
-.ask-panel {
+/* --- the window ----------------------------------------------------------- */
+
+.term {
+  --t-bg: #17110f;
+  --t-bg-2: #1e1715;
+  --t-bg-3: #241c1a;
+  --t-fg: #ece2dd;
+  --t-dim: #a89793;
+  --t-faint: #7a6a66;
+  --t-line: rgba(236, 226, 221, 0.09);
+  --t-rose: #e9a2ae;
+  --t-amber: #e8b776;
+  --t-teal: #74d0bd;
+
   margin-top: clamp(2rem, 5vh, 3rem);
+  border-radius: var(--v2-r-xl);
   overflow: hidden;
-}
-
-.ask-panel__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.8125rem clamp(0.875rem, 3vw, 1.375rem);
-  border-bottom: 1px solid var(--v2-line-weak);
-  background: rgba(0, 0, 0, 0.2);
-}
-
-.ask-panel__id {
-  display: flex;
-  align-items: center;
-  gap: 0.625rem;
-  min-width: 0;
-}
-
-.ask-panel__dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  flex: none;
-  background: var(--v2-text-3);
-  transition: background-color var(--v2-t) var(--v2-ease), box-shadow var(--v2-t) var(--v2-ease);
-}
-
-.ask-panel__dot[data-tone='live'] {
-  background: var(--v2-live);
-  box-shadow: 0 0 8px rgba(34, 211, 238, 0.65);
-}
-
-.ask-panel__dot[data-tone='accent'] {
-  background: var(--v2-accent-bright);
-  box-shadow: 0 0 8px var(--v2-accent-glow);
-  animation: ask-pulse 1.5s ease-in-out infinite;
-}
-
-.ask-panel__name {
+  background: var(--t-bg);
+  border: 1px solid #0f0b0a;
+  box-shadow:
+    0 1px 2px rgba(26, 20, 22, 0.16),
+    0 28px 56px -28px rgba(26, 20, 22, 0.45);
+  font-family: var(--v2-mono);
   font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--v2-text);
+  line-height: 1.75;
+  color: var(--t-fg);
+  font-variant-ligatures: none;
+}
+
+/* --- chrome --------------------------------------------------------------- */
+
+.term__chrome {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.6875rem 0.9375rem;
+  background: var(--t-bg-2);
+  border-bottom: 1px solid var(--t-line);
+}
+
+.term__lights {
+  display: inline-flex;
+  gap: 0.4375rem;
+  flex: none;
+}
+
+.term__lights i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--t-rose);
+  opacity: 0.85;
+}
+
+.term__lights i:nth-child(2) { background: var(--t-amber); }
+.term__lights i:nth-child(3) { background: var(--t-teal); }
+
+.term__path {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--t-dim);
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.ask-panel__sub {
-  font-size: 0.75rem;
-  color: var(--v2-text-3);
-  white-space: nowrap;
-}
+.term__punct { color: var(--t-faint); }
 
-.ask-panel__sub::before {
-  content: '·';
-  margin-right: 0.5rem;
-}
-
-.ask-state {
+.term__status {
   display: inline-flex;
   align-items: center;
-  font-size: 0.6875rem;
-  font-weight: 500;
-  letter-spacing: 0.015em;
-  line-height: 1;
-  padding: 0.4375rem 0.6875rem;
-  border-radius: 999px;
-  border: 1px solid var(--v2-line-weak);
-  background: var(--v2-surface-1);
-  color: var(--v2-text-3);
-  white-space: nowrap;
+  gap: 0.4375rem;
   flex: none;
-  transition:
-    color var(--v2-t) var(--v2-ease),
-    border-color var(--v2-t) var(--v2-ease),
-    background-color var(--v2-t) var(--v2-ease);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--t-dim);
+  white-space: nowrap;
 }
 
-.ask-state[data-tone='live'] {
-  color: var(--v2-live);
-  border-color: rgba(34, 211, 238, 0.28);
-  background: rgba(34, 211, 238, 0.07);
+.term__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t-faint);
+  flex: none;
 }
 
-.ask-state[data-tone='accent'] {
-  color: var(--v2-accent-bright);
-  border-color: rgba(99, 102, 241, 0.3);
-  background: rgba(99, 102, 241, 0.09);
+.term__status[data-tone='live'] { color: var(--t-teal); }
+.term__status[data-tone='live'] .term__status-dot {
+  background: var(--t-teal);
+  box-shadow: 0 0 7px rgba(116, 208, 189, 0.7);
 }
 
-/* --- transcript ----------------------------------------------------------- */
+.term__status[data-tone='accent'] { color: var(--t-amber); }
+.term__status[data-tone='accent'] .term__status-dot {
+  background: var(--t-amber);
+  animation: term-pulse 1.4s ease-in-out infinite;
+}
 
-.ask-transcript {
-  min-height: clamp(240px, 32vh, 320px);
-  max-height: clamp(340px, 50vh, 480px);
+/* --- screen --------------------------------------------------------------- */
+
+.term__screen {
+  min-height: clamp(200px, 28vh, 280px);
+  max-height: clamp(330px, 50vh, 480px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: clamp(1rem, 3vw, 1.5rem);
-  background: rgba(0, 0, 0, 0.12);
+  padding: clamp(0.875rem, 2.5vw, 1.25rem);
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-color: rgba(236, 226, 221, 0.16) transparent;
 }
 
-.ask-transcript--empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ask-transcript::-webkit-scrollbar {
-  width: 10px;
-}
-
-.ask-transcript::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.ask-transcript::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+.term__screen::-webkit-scrollbar { width: 10px; }
+.term__screen::-webkit-scrollbar-track { background: transparent; }
+.term__screen::-webkit-scrollbar-thumb {
+  background: rgba(236, 226, 221, 0.14);
   border: 3px solid transparent;
   background-clip: padding-box;
   border-radius: 999px;
 }
-
-.ask-transcript:hover::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.26);
+.term__screen:hover::-webkit-scrollbar-thumb {
+  background: rgba(236, 226, 221, 0.24);
   background-clip: padding-box;
 }
 
-/* --- empty state ---------------------------------------------------------- */
+/* --- boot banner ---------------------------------------------------------- */
 
-.ask-empty {
+.term__boot p { margin: 0 0 0.25rem; }
+.term__boot-hint { margin: 0.875rem 0 0; }
+
+.term__name { color: var(--t-fg); }
+.term__dim { color: var(--t-dim); }
+.term__faint { color: var(--t-faint); }
+
+.term__cmdname {
+  color: var(--t-rose);
+}
+
+/* --- lines ---------------------------------------------------------------- */
+
+.term__cmd {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 0.9375rem;
-  width: 100%;
-  padding: 0.5rem 0;
-}
-
-.ask-empty__mark {
-  display: grid;
-  place-items: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 15px;
-  color: var(--v2-accent-bright);
-  border: 1px solid rgba(99, 102, 241, 0.24);
-  background: radial-gradient(120% 120% at 50% 0%, rgba(99, 102, 241, 0.2), rgba(99, 102, 241, 0.05));
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 36px -20px var(--v2-accent-glow);
-}
-
-.ask-empty__copy {
-  max-width: 44ch;
-}
-
-.ask-empty__title {
-  margin: 0;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  color: var(--v2-text);
-}
-
-.ask-empty__sub {
-  margin: 0.375rem 0 0;
-  font-size: 0.8125rem;
-  line-height: 1.6;
-  color: var(--v2-text-3);
-}
-
-.ask-empty__chips {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.125rem;
-}
-
-/* --- suggestion chips ----------------------------------------------------- */
-
-.ask-suggest {
-  font-family: inherit;
-  font-size: 0.75rem;
-  font-weight: 450;
-  line-height: 1;
-  padding: 0.5rem 0.8125rem;
-  border-radius: 999px;
-  border: 1px solid var(--v2-line);
-  background: var(--v2-surface-1);
-  color: var(--v2-text-2);
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    color var(--v2-t-fast) var(--v2-ease),
-    border-color var(--v2-t-fast) var(--v2-ease),
-    background-color var(--v2-t-fast) var(--v2-ease),
-    transform var(--v2-t-fast) var(--v2-ease);
-}
-
-.ask-suggest:hover:not(:disabled) {
-  color: var(--v2-text);
-  border-color: var(--v2-line-strong);
-  background: var(--v2-surface-2);
-  transform: translateY(-1px);
-}
-
-.ask-suggest:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-/* --- messages ------------------------------------------------------------- */
-
-.ask-msg {
-  display: flex;
-  align-items: flex-start;
   gap: 0.625rem;
-}
-
-.ask-msg + .ask-msg {
-  margin-top: 0.875rem;
-}
-
-.ask-msg--user {
-  justify-content: flex-end;
-}
-
-.ask-avatar {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  flex: none;
-  margin-top: 3px;
-  border-radius: 9px;
-  color: #fff;
-  background: linear-gradient(135deg, var(--v2-accent) 0%, var(--v2-accent-2) 100%);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 20px -10px var(--v2-accent-glow);
-}
-
-.ask-bubble {
-  min-width: 0;
-  max-width: min(72ch, 100%);
-  padding: 0.875rem 1.125rem;
-  border-radius: var(--v2-r-md);
-  font-size: 0.9375rem;
-  line-height: 1.68;
+  margin: 1.125rem 0 0.375rem;
+  color: var(--t-fg);
   overflow-wrap: anywhere;
 }
 
-.ask-bubble--ai {
-  border-top-left-radius: 6px;
-  border: 1px solid var(--v2-line-weak);
-  background: var(--v2-surface-1);
-  color: var(--v2-text-2);
-}
+.term__cmd:first-child { margin-top: 0; }
 
-.ask-bubble--user {
-  max-width: min(52ch, 100%);
-  border-top-right-radius: 6px;
-  border: 1px solid rgba(99, 102, 241, 0.26);
-  background: rgba(99, 102, 241, 0.13);
-  color: var(--v2-text);
-}
-
-.ask-bubble--error {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5625rem;
-  border-top-left-radius: 6px;
-  border: 1px solid rgba(239, 68, 68, 0.24);
-  background: rgba(239, 68, 68, 0.08);
-  color: #fca5a5;
-  font-size: 0.875rem;
-}
-
-.ask-bubble__icon {
+.term__sigil {
   flex: none;
-  margin-top: 0.25rem;
+  color: var(--t-rose);
+  user-select: none;
 }
 
-/* Cancelled before the first token arrived, say so rather than leaving a
-   bubble that reads as a rendering bug. */
-.ask-bubble__muted {
-  font-size: 0.875rem;
-  font-style: italic;
-  color: var(--v2-text-3);
+.term__out {
+  margin: 0 0 0.25rem;
+  padding-left: 1.3125rem;
+  color: var(--t-dim);
+  overflow-wrap: anywhere;
 }
 
-/* --- typing indicator ----------------------------------------------------- */
-
-.ask-typing {
+.term__error {
   display: flex;
-  align-items: center;
-  gap: 0.3125rem;
-  padding: 1.0625rem 1.125rem;
+  gap: 0.5625rem;
+  margin: 0.375rem 0 0;
+  padding-left: 1.3125rem;
+  color: #f0a9a0;
 }
 
-.ask-typing__dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--v2-accent-bright);
-  opacity: 0.3;
-  animation: ask-blink 1.25s ease-in-out infinite;
+.term__error-tag {
+  flex: none;
+  color: #f0a9a0;
+  opacity: 0.72;
 }
 
-.ask-typing__dot:nth-child(3) { animation-delay: 0.16s; }
-.ask-typing__dot:nth-child(4) { animation-delay: 0.32s; }
+/* --- working indicator ---------------------------------------------------- */
 
-/* Shimmering caret pinned to the end of the last block while tokens land. */
-.ask-bubble[data-streaming='true'] .ask-md > :last-child::after {
-  content: '';
+.term__working {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.term__spinner {
   display: inline-block;
-  width: 2px;
-  height: 0.95em;
-  margin-left: 3px;
-  vertical-align: -0.12em;
-  border-radius: 1px;
-  background: var(--v2-accent-bright);
-  animation: ask-caret 1.05s steps(1, end) infinite;
+  width: 1ch;
+  color: var(--t-amber);
 }
 
-/* --- markdown ------------------------------------------------------------- */
-
-.ask-md > :first-child { margin-top: 0; }
-.ask-md > :last-child { margin-bottom: 0; }
-
-.ask-md p {
-  margin: 0 0 0.75rem;
+.term__spinner::after {
+  content: '|';
+  animation: term-spin 0.72s steps(1, end) infinite;
 }
 
-.ask-md ul,
-.ask-md ol {
-  margin: 0 0 0.75rem;
-  padding-inline-start: 1.15rem;
+/* --- markdown output ------------------------------------------------------ */
+
+.term__md > :first-child { margin-top: 0; }
+.term__md > :last-child { margin-bottom: 0; }
+
+.term__md p { margin: 0 0 0.625rem; }
+
+.term__md ul,
+.term__md ol {
+  margin: 0 0 0.625rem;
+  padding-inline-start: 0;
+  list-style: none;
 }
 
-.ask-md li {
-  margin: 0 0 0.3125rem;
+.term__md li {
+  margin: 0 0 0.1875rem;
+  padding-left: 1.25rem;
+  position: relative;
 }
 
-.ask-md li::marker {
-  color: var(--v2-text-4);
+/* A shell lists with a marker, not a typographic bullet. */
+.term__md li::before {
+  content: '–';
+  position: absolute;
+  left: 0;
+  color: var(--t-faint);
 }
 
-.ask-md h1,
-.ask-md h2,
-.ask-md h3,
-.ask-md h4 {
-  margin: 1rem 0 0.5rem;
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: -0.012em;
-  color: var(--v2-text);
+/* Names of places and projects. */
+.term__md strong {
+  font-weight: 400;
+  color: var(--t-rose);
 }
 
-.ask-md strong {
-  font-weight: 600;
-  color: var(--v2-text);
+/* Anything measured. No chip, no border: in a terminal the colour is the
+   emphasis, and a background here would break the mono grid. */
+.term__figure {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--t-amber);
+  white-space: nowrap;
 }
 
-.ask-md a {
-  color: var(--v2-accent-bright);
+.term__md a {
+  color: var(--t-teal);
   text-decoration: underline;
   text-underline-offset: 2px;
-  transition: color var(--v2-t-fast) var(--v2-ease);
 }
 
-.ask-md a:hover {
-  color: var(--v2-text);
+.term__md h1,
+.term__md h2,
+.term__md h3,
+.term__md h4 {
+  margin: 0.75rem 0 0.375rem;
+  font-size: inherit;
+  font-weight: 400;
+  color: var(--t-fg);
 }
 
-.ask-md blockquote {
-  margin: 0 0 0.75rem;
-  padding-inline-start: 0.875rem;
-  border-inline-start: 2px solid var(--v2-line);
-  color: var(--v2-text-3);
-}
-
-.ask-md code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.8125em;
-}
-
-.ask-code-inline {
-  padding: 0.12em 0.36em;
-  border-radius: 5px;
-  border: 1px solid var(--v2-line-weak);
-  background: var(--v2-surface-3);
-  color: var(--v2-text);
-}
-
-.ask-pre {
-  margin: 0 0 0.75rem;
+.term__pre {
+  margin: 0 0 0.625rem;
   max-width: 100%;
   overflow-x: auto;
-  border-radius: var(--v2-r-sm);
-  border: 1px solid var(--v2-line-weak);
-  background: rgba(0, 0, 0, 0.42);
+  border-left: 2px solid var(--t-line);
+  padding-left: 0.75rem;
 }
 
-.ask-code-block {
+.term__code-block {
   display: block;
-  padding: 0.875rem 1rem;
-  overflow-x: auto;
   white-space: pre;
-  line-height: 1.6;
-  color: var(--v2-text-2);
+  color: var(--t-fg);
 }
 
-/* --- status rail ---------------------------------------------------------- */
-
-.ask-rail {
-  padding: 0.875rem clamp(0.875rem, 3vw, 1.375rem);
-  border-top: 1px solid var(--v2-line-weak);
-  background: rgba(0, 0, 0, 0.16);
+/* Block caret riding the end of the answer while tokens land. */
+.term__md[data-streaming='true'] > :last-child::after {
+  content: '▊';
+  margin-left: 2px;
+  color: var(--t-amber);
+  animation: term-blink 1.05s steps(1, end) infinite;
 }
 
-.ask-rail--center {
+/* --- rail ----------------------------------------------------------------- */
+
+.term__rail {
+  padding: 0.75rem clamp(0.875rem, 2.5vw, 1.25rem);
+  border-top: 1px solid var(--t-line);
+  background: var(--t-bg-2);
+}
+
+.term__rail--center {
   display: flex;
   justify-content: center;
 }
 
-.ask-progress__head {
+.term__progress {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
 }
 
-.ask-progress__label {
+.term__bar {
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+
+.term__bar-fill { color: var(--t-amber); }
+.term__bar-rest { color: var(--t-faint); opacity: 0.5; }
+
+.term__progress-note {
+  margin: 0.375rem 0 0;
   font-size: 0.75rem;
-  color: var(--v2-text-2);
 }
 
-.ask-progress__pct {
-  font-size: 0.75rem;
-  font-variant-numeric: tabular-nums;
-  color: var(--v2-accent-bright);
-}
-
-.ask-progress__track {
-  height: 4px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.07);
-}
-
-.ask-progress__fill {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--v2-accent) 0%, var(--v2-accent-2) 55%, var(--v2-live) 100%);
-  transition: clip-path var(--v2-t) var(--v2-ease);
-}
-
-.ask-progress__note {
-  margin: 0.5625rem 0 0;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  color: var(--v2-text-3);
-}
-
-.ask-stop {
+.term__stop {
+  font: inherit;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: inherit;
+  padding: 0.3125rem 0.75rem;
+  border-radius: var(--v2-r-sm);
+  border: 1px solid var(--t-line);
+  background: transparent;
+  color: var(--t-dim);
+  cursor: pointer;
+  transition: color var(--v2-t-fast) var(--v2-ease), border-color var(--v2-t-fast) var(--v2-ease);
+}
+
+.term__stop:hover {
+  color: var(--t-fg);
+  border-color: rgba(236, 226, 221, 0.22);
+}
+
+.term__key {
+  color: var(--t-amber);
+}
+
+/* --- composer ------------------------------------------------------------- */
+
+.term__composer {
+  padding: 0.75rem clamp(0.875rem, 2.5vw, 1.25rem) 0.9375rem;
+  border-top: 1px solid var(--t-line);
+  background: var(--t-bg-2);
+}
+
+.term__commands {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4375rem;
+  margin-bottom: 0.75rem;
+}
+
+.term__commands-label {
+  margin-right: 0.125rem;
   font-size: 0.75rem;
-  font-weight: 500;
+  color: var(--t-dim);
+}
+
+.term__command {
+  font: inherit;
+  font-size: 0.75rem;
   line-height: 1;
-  padding: 0.5rem 0.9375rem;
-  border-radius: 999px;
-  border: 1px solid var(--v2-line);
-  background: var(--v2-surface-1);
-  color: var(--v2-text-2);
+  padding: 0.3125rem 0.5625rem;
+  border-radius: var(--v2-r-sm);
+  border: 1px solid var(--t-line);
+  background: var(--t-bg-3);
+  color: var(--t-dim);
   cursor: pointer;
   transition:
     color var(--v2-t-fast) var(--v2-ease),
@@ -1194,124 +1021,102 @@ const PANEL_CSS = `
     background-color var(--v2-t-fast) var(--v2-ease);
 }
 
-.ask-stop:hover {
-  color: var(--v2-text);
-  border-color: var(--v2-line-strong);
-  background: var(--v2-surface-2);
+.term__command:hover:not(:disabled) {
+  color: var(--t-rose);
+  border-color: rgba(233, 162, 174, 0.34);
+  background: rgba(233, 162, 174, 0.08);
 }
 
-/* --- composer ------------------------------------------------------------- */
-
-.ask-composer {
-  padding: clamp(0.875rem, 3vw, 1.125rem) clamp(0.875rem, 3vw, 1.375rem);
-  border-top: 1px solid var(--v2-line-weak);
-  background: rgba(0, 0, 0, 0.22);
+.term__command:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.ask-composer__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4375rem;
-  margin-bottom: 0.8125rem;
-}
-
-.ask-field {
+.term__prompt {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.3125rem 0.3125rem 0.3125rem 1.0625rem;
-  border-radius: 999px;
-  border: 1px solid var(--v2-line);
-  background: var(--v2-surface-1);
-  transition:
-    border-color var(--v2-t) var(--v2-ease),
-    background-color var(--v2-t) var(--v2-ease),
-    box-shadow var(--v2-t) var(--v2-ease);
+  gap: 0.625rem;
+  padding: 0.5rem 0.6875rem;
+  border-radius: var(--v2-r-sm);
+  border: 1px solid var(--t-line);
+  background: var(--t-bg);
+  transition: border-color var(--v2-t) var(--v2-ease), box-shadow var(--v2-t) var(--v2-ease);
 }
 
-.ask-field:focus-within {
-  border-color: var(--v2-line-strong);
-  background: var(--v2-surface-2);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+.term__prompt:focus-within {
+  border-color: rgba(233, 162, 174, 0.38);
+  box-shadow: 0 0 0 3px rgba(233, 162, 174, 0.1);
 }
 
-.ask-field__input {
+.term__input {
   flex: 1 1 auto;
   min-width: 0;
-  padding: 0.5rem 0;
   border: 0;
+  padding: 0;
   background: transparent;
   outline: none;
-  font-family: inherit;
-  font-size: 0.875rem;
-  color: var(--v2-text);
+  font: inherit;
+  color: var(--t-fg);
+  caret-color: var(--t-amber);
 }
 
-.ask-field__input::placeholder {
-  color: var(--v2-text-3);
-}
+.term__input::placeholder { color: var(--t-faint); }
+.term__input:disabled { color: var(--t-faint); cursor: not-allowed; }
+.term .term__input:focus-visible { outline: none; }
 
-.ask-field__input:disabled {
-  color: var(--v2-text-3);
-  cursor: not-allowed;
-}
-
-/* The field wrapper carries the focus treatment, so the input must not draw a
-   second ring inside it. */
-.ask-root .ask-field__input:focus-visible {
-  outline: none;
-}
-
-.ask-root .ask-send {
-  width: 38px;
-  height: 38px;
-  min-width: 38px;
+.term__send {
+  font: inherit;
+  font-size: 0.6875rem;
   flex: none;
-  gap: 0;
-  padding: 0;
-  border-radius: 50%;
-  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--v2-r-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--t-faint);
+  cursor: pointer;
+  transition: color var(--v2-t-fast) var(--v2-ease), border-color var(--v2-t-fast) var(--v2-ease);
 }
 
-.ask-root .ask-send:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  box-shadow: none;
+.term__send:not(:disabled):hover {
+  color: var(--t-amber);
+  border-color: rgba(232, 183, 118, 0.3);
 }
 
-.ask-root .ask-send:disabled:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.ask-foot {
-  margin: 1rem 0 0;
-  max-width: 62ch;
-  line-height: 1.6;
-}
+.term__send:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* --- motion --------------------------------------------------------------- */
 
-@keyframes ask-blink {
-  0%, 100% { opacity: 0.25; transform: translateY(0); }
-  40%      { opacity: 1;    transform: translateY(-2px); }
+@keyframes term-blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0; }
 }
 
-@keyframes ask-pulse {
+@keyframes term-pulse {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.35; }
 }
 
-@keyframes ask-caret {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0; }
+@keyframes term-spin {
+  0%   { content: '|'; }
+  25%  { content: '/'; }
+  50%  { content: '—'; }
+  75%  { content: '\\\\'; }
+}
+
+.term[data-reduced] .term__spinner::after,
+.term[data-reduced] .term__md[data-streaming='true'] > :last-child::after,
+.term[data-reduced] .term__status-dot,
+.term[data-reduced] .ask-trust__dot {
+  animation: none;
 }
 
 /* --- narrow viewports ----------------------------------------------------- */
 
 @media (max-width: 560px) {
-  .ask-panel__sub { display: none; }
-  .ask-avatar { display: none; }
-  .ask-bubble { font-size: 0.9rem; padding: 0.8125rem 1rem; }
+  .term { font-size: 0.78125rem; }
+  .term__path { display: none; }
+  .term__bar { display: none; }
+  .term__out,
+  .term__error { padding-left: 0; }
 }
 `;
