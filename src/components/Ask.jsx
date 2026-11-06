@@ -7,7 +7,7 @@ import {
   interruptGenerate,
   isWebGPUSupported,
 } from '../utils/webllmClient';
-import { buildSystemPrompt, asThirdPerson } from '../data/assistantKnowledge';
+import { buildSystemPrompt, asThirdPerson, highlightFacts } from '../data/assistantKnowledge';
 
 const Ask = () => {
     const [inputValue, setInputValue] = useState('');
@@ -446,7 +446,7 @@ const Ask = () => {
                     {isInitializing && modelProgress > 0 && (
                         <div className="model-progress">
                             <div className="progress-text">
-                                Loading local model... {modelProgress}% (Timeout: 2 minutes)
+                                Loading local model... {modelProgress}%
                             </div>
                             <div className="progress-bar">
                                 <div className="progress-fill" style={{ width: `${modelProgress}%` }}></div>
@@ -462,13 +462,15 @@ const Ask = () => {
                                 </div>
                             );
                         } else if (msg.type === 'response') {
-                            // Assistant messages - render Markdown properly
+                            // Assistant messages. highlightFacts marks up the names and figures
+                            // before Markdown runs, so the bold and the code spans here are
+                            // ours, not the model's.
                             return (
                                 <div
                                     key={index}
                                     className={`message ${msg.type}`}
                                 >
-                                    {renderMarkdown(msg.text)}
+                                    {renderMarkdown(highlightFacts(msg.text))}
                                 </div>
                             );
                         } else {
