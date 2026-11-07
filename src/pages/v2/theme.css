@@ -263,6 +263,71 @@
 .v2-card--interactive::after { content: none; }
 
 /* ==========================================================================
+   Folder cards
+   ==========================================================================
+
+   Project work is filed rather than listed: each card is cut from the same
+   stock as the page, with a tab offset to the left carrying its file number
+   the way a drawer of folders is labelled.
+
+   The tab is a pseudo-element, so it adds no markup and stays out of the tab
+   order. Its number is generated content, which some screen readers do read
+   out, and a file number is worth hearing. It sits one pixel down into the
+   card so
+   its background covers the card's own top rule. Without that overlap a line
+   runs straight across the mouth of the folder and the tab reads as a label
+   stuck on top rather than part of the same sheet. */
+
+.v2-folder {
+  --v2-tab-h: 1.5rem;
+  margin-top: var(--v2-tab-h);
+}
+
+.v2-folder::before {
+  content: attr(data-folder);
+  position: absolute;
+  left: -1px;
+  bottom: calc(100% - 1px);
+  z-index: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 1px;
+
+  width: clamp(5rem, 28%, 8.5rem);
+  height: var(--v2-tab-h);
+
+  border: 1px solid var(--v2-line);
+  border-bottom: 0;
+  border-radius: var(--v2-r-lg) var(--v2-r-lg) 0 0;
+  background: var(--v2-surface-1);
+
+  font-family: var(--v2-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: var(--v2-text-4);
+
+  transition:
+    border-color var(--v2-t) var(--v2-ease),
+    color var(--v2-t) var(--v2-ease);
+}
+
+.v2-folder.v2-card--interactive:hover::before {
+  border-color: var(--v2-line-strong);
+  color: var(--v2-accent);
+}
+
+/* The tab owns the top-left corner, so the card and its first panel square off
+   underneath it: the left edge then runs as one unbroken line from the top of
+   the tab down to the foot of the folder. */
+.v2-folder,
+.v2-folder > :first-child {
+  border-top-left-radius: 0;
+}
+
+/* ==========================================================================
    Controls
    ========================================================================== */
 

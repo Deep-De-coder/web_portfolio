@@ -198,11 +198,12 @@ function LinkRow({ project }) {
 
 /* The lead: one project gets a full-width, image-beside-copy treatment so the
    section opens on a focal point instead of an even field of equal cards. */
-function LeadCard({ project, reduced }) {
+function LeadCard({ project, reduced, fileNo }) {
   return (
     <motion.article
       {...rise(reduced)}
-      className="v2-card v2-card--interactive group grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]"
+      data-folder={fileNo}
+      className="v2-card v2-folder v2-card--interactive group grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]"
     >
       <Thumbnail
         src={project.img}
@@ -231,9 +232,13 @@ function LeadCard({ project, reduced }) {
 
 /* Every other card shares one anatomy, fixed-ratio thumbnail, then a body that
    pins tags and links to the bottom so rows align whatever the copy does. */
-function ProjectCard({ project, reduced, index }) {
+function ProjectCard({ project, reduced, index, fileNo }) {
   return (
-    <motion.article {...rise(reduced, index)} className="v2-card v2-card--interactive group flex flex-col">
+    <motion.article
+      {...rise(reduced, index)}
+      data-folder={fileNo}
+      className="v2-card v2-folder v2-card--interactive group flex flex-col"
+    >
       {/* Work with no screenshot keeps the same card, minus the image well.
           Inventing a visual for it would be worse than leaving it out. */}
       {project.img && (
@@ -268,6 +273,11 @@ function ProjectCard({ project, reduced, index }) {
 const [LEAD, ...SECONDARY] = PROJECTS.filter(p => p.featured);
 const REST = PROJECTS.filter(p => !p.featured);
 
+/* One running file number across the whole section, featured first, so the
+   tabs read as a single drawer rather than restarting under the disclosure. */
+const ORDER = [LEAD, ...SECONDARY, ...REST].filter(Boolean);
+const fileNumber = (project) => String(ORDER.indexOf(project) + 1).padStart(2, '0');
+
 export default function ProjectsSection() {
   const reduced = useReducedMotion();
   // Earlier work starts collapsed so the featured set owns the section.
@@ -290,12 +300,12 @@ export default function ProjectsSection() {
 
         {/* Featured: one lead card, then the remaining featured work paired. */}
         <div className="flex flex-col gap-5">
-          {LEAD && <LeadCard project={LEAD} reduced={reduced} />}
+          {LEAD && <LeadCard project={LEAD} reduced={reduced} fileNo={fileNumber(LEAD)} />}
 
           {SECONDARY.length > 0 && (
             <div className="grid gap-5 md:grid-cols-2">
               {SECONDARY.map((p, i) => (
-                <ProjectCard key={p.title} project={p} reduced={reduced} index={i} />
+                <ProjectCard key={p.title} project={p} reduced={reduced} index={i} fileNo={fileNumber(p)} />
               ))}
             </div>
           )}
@@ -334,7 +344,7 @@ export default function ProjectsSection() {
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 {REST.map((p, i) => (
                   // Stagger resets per row so no card waits on the row above it.
-                  <ProjectCard key={p.title} project={p} reduced={reduced} index={i % 3} />
+                  <ProjectCard key={p.title} project={p} reduced={reduced} index={i % 3} fileNo={fileNumber(p)} />
                 ))}
               </div>
             </div>
