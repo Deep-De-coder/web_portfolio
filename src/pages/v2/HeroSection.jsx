@@ -212,7 +212,7 @@ export default function HeroSection() {
                     flexShrink: 0,
                   }}
                 />
-                WebGPU · the assistant on this page runs on your GPU
+                WebGPU · Erevna runs on your GPU
               </span>
             </motion.p>
           </div>

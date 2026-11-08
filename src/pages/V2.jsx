@@ -105,7 +105,7 @@ export default function V2() {
             className="v2-meta"
             style={{ marginTop: 'clamp(1.75rem, 4vh, 2.5rem)', color: 'var(--v2-text-4)' }}
           >
-            Built with React, three.js and WebLLM. The assistant on this page runs on your own GPU.
+            Built with React, three.js and WebLLM. Erevna, the assistant on this page, runs on your own GPU.
           </p>
         </div>
       </footer>

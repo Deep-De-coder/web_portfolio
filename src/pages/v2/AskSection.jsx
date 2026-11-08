@@ -227,8 +227,8 @@ export default function AskSection() {
     } catch (err) {
       throw new Error(
         err.name === 'AbortError'
-          ? "The fallback service didn't respond in time. Your browser needs WebGPU to run the assistant locally."
-          : "Couldn't reach the fallback service. Your browser needs WebGPU to run the assistant locally."
+          ? "The fallback service didn't respond in time. Your browser needs WebGPU to run Erevna locally."
+          : "Couldn't reach the fallback service. Your browser needs WebGPU to run Erevna locally."
       );
     } finally {
       clearTimeout(timeoutId);
@@ -358,7 +358,7 @@ export default function AskSection() {
             </h2>
 
             <p className="v2-lede">
-              This assistant is a language model running on your own GPU through WebGPU. It
+              Erevna is a language model running on your own GPU through WebGPU. It
               downloads once, then answers with no API call and no server round trip, nothing
               you type here ever leaves the tab.
             </p>
@@ -400,12 +400,12 @@ export default function AskSection() {
               role="log"
               aria-live="polite"
               aria-relevant="additions"
-              aria-label="Conversation with the in-browser assistant"
+              aria-label="Conversation with Erevna, the in-browser assistant"
             >
               {!hasMessages && (
                 <div className="term__boot">
                   <p>
-                    <span className="term__name">deep-assistant</span>{' '}
+                    <span className="term__name">erevna</span>{' '}
                     <span className="term__figure">1.0</span>{' '}
                     <span className="term__faint">·</span>{' '}
                     <span className="term__dim">language model, on your GPU, via WebGPU</span>

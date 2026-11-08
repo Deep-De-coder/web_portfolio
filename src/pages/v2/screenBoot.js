@@ -99,7 +99,7 @@ export function drawScreen(ctx, W, H, stage, t) {
     ctx.fillStyle = INK;
     ctx.textAlign = 'left';
     ctx.font = `600 ${Math.round(H * 0.04)}px "DM Sans", system-ui, sans-serif`;
-    ctx.fillText('Ask Deep · running locally', pad + H * 0.03, H * 0.06);
+    ctx.fillText('Erevna · running locally', pad + H * 0.03, H * 0.06);
     ctx.textAlign = 'right';
     ctx.fillStyle = 'rgba(34,211,238,0.7)';
     ctx.font = `500 ${Math.round(H * 0.03)}px "DM Sans", system-ui, sans-serif`;
