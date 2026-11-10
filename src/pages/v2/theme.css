@@ -247,15 +247,21 @@
   transition:
     border-color var(--v2-t) var(--v2-ease),
     box-shadow var(--v2-t) var(--v2-ease),
-    transform var(--v2-t) var(--v2-ease);
+    translate var(--v2-t) var(--v2-ease);
 }
 
 /* The dark system drew a lit top edge here. On paper that reads as a seam,
    so the card is defined by its rule alone. */
 .v2-card::before { content: none; }
 
+/* The lift uses `translate`, not `transform`. These cards are framer-motion
+   elements, and framer writes the entrance animation to inline `transform`,
+   settling on `transform: none` once it finishes. An inline declaration beats
+   a stylesheet one, so a `transform` lift here never applied at all. The
+   `translate` property is a separate longhand that framer leaves alone, and
+   it composes with whatever transform framer owns. */
 .v2-card--interactive:hover {
-  transform: translateY(-2px);
+  translate: 0 -2px;
   border-color: var(--v2-line-strong);
   box-shadow: var(--v2-shadow);
 }
@@ -618,5 +624,5 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .v2-card--interactive:hover { transform: none; }
+  .v2-card--interactive:hover { translate: none; }
 }
