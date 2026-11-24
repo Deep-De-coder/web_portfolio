@@ -103,7 +103,11 @@ export const projects = [
   {
     title: 'Lowlight Diffusion Restoration',
     demoLink: '',
-    codeLink: 'https://github.com/Deep-De-coder/lowlight_diffusion_restoration',
+    // Deep-De-coder/lowlight_diffusion_restoration 404s, so the repo is gone
+    // or private. A Code button that lands on a GitHub 404 is worse than no
+    // button, and the card renders fine without links. Put the URL back here
+    // once the repo is public again.
+    codeLink: '',
     tagline: 'A camera-style pipeline that restores dark, noisy photos.',
     summary:
       'Built on a diffusion img2img backbone fine-tuned with LoRA on LOL and SID, with optional edge-guided conditioning to reduce artifacts and keep structure intact. Benchmarking, inference optimizations and profiling tools are part of the project, so it is engineered as a measurable system rather than a demo.',
