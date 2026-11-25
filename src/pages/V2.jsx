@@ -56,15 +56,25 @@ export default function V2() {
 
   return (
     <div className="v2" style={{ position: 'relative', minHeight: '100vh' }}>
+      <a className="v2-skip" href="#v2-main">
+        Skip to content
+      </a>
+
       <NavBar />
-      <HeroSection />
-      <AboutSection />
-      <AskSection />
-      <ProjectsSection />
-      <ExperienceSection />
-      <EducationSection />
-      <SkillsSection />
-      <PublicationsSection />
+
+      {/* tabIndex -1 so following the skip link moves focus here and not just
+          the scroll position: without it the next Tab goes back to the top of
+          the nav, which is exactly what the link was meant to avoid. */}
+      <main id="v2-main" className="v2-main" tabIndex={-1}>
+        <HeroSection />
+        <AboutSection />
+        <AskSection />
+        <ProjectsSection />
+        <ExperienceSection />
+        <EducationSection />
+        <SkillsSection />
+        <PublicationsSection />
+      </main>
 
       <footer style={{ position: 'relative', paddingBlock: 'clamp(3rem, 7vh, 4.5rem)' }}>
         <div className="v2-container">

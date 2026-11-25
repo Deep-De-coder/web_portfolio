@@ -616,6 +616,52 @@
   border-radius: 2px;
 }
 
+/* Skip link. The masthead puts nine tab stops in front of the page, so a
+   keyboard or switch user otherwise walks the whole nav on every visit.
+   Resting state is clipped to 1px rather than hidden with display or
+   visibility, which would take it out of the tab order and defeat the point.
+   Nothing visual lives here: padding and a border would give the clipped box
+   real area over the masthead logo, so the whole look sits in :focus. */
+.v2-skip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+/* Above the fixed masthead (z-index 50) and the grain overlay (100). */
+.v2-skip:focus {
+  width: auto;
+  height: auto;
+  margin: 0.75rem;
+  padding: 0.6875rem 1rem;
+  overflow: visible;
+  clip-path: none;
+
+  border: 1px solid var(--v2-line-strong);
+  border-radius: var(--v2-r-lg);
+  background: var(--v2-surface-1);
+  box-shadow: var(--v2-shadow);
+
+  font-family: var(--v2-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--v2-text-1);
+}
+
+/* The skip target is focused programmatically, so no ring: the heading that
+   follows is what the user is being handed. */
+.v2-main:focus {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .v2 *,
   .v2 *::before,
